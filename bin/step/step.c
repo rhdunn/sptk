@@ -18,7 +18,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: step-main.c,v 1.1 1996/04/30 12:45:57 koishida Exp koishida $";
+static char *rcs_id = "$Id: step.c,v 1.1.1.1 2000/03/01 13:58:51 yossie Exp $";
 
 
 /*  Standard C Libraries  */

@@ -24,7 +24,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id:$";
+static char *rcs_id = "$Id: merge.c,v 1.1.1.1 2000/03/01 13:58:41 yossie Exp $";
 
 
 /*  Standard C Libraries  */
@@ -59,7 +59,9 @@ void usage(int status)
     fprintf(stderr, "  options:\n");
     fprintf(stderr, "       -s s  : insert point                [%d]\n",START);
     fprintf(stderr, "       -l l  : frame length of input data  [%d]\n",LENG1);
-    fprintf(stderr, "       -n n  : frame length of output data [%d]\n",LENG2);
+    fprintf(stderr, "       -n n  : l - 1                       [%d]\n",LENG1-1);
+    fprintf(stderr, "       -L L  : frame length of insert data [%d]\n",LENG2);
+    fprintf(stderr, "       -N N  : L - 1                       [%d]\n",LENG2-1);
     fprintf(stderr, "       -o    : over write mode             [%s]\n",BOOL[WRITE]);
     fprintf(stderr, "       +type : data type                   [f]\n");
     fprintf(stderr, "                c (char)      s (short)\n");
@@ -101,7 +103,15 @@ void main(int argc, char **argv)
 		    --argc;
 		    break;
 		case 'n':
+		    leng1 = atoi(*++argv)+1;
+		    --argc;
+		    break;
+		case 'L':
 		    leng2 = atoi(*++argv);
+		    --argc;
+		    break;
+		case 'N':
+		    leng2 = atoi(*++argv)+1;
 		    --argc;
 		    break;
 		case 'o':

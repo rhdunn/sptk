@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: acep.c,v 1.1 1996/04/06 09:19:29 koishida Exp koishida $
+    $Id: _acep.c,v 1.1.1.1 2000/03/01 13:58:26 yossie Exp $
 
     Adaptive Cepstral Analysis
 

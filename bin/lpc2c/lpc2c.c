@@ -21,7 +21,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: lpc2c-main.c,v 1.1 1996/02/28 09:04:02 koishida Exp koishida $";
+static char *rcs_id = "$Id: lpc2c.c,v 1.1.1.1 2000/03/01 13:58:39 yossie Exp $";
 
 
 /*  Standard C Libraries  */

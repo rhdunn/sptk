@@ -22,7 +22,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: ramp-main.c,v 1.1 1996/05/01 01:43:41 koishida Exp koishida $";
+static char *rcs_id = "$Id: ramp.c,v 1.1.1.1 2000/03/01 13:58:49 yossie Exp $";
 
 
 /*  Standard C Libraries  */

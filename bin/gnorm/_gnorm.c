@@ -1,5 +1,5 @@
 /************************************************************************
-  $Id: gnorm.c,v 1.1 1996/03/29 06:24:22 koishida Exp koishida $
+  $Id: _gnorm.c,v 1.1.1.1 2000/03/01 13:58:27 yossie Exp $
 
     Gain Normalization
 	

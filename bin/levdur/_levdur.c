@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: levdur.c,v 1.1 1996/02/28 08:22:23 koishida Exp koishida $
+    $Id: _levdur.c,v 1.1.1.1 2000/03/01 13:58:38 yossie Exp $
 
     Solve an Autocorrelation Normal Equation
 			Using Levinson-Durbin Method

@@ -13,13 +13,14 @@
 *		-s       :  subtraction    (a - b)			*
 *		-m       :  multiplication (a * b)			*
 *		-d       :  division       (a / b)			*
+*		-ATAN2   :  atan2          atan2(b,a)			*
 *	notice:								*
 *		file1    : vector a. stdin for default			*
 *		file2    : vector b. stdin for default			*
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id:$";
+static char *rcs_id = "$Id: vopr.c,v 1.1.1.1 2000/03/01 13:58:51 yossie Exp $";
 
 typedef enum _Boolean {FA, TR} Boolean;
 char *BOOL[] = {"FALSE", "TRUE"};
@@ -56,6 +57,7 @@ void usage(int status)
     fprintf(stderr, "       -s     : subtraction    (a - b)\n");
     fprintf(stderr, "       -m     : multiplication (a * b)\n");
     fprintf(stderr, "       -d     : division       (a / b)\n");
+    fprintf(stderr, "       -ATAN2 : atan2          atan2(b,a)\n");
     fprintf(stderr, "       -h     : print this message\n");
     fprintf(stderr, "  infile:\n");
     fprintf(stderr, "       data vectors (float)                     [stdin]\n");
@@ -70,6 +72,7 @@ void usage(int status)
     exit(status);
 }
 
+double  atan2();
 
 int 	 opr = ' ', leng = LENG;
 Boolean  inv = INV;
@@ -105,6 +108,7 @@ void main(int argc, char **argv)
 		case 'd':
 		case 'm':
 		case 's':
+		case 'A':
 		    opr = c;
 		    break;
 		case 'h':
@@ -172,6 +176,10 @@ FILE	*fp1, *fp2;
 	    case 'd':
 		for(k = 0; k < leng; ++k)
 		    a[k] /= b[k];
+		break;
+  	    case 'A':
+	        for(k = 0; k < leng; ++k)
+		    a[k] = atan2(b[k], a[k]);
 		break;
 	    default:
 		break;

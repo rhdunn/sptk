@@ -17,6 +17,7 @@ set cmnd	= $cmnd:t
 set file
 
 @ start		= 0
+@ term          = -1
 @ numscreen	= 5
 @ numdata	= 2000
 set ymax	= 2000
@@ -35,6 +36,10 @@ while ($i < $#argv)
 	case -s:
 		@ i++
 		set start = $argv[$i]
+		breaksw
+	case -e:
+		@ i++
+		set term = $argv[$i]
 		breaksw
 	case -n:
 		@ i++
@@ -101,6 +106,7 @@ usage:
 	echo2 "       $cmnd [ options ] [ infile ] > stdout"
 	echo2 '  options:'
 	echo2 '       -s  s         : start point                  [0]'
+	echo2 '       -e  e         : end point                    [EOF]'
 	echo2 '       -n  n         : data number of one screen    [N/A]'
 	echo2 '       -i  i         : number of screen             [5]'
 	echo2 '       -y  ymax      : maximum amplitude            [N/A]'
@@ -125,7 +131,13 @@ exit $exit_status
 main:
 
 if ( ! $flagnumdata ) then
-	set wc = ` x2x +{$type}a $file | wc -l `
+	if ( $term > 0 ) then
+		@ wc = $term
+	else
+		set wc = ` x2x +{$type}a $file | wc -l `
+	endif
+	@ wc = $wc - $start
+		
 	@ rest = $wc % $numscreen
 	@ wc /= $numscreen
 	if ($rest) @ wc++

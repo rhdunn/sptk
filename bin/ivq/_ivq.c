@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: ivq.c,v 1.1 1996/04/03 08:01:29 koishida Exp koishida $
+    $Id: _ivq.c,v 1.1.1.1 2000/03/01 13:58:37 yossie Exp $
 
     Decoder of Vector Quantization
 

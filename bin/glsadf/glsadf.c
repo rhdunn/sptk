@@ -11,8 +11,9 @@
 *		-g g     :  -1/gamma 			          [1]	*
 *		-p p     :  frame period		        [100]	*
 *		-i i     :  interpolation period	          [1]	*
-*		-n       :  regard input as normalized			*
+*		-n       :  regard input as normalized	      [FALSE]	*
 *					generalized cepstrum		*
+*		-k	 :  filtering without gain	      [FALSE]	*
 *	infile:								*
 *		generalized cepstral coefficients			*
 *		    , c(0), c(1), ..., c(M),				*
@@ -26,7 +27,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: glsadf-main.c,v 1.1 1996/03/28 08:40:04 koishida Exp koishida $";
+static char *rcs_id = "$Id: glsadf.c,v 1.1.1.1 2000/03/01 13:58:35 yossie Exp $";
 
 
 /*  Standard C Libraries  */
@@ -48,6 +49,7 @@ double	glsadf();
 #define	FPERIOD		100
 #define	IPERIOD		1
 #define	NORM		FA
+#define NGAIN		FA
 
 
 /*  Command Name  */
@@ -68,6 +70,7 @@ void usage(int status)
     fprintf(stderr, "       -i i  : interpolation period          [%d]\n", IPERIOD);
     fprintf(stderr, "       -n    : regard input as normalized\n");
     fprintf(stderr, "               generalized cepstrum          [%s]\n", BOOL[NORM]);
+    fprintf(stderr, "       -k    : filtering without gain        [%s]\n",BOOL[NGAIN]);
     fprintf(stderr, "       -h    : print this message\n");
     fprintf(stderr, "  infile:\n");
     fprintf(stderr, "       filter input (float)                  [stdin]\n");
@@ -84,7 +87,7 @@ void main(int argc, char **argv)
     int		m = ORDER, fprd = FPERIOD, iprd = IPERIOD, stage = STAGE, 
     		i, j;
     FILE	*fp = stdin, *fpc = NULL;
-    Boolean	norm = NORM;
+    Boolean	norm = NORM, ngain = NGAIN;
     double	*c, *inc, *cc, *d, x, gamma;
     
     if ((cmnd = strrchr(argv[0], '/')) == NULL)
@@ -112,6 +115,9 @@ void main(int argc, char **argv)
 		    break;
 		case 'n':
 		    norm = 1 - norm;
+		    break;
+		case 'k':
+		    ngain = 1 - ngain;
 		    break;
 		case 'h':
 		    usage(0);
@@ -154,7 +160,7 @@ void main(int argc, char **argv)
 	for(j=fprd, i=(iprd+1)/2; j--;){
 	    if (freadf(&x, sizeof(x), 1, fp) != 1) exit(0);
 
-	    x *= c[0];
+	    if (!ngain) x *= c[0];
 	    x = glsadf(x, c, m, stage, d);
 	    
 	    fwritef(&x, sizeof(x), 1, stdout);

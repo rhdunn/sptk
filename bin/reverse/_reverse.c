@@ -1,6 +1,6 @@
 /************************************************************************
 
-  $Id: reverse.c,v 1.1 1996/01/22 08:39:16 nmiya Exp nmiya $
+  $Id: _reverse.c,v 1.1.1.1 2000/03/01 13:58:49 yossie Exp $
 
   Reverse the order of data in sequence
       reverse(real* p, int l)

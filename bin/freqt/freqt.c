@@ -23,7 +23,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: freqt-main.c,v 1.1 1996/04/01 09:32:57 koishida Exp koishida $";
+static char *rcs_id = "$Id: freqt.c,v 1.1.1.1 2000/03/01 13:58:34 yossie Exp $";
 
 
 /*  Standard C Libraries  */

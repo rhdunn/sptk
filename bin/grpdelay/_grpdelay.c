@@ -1,5 +1,5 @@
 /***************************************************************
-  $Id: grpdelay.c,v 1.1 1996/02/06 12:38:47 isshiki Exp isshiki $
+  $Id: _grpdelay.c,v 1.1.1.1 2000/03/01 13:58:35 yossie Exp $
 	group delay of digital filter
 		grpdelay(x, gd, size, is_alma);
 

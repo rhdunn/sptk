@@ -39,7 +39,7 @@ set xname = ( 	"Normalized frequency" \
 		"Frequency (kHz)" "" \
 		"Frequency (kHz)" )
 set xs = (	"0 0.25 0.5" \
-		0\ \'1.74\ \"\\pi/2\"\ \'3.14\ \"\\pi\" ""\
+		0\ \'1.57\ \"\\pi/2\"\ \'3.14\ \"\\pi\" ""\
 		"0 1 2 3 4" \
 		"0 1 2 3 4 5" "" ""\
 		"0 2 4 6 8" "" \

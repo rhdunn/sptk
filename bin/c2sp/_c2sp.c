@@ -1,5 +1,5 @@
 /***************************************************************
-    $Id: c2sp.c,v 1.1 1996/04/08 06:42:02 koishida Exp koishida $
+    $Id: _c2sp.c,v 1.1.1.1 2000/03/01 13:58:30 yossie Exp $
 
     Transform cepstrum to spectrum
 

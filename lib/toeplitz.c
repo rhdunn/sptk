@@ -1,5 +1,5 @@
 /****************************************************************
-    $Id:$
+    $Id: toeplitz.c,v 1.1.1.1 2000/03/01 13:58:56 yossie Exp $
 
     Solve a Synmetric Toeplitz Set of Linear Equations	
 

@@ -2,8 +2,8 @@
 # Makefile for commands
 #
 
-TARGET		= average
-SRCS		= _$(TARGET).c $(TARGET).c
+TARGET		= extract
+SRCS		= $(TARGET).c
 OBJS		= $(SRCS:.c=.o)
 
 PREFIX		= /usr/local/SPTK

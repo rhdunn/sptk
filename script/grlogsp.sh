@@ -41,19 +41,27 @@ set help	= 0
 set file
 
 set xname = ( 	"Normalized frequency" \
-		"Normalized frequency (rad)" "" \
+		"Normalized frequency (rad)" \
+		"" \
 		"Frequency (kHz)" \
-		"Frequency (kHz)" "" "" \
-		"Frequency (kHz)" "" \
+		"Frequency (kHz)" \
+		"Frequency (kHz)" \
+		"" \
+		"Frequency (kHz)" \
+		"" \
 		"Frequency (kHz)" )
 set xs = (	"0 0.25 0.5" \
-		0\ \'1.74\ \"\\pi/2\"\ \'3.14\ \"\\pi\" "" \
+		0\ \'1.57\ \"\\pi/2\"\ \'3.14\ \"\\pi\" \
+		"" \
 		"0 1 2 3 4" \
-		"0 1 2 3 4 5" "" ""\
-		"0 2 4 6 8" "" \
+		"0 1 2 3 4 5" \
+		"0 2 4 6" \
+		"" \
+		"0 2 4 6 8" \
+		"" \
 		"0 2 4 6 8 10" )
-set xx = ("0 0.5" "0 3.14" "" "0 4" "0 5" "" "" "0 8" "" "0 10")
-set xl = (0.5 3.14 "" 4 5 "" "" 8 "" 10)
+set xx = ("0 0.5" "0 3.14" "" "0 4" "0 5" "0 6" "" "0 8" "" "0 10")
+set xl = (0.5 3.14 "" 4 5 6 "" 8 "" 10)
 
 set on_x = (25 60 95 130 165)
 
@@ -146,6 +154,10 @@ while ($i < $#argv)
 		@ i++
 		set s = $argv[$i]
 		breaksw
+	case -e:
+		@ i++
+		set e = $argv[$i]
+		breaksw
 	case -l:
 		@ i++
 		@ l = $argv[$i]
@@ -178,7 +190,7 @@ goto main
 
 usage:
 	echo2 ''
-	echo2 " $cmnd - draw a runnig log spectrum graph"
+	echo2 " $cmnd - draw a running log spectrum graph"
 	echo2 ''
 	echo2 '  usage:'
 	echo2 '       grlogsp.sh [ options ] [ infile ] > stdout'
@@ -208,11 +220,12 @@ endif
 	echo2 '       -p   p         : pen no.                      [2]'
 	echo2 '       -ln  ln        : line number                  [1]'
 	echo2 '       -s   s         : start frame number           [0]'
+	echo2 '       -e   e         : end frame number             [EOF]'
 	echo2 '       -n   n         : number of frame              [EOF]'
 	echo2 '       -l   l         : frame length                 [256]'
-	echo2 '       -c   "c"       : coment for the graph         [""]'
-	echo2 '       -c2  "c2"      : coment for the graph         [""]'
-	echo2 '       -c3  "c3"      : coment for the graph         [""]'
+	echo2 '       -c   "c"       : comment for the graph        [""]'
+	echo2 '       -c2  "c2"      : comment for the graph        [""]'
+	echo2 '       -c3  "c3"      : comment for the graph        [""]'
 	echo2 '       -h             : print this message'
 	echo2 '       -help          : print help in detail'
 if ( $help ) then
@@ -230,6 +243,7 @@ if ( $help ) then
 	echo2 '       -cy2 cy2       : second comment position      [-14]'
 	echo2 '       -cy3 cy3       : third comment position       [-20]'
 	echo2 '       -cs  cs        : comment size                 [1]'
+	echo2 '       -f   f         : additional data file for fig [NULL]'
 endif
 	echo2 '  infile:'
 	echo2 '       log spectrum (float)                          [stdin]'
@@ -306,11 +320,22 @@ fig $T -W $w -H $h -o $xo $yo -g $g << EOF
 	xname "$xname[$x]"
 EOF
 
+if ($?f) then
+	fig $f -W $w -H $h -o $xo $yo -g 0
+endif
+
 @ lhi = $l / 2 + 1
 @ s = $s * $lhi
 
 if ($?n) then
 	@ e = $s + $n * $lhi - 1
+	set ee = "-e $e"
+else if ($?e) then
+	@ e = $e * $lhi - 1
+	if( $e < $s ) then
+		echo2 "${cmnd}: invalid start or end frame number"
+		exit 1
+	endif
 	set ee = "-e $e"
 else
 	set ee = ""

@@ -28,13 +28,17 @@ static char *rcs_id = "$Id:";
 #include <string.h>
 
 
+typedef enum _Boolean {FA, TR} Boolean;
+char *BOOL[] = {"FALSE", "TRUE"};
+
+
 /* Required Functions */
 void phase();
 
 
 /* Default Values */
 #define	FLMLNG	256
-
+#define UNLAP	TR
 
 /* Command Name */
 char 	*cmnd;
@@ -54,6 +58,7 @@ int status;
 	fprintf(stderr, "       -z z  : denominator cofficients file\n");
 	fprintf(stderr, "       -m m  : order of denominator polynomial [L-1]\n");
 	fprintf(stderr, "       -n n  : order of numerator polynomial   [L-1]\n");
+	fprintf(stderr, "       -u    : unlapping                       [%s]\n",BOOL[UNLAP]);
 	fprintf(stderr, "       -h    : print this message\n");
 	fprintf(stderr, "  infile:\n");
 	fprintf(stderr, "       data sequence (float)                   [stdin]\n");
@@ -69,6 +74,7 @@ main(argc, argv)
 {
 
 	int flng = FLMLNG, m = -1, n = -1;
+	int unlap = UNLAP;
 	double *p, *z, *ph;
 	char *file_z = "", *file_p = "";
 	FILE *fp_z, *fp_p;
@@ -81,22 +87,29 @@ main(argc, argv)
 
 	while (--argc)
 		if (**++argv == '-'){
-			argc--;
 			switch (*(*argv+1)) {
 			case 'm':
 				m = atoi(*++argv);
+				--argc;
 				break;
 			case 'n':
 				n = atoi(*++argv);
+				--argc;
 				break;
 			case 'l':
 				flng = atoi(*++argv);
+				--argc;
 				break;
 			case 'z':
 				file_z = *++argv;
+				--argc;
 				break;
 			case 'p':
 				file_p = *++argv;
+				--argc;
+				break;
+			case 'u':
+				unlap = 1 - unlap;
 				break;
 			case 'h':
 				usage(0);
@@ -142,7 +155,7 @@ main(argc, argv)
 			if(freadf(p, sizeof(*p), m+1, fp_p) == 0 )
 				exit(0);
 		}
-		phase(p, m, z, n, ph, flng);	
+		phase(p, m, z, n, ph, flng, unlap);	
 		fwritef(ph, sizeof(*ph), no, stdout);
 	}
 	exit(0);

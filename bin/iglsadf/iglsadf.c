@@ -11,9 +11,9 @@
 *		-g g     :  -1/gamma 			          [1]	*
 *		-p p     :  frame period		        [100]	*
 *		-i i     :  interpolation period	          [1]	*
-*		-n       :  regard input as normalized			*
+*		-n       :  regard input as normalized        [FALSE]	*
 *			    generalized cepstrum			*
-*		-k	 :  filtering without gain			*
+*		-k	 :  filtering without gain	      [FALSE]	*
 *	infile:								*
 *		generalized cepstral coefficients			*
 *		    , c(0), c(1), ..., c(M),				*
@@ -27,7 +27,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id:$";
+static char *rcs_id = "$Id: iglsadf.c,v 1.1.1.1 2000/03/01 13:58:27 yossie Exp $";
 
 
 /*  Standard C Libraries  */

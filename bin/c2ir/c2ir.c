@@ -7,8 +7,9 @@
 *	usage:								*
 *		c2ir [ options ] [ infile ] > stdout			*
 *	options:       							*
-*		-l l	 :  length of impulse responce   [256]		*
 *		-m m	 :  order of cepstrum            [25]		*
+*		-M M	 :  order of impulse response    [255]		*
+*		-L L	 :  length of impulse responce   [256]		*
 *		-i	 :  input is minimum phase sequence		*
 *	infile:								*
 *		stdin for default					*
@@ -16,7 +17,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id="$Id: c2ir-main.c,v 1.1 1996/04/15 05:16:27 isshiki Exp isshiki $";
+static char *rcs_id="$Id: c2ir.c,v 1.1.1.1 2000/03/01 13:58:30 yossie Exp $";
 
 
 /* Standard C Libraries */
@@ -48,8 +49,9 @@ int status;
 	fprintf(stderr, "  usage:\n");
 	fprintf(stderr, "       %s [ options ] [ infile ] > stdout\n", cmnd);
 	fprintf(stderr, "  options:\n");
-	fprintf(stderr, "       -l l  : length of impulse response   [%d]\n", LENG);
 	fprintf(stderr, "       -m m  : order of cepstrum            [%d]\n", ORDER);
+	fprintf(stderr, "       -M M  : order of impulse response    [%d]\n", LENG-1);
+	fprintf(stderr, "       -L L  : length of impulse response   [%d]\n", LENG);
 	fprintf(stderr, "       -i    : input minimum phase sequence \n");
 	fprintf(stderr, "       -h    : print this message\n\n");
 	fprintf(stderr, "  infile:\n");
@@ -86,11 +88,14 @@ char	*argv[];
 			case 'i':
 				is_i = 1;
 				break;
-			case 'l':
-				leng = atoi(s);
-				break;
 			case 'm':
 				nc = atoi(s) + 1;
+				break;
+			case 'M':
+				leng = atoi(s) + 1;
+				break;
+			case 'L':
+				leng = atoi(s);
 				break;
 			case 'h':
 				usage(0);				

@@ -17,7 +17,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: impulse-main.c,v 1.1 1996/04/30 12:46:44 koishida Exp koishida $";
+static char *rcs_id = "$Id: impulse.c,v 1.1.1.1 2000/03/01 13:58:37 yossie Exp $";
 
 
 /*  Standard C Libralies  */

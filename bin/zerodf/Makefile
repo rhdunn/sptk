@@ -15,7 +15,7 @@ INSTALL		= install -cs
 
 INCDIR		= -I../../include
 LIBDIR		= -L../../lib
-CFLAGS		= -O2 $(INCDIR)
+CFLAGS		= -O2 $(INCDIR) -g -Wall
 LDFLAGS		= $(LIBDIR)
 LIBS		= -lSPTK -lm
 

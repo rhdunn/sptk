@@ -142,7 +142,7 @@ bbox( fp, xmin, ymin, xmax, ymax, shrink, xoffset, yoffset, bbm )
 	plot_xmax = 4000;
 	plot_ymax = 2850;
 
-	while ( (c=getc(fp)) != EOF )  {
+	while ( (c=getc(fp)) != (char)EOF )  {
 		switch (c)  {
 		    case 'M':	fscanf(fp, "%d %d", &x, &y);
 				*xmin = plot_min(x, *xmin, plot_xmin);

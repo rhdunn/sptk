@@ -20,7 +20,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: delay-main.c,v 1.1 1996/04/11 04:34:41 koishida Exp koishida $";
+static char *rcs_id = "$Id: delay.c,v 1.1.1.1 2000/03/01 13:58:31 yossie Exp $";
 
 
 /*  Standard C Libraries  */

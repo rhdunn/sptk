@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: poledf.c,v 1.1 1996/03/25 05:17:41 koishida Exp koishida $
+    $Id: _poledf.c,v 1.1.1.1 2000/03/01 13:58:35 yossie Exp $
 
     All Pole Digital Filter
 

@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: agcep.c,v 1.1 1996/04/06 09:23:18 koishida Exp koishida $
+    $Id: _agcep.c,v 1.1.1.1 2000/03/01 13:58:28 yossie Exp $
 
     Adaptive Generalized Cepstral Analysis
 

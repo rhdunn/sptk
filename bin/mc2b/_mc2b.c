@@ -1,5 +1,5 @@
 /***************************************************************
-    $Id: mc2b.c,v 1.1 1996/02/28 05:00:01 koishida Exp koishida $
+    $Id: _mc2b.c,v 1.1.1.1 2000/03/01 13:58:28 yossie Exp $
 
     Transform Mel Cepstrum to MLSA Digital Filter Coefficients
 

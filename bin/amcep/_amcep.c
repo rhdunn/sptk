@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: amcep.c,v 1.1 1996/04/06 09:20:57 koishida Exp koishida $
+    $Id: _amcep.c,v 1.1.1.1 2000/03/01 13:58:28 yossie Exp $
 
     Adaptive Mel Cepstral Analysis
 

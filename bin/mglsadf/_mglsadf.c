@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: mglsadf.c,v 1.1 1996/03/30 09:30:53 koishida Exp koishida $
+    $Id: _mglsadf.c,v 1.1.1.1 2000/03/01 13:58:44 yossie Exp $
 
     MGLSA Digital Filter
 

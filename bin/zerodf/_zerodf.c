@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: zerodf.c,v 1.1 1996/03/25 06:03:18 koishida Exp koishida $
+    $Id: _zerodf.c,v 1.1.1.1 2000/03/01 13:58:27 yossie Exp $
 
     All Zero Digital Filter
 
@@ -22,7 +22,8 @@ int	m;
     register int  i;
     double 	  out;
 
-    out = b[0] * x;
+    out = b[0]*x;
+
     for(m--; m>0; m--){
 	out += b[m+1] * d[m];
 	d[m] = d[m-1];
@@ -40,7 +41,7 @@ int	m;
     register int        i;
     double              out;
 
-    out = b[0] * x + d[0];
+    out = b[0]*x + d[0];
 
     for(i=1; i<m; i++)
 	d[i-1] = b[i] * x + d[i];

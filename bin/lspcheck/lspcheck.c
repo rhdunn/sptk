@@ -7,7 +7,7 @@
 *	usage:								*
 *		lspcheck [ options ] [ infile ] > stdout		*
 *	options:							*
-*		-m m     :  order of LSP		[24]		*
+*		-m m     :  order of LSP		[25]		*
 *		-s s     :  sampling frequency (kHz)	[10]		*
 *		-k	 :  input & output gain		[FALSE]		*
 *		-i i     :  input format (see infile)	[0]		*
@@ -27,7 +27,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: lspcheck-main.c,v 1.1 1996/06/28 08:54:35 koishida Exp koishida $";
+static char *rcs_id = "$Id: lspcheck.c,v 1.1.1.1 2000/03/01 13:58:40 yossie Exp $";
 
 
 typedef enum _Boolean {FA, TR} Boolean;
@@ -40,7 +40,7 @@ char *BOOL[] = {"FALSE", "TRUE"};
 
 
 /*  Default Values  */
-#define ORDER		24
+#define ORDER		25
 #define ITYPE		0
 #define OTYPE		-1
 #define SAMPLING	10

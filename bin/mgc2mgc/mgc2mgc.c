@@ -33,7 +33,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: mgc2mgc-main.c,v 1.1 1996/04/08 07:17:36 koishida Exp koishida $";
+static char *rcs_id = "$Id: mgc2mgc.c,v 1.1.1.1 2000/03/01 13:58:42 yossie Exp $";
 
 
 /*  Standard C Libraries  */

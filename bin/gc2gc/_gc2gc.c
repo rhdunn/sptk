@@ -1,5 +1,5 @@
 /***************************************************************
-    $Id: gc2gc.c,v 1.1 1996/04/03 07:41:30 koishida Exp koishida $
+    $Id: _gc2gc.c,v 1.1.1.1 2000/03/01 13:58:34 yossie Exp $
 
     Generalized Cepstral Transformation	
 
@@ -13,27 +13,43 @@
 	double	g2	: gamma of gc2
 
 *****************************************************************/
+#include <stdio.h>
+#include <SPTK.h>
 
 void gc2gc(c1, m1, g1, c2, m2, g2)
 double 	*c1, *c2, g1, g2;
 int 	m1, m2;
 {
-    double 	ss1, ss2, cc;
-    int 	i, min, k, mk;
-    
-    c2[0] = c1[0];
+    int 	  i, min, k, mk;
+    double 	  ss1, ss2, cc;
+    static double *ca = NULL;
+    static int    size;
+
+    if(ca == NULL){
+        ca = dgetmem(m1+1);
+	size = m1;
+    }
+    if(m1 > size){
+        free(ca);
+        ca = dgetmem(m1+1);
+	size = m1;
+    }
+
+    movem(c1, ca, sizeof(*c1), m1+1);
+
+    c2[0] = ca[0];
     for (i = 1; i <= m2; i++){
 	ss1 = ss2 = 0.0;
 	min = m1 < i ? m1 : i - 1;
 	for (k = 1; k <= min; k++){
 	    mk = i - k;
-	    cc = c1[k] * c2[mk];
+	    cc = ca[k] * c2[mk];
 	    ss2 += k * cc;
 	    ss1 += mk * cc;
 	}
 
 	if (i <= m1)
-	    c2[i] = c1[i] + (g2*ss2 - g1*ss1)/i;
+	    c2[i] = ca[i] + (g2*ss2 - g1*ss1)/i;
 	else
 	    c2[i] = (g2*ss2 - g1*ss1)/i;
     }

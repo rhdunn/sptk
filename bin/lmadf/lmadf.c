@@ -12,6 +12,7 @@
 *		-p p     :  frame period		[100]		*
 *		-i i     :  interpolation period	[1]		*
 *		-P P	 :  order of pade approximation [4]		*
+*		-k	 :  filtering without gain  [FALSE]		*
 *	infile:								*
 *		cepstral coefficients					*
 *		    , c~(0), c~(1), ..., c~(M),				*
@@ -27,13 +28,16 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: lmadf-main.c,v 1.1 1996/04/01 09:24:25 koishida Exp koishida $";
+static char *rcs_id = "$Id: lmadf.c,v 1.1.1.1 2000/03/01 13:58:26 yossie Exp $";
 
 
 /*  Standard C Libraries  */
 #include <stdio.h>
 #include <string.h>
 #include <SPTK.h>
+
+typedef enum _Boolean {FA, TR} Boolean;
+char *BOOL[] = {"FALSE", "TRUE"};
 
 
 /*  Required Functions  */
@@ -45,6 +49,7 @@ double	lmadf(), exp();
 #define	FPERIOD		100
 #define	IPERIOD		1
 #define PADEORD 	4
+#define NGAIN		FA
 
 
 /*  Command Name  */
@@ -63,6 +68,7 @@ void usage(int status)
     fprintf(stderr, "       -p p  : frame period                [%d]\n", FPERIOD);
     fprintf(stderr, "       -i i  : interpolation period        [%d]\n", IPERIOD);
     fprintf(stderr, "       -P P  : order of pade approximation [%d]\n", PADEORD);
+    fprintf(stderr, "       -k    : filtering without gain      [%s]\n", BOOL[NGAIN]);
     fprintf(stderr, "       -h    : print this message\n");
     fprintf(stderr, "  infile:\n");
     fprintf(stderr, "       filter input (float)                [stdin]\n");
@@ -82,6 +88,7 @@ void main(int argc, char **argv)
     int		m = ORDER, fprd = FPERIOD, iprd = IPERIOD, i, j, pd = PADEORD;
     FILE	*fp = stdin, *fpc = NULL;
     double	*c, *inc, *cc, *d, x;
+    Boolean	ngain = NGAIN;
     
     if ((cmnd = strrchr(argv[0], '/')) == NULL)
 	cmnd = argv[0];
@@ -105,6 +112,9 @@ void main(int argc, char **argv)
 		case 'P':
 		    pd = atoi(*++argv);
 		    --argc;
+		    break;
+		case 'k':
+		    ngain = 1 - ngain;
 		    break;
 		case 'h':
 		    usage(0);
@@ -144,7 +154,7 @@ void main(int argc, char **argv)
 	for(j=fprd, i=(iprd+1)/2; j--;){
 	    if (freadf(&x, sizeof(x), 1, fp) != 1) exit(0);
 
-	    x *= exp(c[0]);
+	    if (!ngain) x *= exp(c[0]);
 	    x = lmadf(x, c, m, pd, d);
 	    
 	    fwritef(&x, sizeof(x), 1, stdout);

@@ -14,6 +14,7 @@
 *		-i i     :  interpolation period	 [1]		*
 *		-b       :  mcep is filter coefficient b [FALSE]	*
 *		-P P     :  order of pade approximation	 [4]		*
+*		-k	 :  filtering without gain	 [FALSE]	*
 *	infile:								*
 *		mel cepstral coefficients				*
 *		    , c~(0), c~(1), ..., c~(M),				*
@@ -29,7 +30,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: mlsadf-main.c,v 1.1 1996/04/09 11:26:36 koishida Exp koishida $";
+static char *rcs_id = "$Id: mlsadf.c,v 1.1.1.1 2000/03/01 13:58:28 yossie Exp $";
 
 
 /*  Standard C Libraries  */
@@ -53,6 +54,7 @@ double	mlsadf(), exp();
 #define	IPERIOD		1
 #define	BFLAG		FA
 #define	PADEORDER	4
+#define NGAIN		FA
 
 
 /*  Command Name  */
@@ -73,6 +75,7 @@ void usage(int status)
     fprintf(stderr, "       -i i  : interpolation period         [%d]\n", IPERIOD);
     fprintf(stderr, "       -b    : output filter coefficient b  [%s]\n", BOOL[BFLAG]);
     fprintf(stderr, "       -P P  : order of pade approximation  [%d]\n", PADEORDER);
+    fprintf(stderr, "       -k    : filtering without gain       [%s]\n", BOOL[NGAIN]);
     fprintf(stderr, "       -h    : print this message\n");
     fprintf(stderr, "  infile:\n");
     fprintf(stderr, "       filter input (float)                 [stdin]\n");
@@ -92,7 +95,7 @@ void main(int argc, char **argv)
 		fprd = FPERIOD, iprd = IPERIOD, i, j;
     FILE	*fp = stdin, *fpc = NULL;
     double	*c, *inc, *cc, *d, x, a = ALPHA, atof();
-    Boolean	bflag = BFLAG;
+    Boolean	bflag = BFLAG, ngain = NGAIN;
     
     if ((cmnd = strrchr(argv[0], '/')) == NULL)
 	cmnd = argv[0];
@@ -123,6 +126,9 @@ void main(int argc, char **argv)
 		    break;
 		case 'b':
 		    bflag = 1 - bflag;
+		    break;
+		case 'k':
+		    ngain = 1 - ngain;
 		    break;
 		case 'h':
 		    usage(0);
@@ -166,7 +172,7 @@ void main(int argc, char **argv)
 	for(j=fprd, i=(iprd+1)/2; j--;){
 	    if (freadf(&x, sizeof(x), 1, fp) != 1) exit(0);
 
-	    x *= exp(c[0]);
+	    if (!ngain) x *= exp(c[0]);
 	    x = mlsadf(x, c, m, a, pd, d);
 	    
 	    fwritef(&x, sizeof(x), 1, stdout);

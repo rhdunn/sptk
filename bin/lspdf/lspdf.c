@@ -1,26 +1,19 @@
 /************************************************************************
 *									*
-*    LSP Digital Filter for Speech Synthesis				*
+*    LSP Speech Synthesis Digital Filter				*
 *									*
 *					1996.9  K.Koishida		*
 *									*
 *	usage:								*
 *		lspdf [ options ] [ infile ] > stdout			*
 *	options:							*
-*		-m m     :  order of coefficients	[24]		*
+*		-m m     :  order of coefficients	[25]		*
 *		-p p     :  frame period		[100]		*
 *		-i i     :  interpolation period	[1]		*
-*		-s s	 :  sampling frequency		[10]		*
-*		-o o	 :  input format		[0]		*
+*		-k	 :  filtering without gain      [FALSE]		*
 *	infile:								*
 *		coefficients						*
-*             	    input format      LSP                               *
-*                     	   0    normalized frequency (0 ~ pi)           *
-*                   	   1    normalized frequency (0 ~ 0.5)          *
-*                   	   2    frequency (kHz)                         *
-*                   	   3    frequency (Hz)                          *
-*                   LSP                                                 *
-*		           , K, f(1), ..., f(m),			*
+*		    , K, f(1), ..., f(m),				*
 *		excitation sequence					*
 *		    , x(0), x(1), ..., 					*
 *	stdout:								*
@@ -28,54 +21,54 @@
 *		    , y(0), y(1), ...,					*
 *	require:							*
 *		lspdf_even()						*
+*		lspdf_odd()						*
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: lspdf-main.c,v 1.1 1996/09/17 05:07:18 koishida Exp koishida $";
+static char *rcs_id = "$Id: lspdf.c,v 1.1.1.1 2000/03/01 13:58:41 yossie Exp $";
 
 
-/*  Standard C Libraries  */
+/*  Standard C Libralies  */
 #include <stdio.h>
 #include <string.h>
 #include <SPTK.h>
 
+typedef enum _Boolean {FA, TR} Boolean;
+char *BOOL[] = {"FALSE", "TRUE"};
+
 
 /*  Required Functions  */
 double	lspdf_even();
+double	lspdf_odd();
 
 
 /*  Default Values  */
-#define ORDER		24
+#define ORDER		25
 #define	FPERIOD		100
 #define	IPERIOD		1
-#define ITYPE		0
-#define SAMPLING	10
+#define	TRANSPOSE	FA
+#define NGAIN		FA
 
 
 /*  Command Name  */
 char	*cmnd;
 
-
 void usage(int status)
 {
     fprintf(stderr, "\n");
-    fprintf(stderr, " %s - LSP digital filter for speech synthesis\n",cmnd);
+    fprintf(stderr, " %s - LSP speech synthesis digital filter\n",cmnd);
     fprintf(stderr, "\n");
     fprintf(stderr, "  usage:\n");
     fprintf(stderr, "       %s [ options ] lspfile [ infile ] > stdout\n", cmnd);
     fprintf(stderr, "  options:\n");
-    fprintf(stderr, "       -m m  : order of coefficients [%d]\n", ORDER);
-    fprintf(stderr, "       -p p  : frame period          [%d]\n", FPERIOD);
-    fprintf(stderr, "       -i i  : interpolation period  [%d]\n", IPERIOD);
-    fprintf(stderr, "       -s s  : sampling frequency    [%d]\n", SAMPLING);
-    fprintf(stderr, "       -o o  : input format          [%d]\n", ITYPE);
-    fprintf(stderr, "                 0 (normalized frequency <0...pi>)\n");
-    fprintf(stderr, "                 1 (normalized frequency <0...0.5>)\n");
-    fprintf(stderr, "                 2 (frequency (kHz))\n");
-    fprintf(stderr, "                 3 (frequency (Hz))\n");
+    fprintf(stderr, "       -m m  : order of coefficients  [%d]\n", ORDER);
+    fprintf(stderr, "       -p p  : frame period           [%d]\n", FPERIOD);
+    fprintf(stderr, "       -i i  : interpolation period   [%d]\n", IPERIOD);
+/*    fprintf(stderr, "       -t    : transpose filter      [%s]\n", BOOL[TRANSPOSE]);*/
+    fprintf(stderr, "       -k    : filtering without gain [%s]\n", BOOL[NGAIN]);
     fprintf(stderr, "       -h    : print this message\n");
     fprintf(stderr, "  infile:\n");
-    fprintf(stderr, "       filter input (float)          [stdin]\n");
+    fprintf(stderr, "       filter input (float)           [stdin]\n");
     fprintf(stderr, "  stdout:\n");
     fprintf(stderr, "       filter output (float)\n");
     fprintf(stderr, "  lspfile:\n");
@@ -87,10 +80,11 @@ void usage(int status)
 
 void main(int argc, char **argv)
 {
-    int		m = ORDER, fprd = FPERIOD, iprd = IPERIOD,
-		itype = ITYPE, sampling = SAMPLING, i, j;
+    int		m = ORDER, fprd = FPERIOD, iprd = IPERIOD, tp = TRANSPOSE, 
+                i, j, flag_odd;
     FILE	*fp = stdin, *fpc = NULL;
     double	*c, *inc, *cc, *d, x;
+    Boolean	ngain = NGAIN;
     
     if ((cmnd = strrchr(argv[0], '/')) == NULL)
 	cmnd = argv[0];
@@ -111,13 +105,11 @@ void main(int argc, char **argv)
 		    iprd = atoi(*++argv);
 		    --argc;
 		    break;
-		case 's':
-		    sampling = atoi(*++argv);
-		    --argc;
-		    break;
-		case 'o':
-		    itype = atoi(*++argv);
-		    --argc;
+/*		case 't':
+		    tp = 1 - tp;
+		    break;*/
+		case 'k':
+		    ngain = 1 - ngain;
 		    break;
 		case 'h':
 		    usage(0);
@@ -131,15 +123,13 @@ void main(int argc, char **argv)
 	else
 	    fp = getfp(*argv, "r");
 
-    if (m % 2 != 0){
-	fprintf(stderr,"%s : Order of LSP must be even!\n",cmnd);
-	exit(1);
-    }
-    
     if(fpc == NULL){
 	fprintf(stderr,"%s : Cannot open LSP file!\n",cmnd);
 	exit(1);
     }
+
+    if(m % 2 == 0) flag_odd = 0;
+    else           flag_odd = 1;
 
     c = dgetmem(5*m+4);
     cc  = c  + m + 1;
@@ -148,31 +138,8 @@ void main(int argc, char **argv)
     
     if(freadf(c, sizeof(*c), m+1, fpc) != m+1) exit(1);
 
-    if(itype == 1)
-        for(i=1; i<m+1; i++)
-            c[i] *= PI2;
-    else if (itype == 2 || itype == 3)
-        for(i=1; i<m+1; i++)
-            c[i] *= PI2 / sampling;
-    
-    if(itype == 3)
-        for(i=1; i<m+1; i++)
-            c[i] /= 1000;
-
-
     for(;;){
 	if(freadf(cc, sizeof(*cc), m+1, fpc) != m+1) exit(0);
-
-	if(itype == 1)
-            for(i=1; i<m+1; i++)
-                cc[i] *= PI2;
-        else if (itype == 2 || itype == 3)
-            for(i=1; i<m+1; i++)
-                cc[i] *= PI2 / sampling ;
-    
-        if(itype == 3)
-            for(i=1; i<m+1; i++)
-                cc[i] /= 1000;
 	
 	for(i=0; i<=m; i++)
 	    inc[i] = (cc[i] - c[i])*iprd / fprd;
@@ -180,9 +147,12 @@ void main(int argc, char **argv)
 	for(j=fprd, i=(iprd+1)/2; j--;){
 	    if (freadf(&x, sizeof(x), 1, fp) != 1) exit(0);
 
-	    x *= c[0];
+	    if (!ngain) x *= c[0];
 
-	    x = lspdf_even(x, c, m, d);
+	    if(flag_odd)
+	        x = lspdf_odd(x, c, m, d);
+	    else
+	        x = lspdf_even(x, c, m, d);
 
 	    fwritef(&x, sizeof(x), 1, stdout);
 			

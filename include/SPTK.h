@@ -12,7 +12,14 @@
 #define ABS(x)	(x < 0. ? -x : x)
 /* #endif */
 
-extern char	*windows[];
+typedef enum _Window {
+	BLACKMAN,
+	HAMMING,
+	HANNING,
+	BARTLETT,
+	TRAPEZOID,
+	RECTANGULAR
+} Window;
 
 void	fillz();
 void	movem()	;

@@ -19,7 +19,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: ivq-main.c,v 1.1 1996/04/03 08:01:29 koishida Exp koishida $";
+static char *rcs_id = "$Id: ivq.c,v 1.1.1.1 2000/03/01 13:58:37 yossie Exp $";
 
 
 /*  Standard C Libraries  */

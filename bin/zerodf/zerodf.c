@@ -11,6 +11,7 @@
 *		-p p     :  frame period		[100]		*
 *		-i i     :  interpolation period	[1]		*
 *		-t       :  transpose filter		[FALSE]		*
+*		-k       :  filtering without gain	[FALSE]		*
 *	infile:								*
 *		coefficients						*
 *		    , b(0), b(1), ..., b(m),				*
@@ -24,7 +25,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: zerodf-main.c,v 1.1 1996/03/25 06:03:18 koishida Exp koishida $";
+static char *rcs_id = "$Id: zerodf.c,v 1.1.1.1 2000/03/01 13:58:27 yossie Exp $";
 
 
 /*  Standard C Libralies  */
@@ -45,6 +46,7 @@ double	zerodf(), zerodft();
 #define	FPERIOD		100
 #define	IPERIOD		1
 #define	TRANSPOSE	FA
+#define NGAIN		FA
 
 
 /*  Command Name  */
@@ -58,13 +60,14 @@ void usage(int status)
     fprintf(stderr, "  usage:\n");
     fprintf(stderr, "       %s [ options ] bfile [ infile ] > stdout\n", cmnd);
     fprintf(stderr, "  options:\n");
-    fprintf(stderr, "       -m m  : order of coefficients [%d]\n", ORDER);
-    fprintf(stderr, "       -p p  : frame period          [%d]\n", FPERIOD);
-    fprintf(stderr, "       -i i  : interpolation period  [%d]\n", IPERIOD);
-    fprintf(stderr, "       -t    : transpose filter      [%s]\n", BOOL[TRANSPOSE]);
+    fprintf(stderr, "       -m m  : order of coefficients  [%d]\n", ORDER);
+    fprintf(stderr, "       -p p  : frame period           [%d]\n", FPERIOD);
+    fprintf(stderr, "       -i i  : interpolation period   [%d]\n", IPERIOD);
+    fprintf(stderr, "       -t    : transpose filter       [%s]\n", BOOL[TRANSPOSE]);
+    fprintf(stderr, "       -k    : filtering without gain [%s]\n", BOOL[NGAIN]);
     fprintf(stderr, "       -h    : print this message\n");
     fprintf(stderr, "  infile:\n");
-    fprintf(stderr, "       filter input (float)          [stdin]\n");
+    fprintf(stderr, "       filter input (float)           [stdin]\n");
     fprintf(stderr, "  stdout:\n");
     fprintf(stderr, "       filter output (float)\n");
     fprintf(stderr, "  bfile:\n");
@@ -79,7 +82,7 @@ void main(int argc, char **argv)
                 i, j;
     FILE	*fp = stdin, *fpc = NULL;
     double	*c, *inc, *cc, *d, x;
-    Boolean	tp = TRANSPOSE;
+    Boolean	tp = TRANSPOSE, ngain = NGAIN;
     
     if ((cmnd = strrchr(argv[0], '/')) == NULL)
 	cmnd = argv[0];
@@ -103,6 +106,9 @@ void main(int argc, char **argv)
 		case 't':
 		    tp = 1 - tp;
 		    break;
+		case 'k':
+		    ngain = 1 - ngain;
+		    break;
 		case 'h':
 		    usage(0);
 		default:
@@ -124,7 +130,7 @@ void main(int argc, char **argv)
     cc  = c  + m + 1;
     inc = cc + m + 1;
     d   = inc+ m + 1;
-    
+ 
     if(freadf(c, sizeof(*c), m+1, fpc) != m+1) exit(1);
 
     for(;;){
@@ -136,8 +142,10 @@ void main(int argc, char **argv)
 	for(j=fprd, i=(iprd+1)/2; j--;){
 	    if (freadf(&x, sizeof(x), 1, fp) != 1) exit(0);
 
-	    x *= c[0];
-	    if (! tp)
+	    if (ngain)
+		for(i=m; i>=0; i--) c[i] /= c[0];
+
+	    if (!tp)
 		x = zerodf(x, c, m, d);
 	    else
 		x = zerodft(x, c, m, d);

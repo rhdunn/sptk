@@ -1,5 +1,5 @@
 /****************************************************************
-  $Id: nrand.c,v 1.1 1996/01/22 07:46:30 nmiya Exp nmiya $
+  $Id: _nrand.c,v 1.1.1.1 2000/03/01 13:58:32 yossie Exp $
 
     Generate Normal Distributed Random Value
         nrand(p, leng, seed)

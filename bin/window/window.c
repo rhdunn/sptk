@@ -3,6 +3,7 @@
 *    Data Windowing							*
 *									*
 *					1996.1	N.Miyazaki		*
+*					1998.11	T.Masuko		*
 *									*
 *	usage:								*
 *		window [ infile ] [ options ] > outfile			*
@@ -14,11 +15,12 @@
 *			n=1: normalize by power				*
 *			n=2: normalize by magnitude			*
 *		-w w	 :  type of window				*
-*			w=0: blackman  window				*
-*			w=1: hamming   window				*
-*			w=2: hanning   window				*
-*			w=3: bartlett  window				*
-*			w=4: trapezoid window				*
+*			w=0: blackman    window				*
+*			w=1: hamming     window				*
+*			w=2: hanning     window				*
+*			w=3: bartlett    window				*
+*			w=4: trapezoid   window				*
+*			w=5: rectangular window				*
 *	infile:								*
 *		stdin for default					*
 *		input is assumed to be double				*
@@ -26,14 +28,19 @@
 *		if L > l, (L-l)-zeros are padded			*
 *									*
 ************************************************************************/
-static char *rcs_id = "$Id: window-main.c,v 1.1 1996/01/25 12:47:30 nmiya Exp nmiya $";
+static char *rcs_id = "$Id: window.c,v 1.1.1.1 2000/03/01 13:58:52 yossie Exp $";
 
 
 /*  Standard C Libraries  */
 #include <stdio.h>
-#include <SPTK.h>
 #include <string.h>
+#include <SPTK.h>
 
+
+/*  Default Values */
+#define	FLENG		256
+#define	WINTYPE		BLACKMAN
+#define	NORMFLG		1
 
 /*  Required Function */
 double	window();
@@ -50,18 +57,19 @@ int usage()
 	fprintf(stderr, "  usage:\n"); 
 	fprintf(stderr, "       %s [ options ] [ infile ] > outfile\n", cmnd); 
 	fprintf(stderr, "  options:\n"); 
-	fprintf(stderr, "       -l l  : frame length of input  [256]\n");
+	fprintf(stderr, "       -l l  : frame length of input  [%d]\n", FLENG);
 	fprintf(stderr, "       -L L  : frame length of output [l]\n");
-	fprintf(stderr, "       -n n  : type of normalization  [1]\n");
+	fprintf(stderr, "       -n n  : type of normalization  [%d]\n", NORMFLG);
 	fprintf(stderr, "                 0 none\n");
 	fprintf(stderr, "                 1 normalize by power\n");
 	fprintf(stderr, "                 2 normalize by magnitude\n");
-	fprintf(stderr, "       -w w  : type of window         [0]\n");
+	fprintf(stderr, "       -w w  : type of window         [%d]\n", WINTYPE);
 	fprintf(stderr, "                 0 (blackman)\n");
 	fprintf(stderr, "                 1 (hamming)\n");
 	fprintf(stderr, "                 2 (hanning)\n");
 	fprintf(stderr, "                 3 (bartlett)\n");
 	fprintf(stderr, "                 4 (trapezoid)\n");
+	fprintf(stderr, "                 5 (rectangular)\n");
 	fprintf(stderr, "       -h    : print this message\n");
 	fprintf(stderr, "  infile:\n"); 
 	fprintf(stderr, "       data sequence (float)          [stdin]\n"); 
@@ -72,16 +80,15 @@ int usage()
 }
 
 
-main(argc,argv)
+main(argc, argv)
 int	argc;
 char	*argv[];
 {
 	FILE	*fp = stdin;
 	char	*s, c;
-	int	l=256, outl = 0, zerol, normal=1, wintype;
-	double  *x, *zero;	
-
-	wintype = 0;
+	int	fleng = FLENG, outl = -1, normflg = NORMFLG;
+	Window	wintype = WINTYPE;
+	double  *x, *zero;
 
         if ((cmnd = strrchr(argv[0], '/')) == NULL)
 	    cmnd = argv[0];
@@ -100,13 +107,13 @@ char	*argv[];
 				wintype = atoi(s);
 				break;
 			case 'l':
-				l = atoi(s);
+				fleng = atoi(s);
 				break;
 			case 'L':
 				outl = atoi(s);
 				break;
 			case 'n':
-				normal = atoi(s);
+				normflg = atoi(s);
 				break;
 			case 'h':
 			default:
@@ -117,26 +124,16 @@ char	*argv[];
 			 fp = getfp(*argv, "r");
 	}
 
-	if(outl < l)
-	    outl = l;
+	if (outl < 0)
+	    outl = fleng;
 
-	zerol = outl - l;
-	
-	x = dgetmem(l);
+	x = dgetmem(fleng > outl ? fleng : outl);
 
-	if(zerol > 0){
-	    zero = dgetmem(zerol);
-	    
-	    while(freadf(x, sizeof(*x), l, fp) == l) {
-		window(windows[wintype], x, l, normal);
-		fwritef(x, sizeof(*x), l, stdout);
-		fwritef(zero, sizeof(*zero), zerol, stdout);
-	    }
+	while(freadf(x, sizeof(*x), fleng, fp) == fleng) {
+	    window(wintype, x, fleng, normflg);
+	    fwritef(x, sizeof(*x), outl, stdout);
 	}
-	else
-	    while(freadf(x, sizeof(*x), l, fp) == l) {
-		window(windows[wintype], x, l, normal);
-		fwritef(x, sizeof(*x), l, stdout);
-	    }
+
 	exit(0);
 }
+

@@ -1,6 +1,6 @@
 /******************************************************************
 
-    $Id:$
+    $Id: theq.c,v 1.1.1.1 2000/03/01 13:58:56 yossie Exp $
 
     Subroutine for Solving a Toeplitz plus Hankel		
 	Coefficient Matrix System of Equations  ( T + H ) a = b	

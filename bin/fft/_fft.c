@@ -1,5 +1,5 @@
 /********************************************************
-   $Id: fft.c,v 1.3 1996/02/02 08:59:40 isshiki Exp isshiki $					
+   $Id: _fft.c,v 1.1.1.1 2000/03/01 13:58:29 yossie Exp $					
 	NAME:					
 		fft - fast fourier transform    
 	SYNOPSIS:					

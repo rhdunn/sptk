@@ -1,6 +1,6 @@
 /***************************************************************
 
-    $Id: lpc2par.c,v 1.1 1996/02/29 03:07:35 koishida Exp koishida $
+    $Id: _lpc2par.c,v 1.1.1.1 2000/03/01 13:58:40 yossie Exp $
 
     Transformation LPC to PARCOR 
 

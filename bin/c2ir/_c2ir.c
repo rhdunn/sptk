@@ -1,5 +1,5 @@
 /******************************************************************
- $Id: c2ir.c,v 1.1 1996/04/15 05:16:14 isshiki Exp isshiki $
+ $Id: _c2ir.c,v 1.1.1.1 2000/03/01 13:58:30 yossie Exp $
 
 	cepstrum to impulse response
 		c2ir(c,nc,h,leng)

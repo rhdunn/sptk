@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: mcep.c,v 1.1 1996/04/18 11:06:52 koishida Exp koishida $
+    $Id: _mcep.c,v 1.1.1.1 2000/03/01 13:58:41 yossie Exp $
 
     Mel-Cepstral Analysis
 

@@ -79,7 +79,7 @@ usage(status)
     fprintf(stderr, "       -p p  : paper                [%s]\n",MEDIA);
     fprintf(stderr, "               (Letter,A3,A4,A5,B4,B5)\n");
     fprintf(stderr, "       -l    : landscape            [%s]\n",BOOL[LANDSCAPE]);
-    fprintf(stderr, "       -r r  : resulution           [%d dpi]\n",RESOLUTION);
+    fprintf(stderr, "       -r r  : resolution           [%d dpi]\n",RESOLUTION);
     fprintf(stderr, "       -b    : bold mode            [FALSE]\n");
     fprintf(stderr, "       -T T  : top    margin <mm>   [%d]\n",bbm.top);
     fprintf(stderr, "       -B B  : bottom margin <mm>   [%d]\n",bbm.bottom);
@@ -184,13 +184,13 @@ main( argc, argv )
 	}
 	else  {
 		fp = tmpfile();
-		while ((c=getchar()) != EOF)
+		while ((c=getchar()) != (char)EOF)
 			fputc(c, fp);
 		rewind(fp);
 	}
 
 	ungetc(flg=fgetc(fp), fp);
-	if (flg == EOF)  {
+	if (flg == (char)EOF)  {
                 fprintf(stderr, "%s: Input file is empty!\n", progname);
 		return(-1);
 	}

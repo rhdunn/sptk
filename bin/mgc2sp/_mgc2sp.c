@@ -1,6 +1,6 @@
 /***********************************************************************
 
-    $Id: mgc2sp.c,v 1.1 1996/04/08 07:28:09 koishida Exp koishida $
+    $Id: _mgc2sp.c,v 1.1.1.1 2000/03/01 13:58:42 yossie Exp $
 
     Transformation mel-generalized cepstrum to log spectrum
 

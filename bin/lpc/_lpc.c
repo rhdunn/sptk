@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: lpc.c,v 1.1 1996/02/28 08:58:08 koishida Exp koishida $
+    $Id: _lpc.c,v 1.1.1.1 2000/03/01 13:58:39 yossie Exp $
 
     LPC Analysis Using Levinson-Durbin method
 

@@ -30,7 +30,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: gcep-main.c,v 1.1 1996/03/28 05:20:32 koishida Exp koishida $";
+static char *rcs_id = "$Id: gcep.c,v 1.1.1.1 2000/03/01 13:58:35 yossie Exp $";
 
 
 /*  Standard C Libraries  */

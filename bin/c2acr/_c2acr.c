@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: c2acr.c,v 1.1 1996/02/28 05:16:22 koishida Exp koishida $
+    $Id: _c2acr.c,v 1.1.1.1 2000/03/01 13:58:29 yossie Exp $
 
     Transformation Cepstrum to Autocorrelation
 

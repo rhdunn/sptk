@@ -1,5 +1,5 @@
 /*******************************************************************
-  $Id: phase.c,v 1.1 1996/02/16 10:12:40 isshiki Exp isshiki $
+  $Id: _phase.c,v 1.1.1.1 2000/03/01 13:58:48 yossie Exp $
 	comupte phase of digital filter or real seaquence
 		phase(p, mp, z, mz, ph, flng)
 
@@ -9,6 +9,7 @@
 		int 	mz	: order of denominator polynomilal
 		doble 	*ph	: phase 
 		int	flng	: FFT size
+		int	unlap	: unlapping
 			
 			Naohiro Isshiki 	Feb.1995
 ********************************************************************/
@@ -16,9 +17,9 @@
 #include <math.h>
 #include <SPTK.h>
 	
-void phase(p, mp, z, mz, ph, flng)
+void phase(p, mp, z, mz, ph, flng, unlap)
 double 	*p,*z,*ph;
-int 	mp, mz, flng;
+int 	mp, mz, flng, unlap;
 {
 	static double	*x;
 	static int fsize = 0;
@@ -59,10 +60,12 @@ int 	mp, mz, flng;
 	i++;
 	for (; i < no; i++){
 		ph[i] = atan2(py[i], ph[i]) / pi;
-		if (ph[i - 1] - ph[i] - offset > 1)
-			offset += 2;
-		else if (ph[i] + offset - ph[i - 1] > 1)
-			offset -= 2;
-		ph[i] += offset;
+		if (unlap) {
+			if (ph[i - 1] - ph[i] - offset > 1)
+				offset += 2;
+			else if (ph[i] + offset - ph[i - 1] > 1)
+				offset -= 2;
+			ph[i] += offset;
+		}
 	}
 }

@@ -32,6 +32,7 @@
 /* Standard C Libraries  */
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <SPTK.h>
 
 
@@ -47,8 +48,10 @@
 #define	SIZE	256
 #define STYPE 	21
 
+#define BUFLENGTH 256
+
 #ifndef LIB
-	#define LIB "/usr/local/cmnd/lib"
+	#define LIB "/usr/local/SPTK/lib"
 #endif
 
 #define COEF2_1 LIB "/lpfcoef.2to1"
@@ -268,7 +271,7 @@ void firinit()
 		fprintf(stderr, "%s: cannot open %s\n", cmnd, coef);
 		exit(1);
 	}
-	flengdn = freadf(hdn, sizeof(*hdn), RBSIZE + 1, fp);
+	flengdn = freada(hdn, RBSIZE + 1, fp);
 	fclose(fp);
 	if(--flengdn < 0) {
 		fprintf(stderr, "%s: cannot read filter coefficients\n", cmnd);
@@ -279,7 +282,7 @@ void firinit()
 			fprintf(stderr, "%s: cannot open %s\n", cmnd, coef1);
 			exit(1);
 		}
-		flengup = freadf(hup, sizeof(*hup), RBSIZE +1, fp);
+		flengup = freada(hup, RBSIZE +1, fp);
 		fclose(fp);
 		if(--flengup < 0) {
 			fprintf(stderr, "%s: cannot read filter coefficients\n",cmnd);
@@ -289,4 +292,18 @@ void firinit()
 	}
 	else
 		start = flengdn / (2 * decrate);
+}
+
+int freada( double *p, int bl, FILE *fp)
+{
+	int c;
+	char buf[BUFLENGTH];
+
+	c = 0;
+	while( c < bl ){
+		if( fgets( buf, BUFLENGTH, fp) == NULL) break;
+		p[c] = atof( buf);
+		c+=1;
+	}
+	return c;
 }

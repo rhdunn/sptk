@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: glsadf.c,v 1.1 1996/03/28 08:40:04 koishida Exp koishida $
+    $Id: _glsadf.c,v 1.1.1.1 2000/03/01 13:58:35 yossie Exp $
 
     GLSA Digital Filter
 

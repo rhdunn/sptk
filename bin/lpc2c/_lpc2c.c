@@ -1,6 +1,6 @@
 /****************************************************************
 
-    $Id: lpc2c.c,v 1.1 1996/02/28 09:04:02 koishida Exp koishida $
+    $Id: _lpc2c.c,v 1.1.1.1 2000/03/01 13:58:39 yossie Exp $
 
     Transformation LPC to Cepstrum 
 

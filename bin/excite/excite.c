@@ -22,7 +22,7 @@
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: excit-main.c,v 1.1 1996/04/11 04:34:59 koishida Exp koishida $";
+static char *rcs_id = "$Id: excite.c,v 1.1.1.1 2000/03/01 13:58:32 yossie Exp $";
 
 
 /*  Standard C Libraries  */

@@ -14,8 +14,8 @@ INCLUDE		= $(PREFIX)/include
 #
 # Directories which contain libraries and include files of X11.
 #
-XINCDIR		= /usr/local/X11/include
-XLIBDIR		= /usr/local/X11/lib
+XINCDIR		= /usr/X11R6/include
+XLIBDIR		= /usr/X11R6/lib
 XLIBS		= -lX11
 #XLIBS		= -lX11 -lsocket
 
@@ -32,6 +32,16 @@ INSTALL		= install -cs
 #
 #DOUBLE		= -DDOUBLE
 
+#
+# If you want to compile 'da' and 'daplay', specify your operating system.
+# These commands will work only on SunOS4.1.x, SunOS5.x(sparc), and linux(i386).
+# Avaliable values are:
+#    SUNOS          SunOS4.1.x
+#    SOLARIS        SunOS5.x(sparc)
+#    LINUX          linux(i386)
+# 
+DA_OSTYPE	= 
+
 ########################################################################
 
 SUBDIR		= lib include bin script
@@ -45,7 +55,7 @@ LIBS		= -lSPTK -lm
 
 all:
 	for d in $(SUBDIR) ; do \
-		( cd $$d ; $(MAKE) CC="$(CC)" LIB="$(LIB)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LIBS="$(LIBS)" XLIBS="$(XLIBS)" ) ; \
+		( cd $$d ; $(MAKE) CC="$(CC)" LIB="$(LIB)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LIBS="$(LIBS)" XLIBS="$(XLIBS)" DA_OSTYPE="$(DA_OSTYPE)") ; \
 	done
 
 install:
@@ -56,18 +66,18 @@ install:
 		fi ; \
 	done
 	for d in $(SUBDIR) ; do \
-		( cd $$d ; $(MAKE) CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LIBS="$(LIBS)" INSTALL="$(INSTALL)" BIN="$(BIN)" LIB="$(LIB)" XLIBS="$(XLIBS)" INCLUDE="$(INCLUDE)" install ) ; \
+		( cd $$d ; $(MAKE) CC="$(CC)" CFLAGS="$(CFLAGS)" LDFLAGS="$(LDFLAGS)" LIBS="$(LIBS)" INSTALL="$(INSTALL)" BIN="$(BIN)" LIB="$(LIB)" XLIBS="$(XLIBS)" INCLUDE="$(INCLUDE)" DA_OSTYPE="$(DA_OSTYPE)" install ) ; \
 	done
 
 clean:
 	for d in $(SUBDIR) ; do \
-		( cd $$d ; $(MAKE) RM="$(RM)" clean ) ; \
+		( cd $$d ; $(MAKE) RM="$(RM)" DA_OSTYPE="$(DA_OSTYPE)" clean ) ; \
 	done
 	$(RM) \#* *~
 
 veryclean: clean
 #	for d in $(SUBDIR) ; do \
-#		( cd $$d ; $(MAKE) RM="$(RM)" veryclean ) ; \
+#		( cd $$d ; $(MAKE) RM="$(RM)" DA_OSTYPE="$(DA_OSTYPE)" veryclean ) ; \
 #	done
 	for d in $(BIN) $(LIB) $(INCLUDE) ; do \
 		if [ ! -d $$d ]; then \

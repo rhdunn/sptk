@@ -7,7 +7,7 @@
 *	usage:								*
 *		lsp2lpc [ options ] [ infile ] > stdout			*
 *	options:							*
-*		-m m     :  order of LPC		[24]		*
+*		-m m     :  order of LPC		[25]		*
 *		-s s     :  sampling frequency (kHz)	[10]		*
 *		-k       :  input & output gain		[TRUE]		*
 *		-i i     :  input format (see infile)	[0]		*
@@ -22,14 +22,12 @@
 *	stdout:								*
 *		LPC							*
 *		    , K(=1), a(1), ..., a(M),				*
-*	notice: 							*
-*		m must be even						*
 *	require:							*
 *		lsp2lpc()						*
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: lsp2lpc-main.c,v 1.1 1996/03/30 07:53:09 koishida Exp koishida $";
+static char *rcs_id = "$Id: lsp2lpc.c,v 1.1.1.1 2000/03/01 13:58:40 yossie Exp $";
 
 
 /*  Standard C Libraries  */
@@ -43,7 +41,7 @@ void	lsp2lpc();
 
 
 /*  Default Values  */
-#define ORDER		24
+#define ORDER		25
 #define ITYPE		0
 #define SAMPLING	10
 #define GAIN		1
@@ -74,8 +72,6 @@ void usage(int status)
     fprintf(stderr, "       LSP (float)                [stdin]\n");
     fprintf(stderr, "  stdout:\n");
     fprintf(stderr, "       LP coefficients (float)\n");
-    fprintf(stderr, "  notice:\n");
-    fprintf(stderr, "       m must be even\n");
     fprintf(stderr, "\n");
     exit(status);
 }
@@ -118,12 +114,6 @@ void main(int argc, char **argv)
 	}
 	else 
 	    fp = getfp(*argv, "r");
-
-    if(m%2==1){
-	fprintf(stderr,"%s : order of lsp must be even!\n",cmnd);
-	usage(1);
-    }
-
 
     lsp = dgetmem(m+m+1+gain);
     a = lsp + m + gain;

@@ -2,19 +2,18 @@
 *									*
 *    Transform LPC to LSP					 	*
 *									*
-*					1996.1  K.Koishida		*
+*					1998.11 K.Koishida		*
 *									*
 *	usage:								*
 *		lpc2lsp [ options ] [ infile ] > stdout			*
 *	options:							*
-*		-m m  :  order of LPC				  [24]	*
+*		-m m  :  order of LPC				  [25]	*
 *		-s s  :  sampling frequency (kHz)		  [10]	*
 *		-k    :  output gain		 		[TRUE]	*
 *		-o o  :  output format	(see stdout)		   [0]	*
 *	 	(level 2)						*
 *		-n n  :  split number of unit circle		 [128]	*
-*		-p p  :  maximum number of interpolation for P(z)  [4]	*
-*		-q q  :  maximum number of interpolation for Q(z) [15]	*
+*		-p p  :  maximum number of interpolation           [4]	*
 *		-d d  :  end condition of interpolation		[1e-6]	*
 *	infile:								*
 *		LP coefficients						*
@@ -29,12 +28,10 @@
 *		    , f(1), ..., f(m),					*
 *	require:							*
 *		lpc2lsp()						*
-*	note:								*
-*		m must be even						*
 *									*
 ************************************************************************/
 
-static char *rcs_id = "$Id: lpc2lsp-main.c,v 1.1 1996/03/30 07:39:37 koishida Exp koishida $";
+static char *rcs_id = "$Id: lpc2lsp.c,v 1.1.1.1 2000/03/01 13:58:39 yossie Exp $";
 
 
 /*  Standard C Libraries  */
@@ -52,12 +49,11 @@ char *BOOL[] = {"FALSE", "TRUE"};
 
 
 /*  Default Values  */
-#define ORDER		24
+#define ORDER		25
 #define SAMPLING	10
 #define OTYPE		0
 #define	SPNUM		128
-#define	MAXP		4
-#define	MAXQ		15
+#define	MAXITR		4
 #define	END		1e-6
 #define GAIN		TR
 		
@@ -84,8 +80,7 @@ void usage(int status)
     fprintf(stderr, "                 3 (frequency [Hz])\n");
     fprintf(stderr, "     (level 2)\n");
     fprintf(stderr, "       -n n  : split number of unit circle             [%d]\n", SPNUM);
-    fprintf(stderr, "       -p p  : maximum number of interpolation of P(z) [%d]\n", MAXP);
-    fprintf(stderr, "       -q q  : maximum number of interpolation of Q(z) [%d]\n", MAXQ);
+    fprintf(stderr, "       -p p  : maximum number of interpolation         [%d]\n", MAXITR);
     fprintf(stderr, "       -d d  : end condition of interpolation          [%g]\n", END);
     fprintf(stderr, "       -h    : print this message\n");
     fprintf(stderr, "  infile:\n");
@@ -99,7 +94,7 @@ void usage(int status)
 void main(int argc, char **argv)
 {
     int		m = ORDER, otype = OTYPE, sampling = SAMPLING, 
-                n = SPNUM, p = MAXP, q = MAXQ, i;
+                n = SPNUM, p = MAXITR, i;
     FILE	*fp = stdin;
     double	*a, *lsp, end = END, atof();    
     Boolean	gain = GAIN;
@@ -127,10 +122,6 @@ void main(int argc, char **argv)
 		    p = atoi(*++argv);
 		    --argc;
 		    break;
-		case 'q':
-		    q = atoi(*++argv);
-		    --argc;
-		    break;
 		case 'n':
 		    n = atoi(*++argv);
 		    --argc;
@@ -156,7 +147,7 @@ void main(int argc, char **argv)
     a = lsp + m;
 
     while (freadf(a, sizeof(*a), m+1, fp) == m+1){
-	lpc2lsp(a, lsp, m, n, p, q, end);
+	lpc2lsp(a, lsp, m, n, p, end);
 
 	if (otype == 0)
 	    for(i=0; i<m; i++)

@@ -1,5 +1,5 @@
 /********************************************************
- $Id: fftr.c,v 1.3 1996/02/02 09:34:26 isshiki Exp $							
+ $Id: _fftr.c,v 1.1.1.1 2000/03/01 13:58:29 yossie Exp $							
  NAME:							
 	fftr - Fast Fourier Transform for Double sequence	   
  SYNOPSIS:                                             

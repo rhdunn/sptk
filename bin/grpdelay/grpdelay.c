@@ -17,7 +17,7 @@
 *	Note that double precision FFT is used.				*
 ************************************************************************/
 
-static char *rcs_id = "$Id: grpdelay-main.c,v 1.1 1996/02/06 12:38:40 isshiki Exp isshiki $";
+static char *rcs_id = "$Id: grpdelay.c,v 1.1.1.1 2000/03/01 13:58:35 yossie Exp $";
 
 /* Standard C Libraries */
 #include <stdio.h>
