@@ -1,3 +1,42 @@
+/*
+  ----------------------------------------------------------------
+	Speech Signal Processing Toolkit (SPTK): version 3.0
+			 SPTK Working Group
+
+		   Department of Computer Science
+		   Nagoya Institute of Technology
+				and
+    Interdisciplinary Graduate School of Science and Engineering
+		   Tokyo Institute of Technology
+		      Copyright (c) 1984-2000
+			All Rights Reserved.
+
+  Permission is hereby granted, free of charge, to use and
+  distribute this software and its documentation without
+  restriction, including without limitation the rights to use,
+  copy, modify, merge, publish, distribute, sublicense, and/or
+  sell copies of this work, and to permit persons to whom this
+  work is furnished to do so, subject to the following conditions:
+
+    1. The code must retain the above copyright notice, this list
+       of conditions and the following disclaimer.
+
+    2. Any modifications must be clearly marked as such.
+
+  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF TECHNOLOGY,
+  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM
+  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT
+  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF
+  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE
+  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+  PERFORMANCE OF THIS SOFTWARE.
+ ----------------------------------------------------------------
+*/
+
 /****************************************************************
 *	Interpret X-Y Ploter Commands				*
 ****************************************************************/
@@ -24,7 +63,7 @@ static int	sp = 1;
 static int	cw = FCW, ch = FCH, th = 0;
 
 extern Display		*display;
-extern Window		window;
+extern Window		main_window;
 extern int		screen;
 extern GC		gc;
 extern unsigned long	forepix, backpix;
@@ -113,7 +152,7 @@ static line( points, n )
 	XPoint	*points;
 	int	n;
 {
-	XDrawLines(display, window, gc, points, n, CoordModeOrigin);
+	XDrawLines(display, main_window, gc, points, n, CoordModeOrigin);
 }
 
 static polyline( points, frame, fill, n )
@@ -170,7 +209,7 @@ static dplot( density, x, y, w, h )
 			pos[n].y = y - (short)p / w;
 		}
 	}
-	XDrawPoints(display, window, gc, pos, n_plot, CoordModeOrigin);
+	XDrawPoints(display, main_window, gc, pos, n_plot, CoordModeOrigin);
 }
 
 static hatching( type )
@@ -212,7 +251,7 @@ static reset_fill()
 static box( x, y, w, h )
 	short	x, y, w, h;
 {
-	XDrawRectangle(display, window, gc, x, y, w, h);
+	XDrawRectangle(display, main_window, gc, x, y, w, h);
 }
 
 static fillbox( type, x, y, w, h )
@@ -221,13 +260,13 @@ static fillbox( type, x, y, w, h )
 {
 	Pixmap	till_pmap;
 
-	till_pmap = XCreatePixmapFromBitmapData(display, window,
+	till_pmap = XCreatePixmapFromBitmapData(display, main_window,
 			till_bits[type], till_width, till_height,
 			forepix, backpix, DefaultDepth(display, 0));
 
 	XSetTile(display, gc, till_pmap);
 	XSetFillStyle(display, gc, FillTiled);
-	XFillRectangle(display, window, gc, x, y, w, h);
+	XFillRectangle(display, main_window, gc, x, y, w, h);
 
 	XFreePixmap(display, till_pmap);
 }
@@ -238,13 +277,13 @@ static fillpoly( points, type, n )
 {
 	Pixmap	till_pmap;
 
-	till_pmap = XCreatePixmapFromBitmapData(display, window,
+	till_pmap = XCreatePixmapFromBitmapData(display, main_window,
 			till_bits[type], till_width, till_height,
 			forepix, backpix, DefaultDepth(display, 0));
 
 	XSetTile(display, gc, till_pmap);
 	XSetFillStyle(display, gc, FillTiled);
-	XFillPolygon(display, window, gc, points, n, Convex, CoordModeOrigin);
+	XFillPolygon(display, main_window, gc, points, n, Convex, CoordModeOrigin);
 
 	XFreePixmap(display, till_pmap);
 }
@@ -324,7 +363,7 @@ static text( s, n, fn )
 	}
 
 	if (th == 0)
-		XDrawString(display, window, gc, 
+		XDrawString(display, main_window, gc, 
 			    points[0].x, points[0].y, s, n);
 	else  {
 		xadj = ccw / shrink;
@@ -332,7 +371,7 @@ static text( s, n, fn )
 		while (n)  {
 			cx = points[0].x - xadj;
 			cy = points[0].y - yadj * --n;
-			XDrawString(display, window, gc, cx, cy, s, 1);
+			XDrawString(display, main_window, gc, cx, cy, s, 1);
 			*s++;
 		}
 	}
@@ -389,12 +428,12 @@ static mark( w )
 {
 	Pixmap	mark_pmap;
 
-	mark_pmap = XCreatePixmapFromBitmapData(display, window,
+	mark_pmap = XCreatePixmapFromBitmapData(display, main_window,
 			mark_bits[w], mark_width, mark_height,
 			forepix, backpix,
 			DefaultDepth(display, 0));
 
-	XCopyArea(display, mark_pmap, window, gc,
+	XCopyArea(display, mark_pmap, main_window, gc,
 		  0, 0, mark_width, mark_height,
 		  points[0].x - mark_width/2,
 		  points[0].y - mark_height/2);
@@ -418,7 +457,7 @@ static circle( x0, y0, r1, r2, arg1, arg2 )
 	width  *= 2;
 	height *= 2;
 
-	XDrawArc(display, window, gc, x, y,
+	XDrawArc(display, main_window, gc, x, y,
 		 width, height, arg1*64, arg2*64);
 }
 

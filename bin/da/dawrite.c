@@ -1,3 +1,42 @@
+/*
+  ----------------------------------------------------------------
+	Speech Signal Processing Toolkit (SPTK): version 3.0
+			 SPTK Working Group
+
+		   Department of Computer Science
+		   Nagoya Institute of Technology
+				and
+    Interdisciplinary Graduate School of Science and Engineering
+		   Tokyo Institute of Technology
+		      Copyright (c) 1984-2000
+			All Rights Reserved.
+
+  Permission is hereby granted, free of charge, to use and
+  distribute this software and its documentation without
+  restriction, including without limitation the rights to use,
+  copy, modify, merge, publish, distribute, sublicense, and/or
+  sell copies of this work, and to permit persons to whom this
+  work is furnished to do so, subject to the following conditions:
+
+    1. The code must retain the above copyright notice, this list
+       of conditions and the following disclaimer.
+
+    2. Any modifications must be clearly marked as such.
+
+  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF TECHNOLOGY,
+  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM
+  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT
+  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF
+  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE
+  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+  PERFORMANCE OF THIS SOFTWARE.
+ ----------------------------------------------------------------
+*/
+
 /************************************************************************
 *                                                                       *
 *    play 16-bit linear PCM data on LINUX and SS10                      *
@@ -26,7 +65,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: dawrite.c,v 1.2 2000/06/30 08:47:17 sako Exp $";
+static char *rcs_id = "$Id: dawrite.c,v 1.5 2002/12/25 05:29:03 sako Exp $";
 
 /* Standard C Libraries */
 #include <stdio.h>
@@ -91,11 +130,11 @@ float		ampgain = -1;
 int		byteswap = 0;
 size_t		abuf_size;
 
-#ifdef LINUX
+#if defined(LINUX) || defined(FreeBSD)
 int	org_vol, org_channels, org_precision, org_freq;
-#endif /* LINUX */
+#endif /* LINUX or FreeBSD */
 
-#ifdef SOLARIS
+#if defined(SOLARIS) || defined(SUNOS)
 audio_info_t	org_data;
 #endif /* SOLARIS */
 void		reset_audiodev();
@@ -315,14 +354,18 @@ int	leng;
 void init_audiodev(dtype)
 int	dtype;
 {
-#ifdef LINUX
+#if defined(LINUX) || defined(FreeBSD)
 	int arg;
 
 	if( (adfp = fopen( AUDIO_DEV, "w")) == NULL){
 		fprintf( stderr, "%s: can't open audio device\n", cmnd);
 		exit(1);
 	}
+#ifdef LINUX
 	ADFD = adfp->_fileno;
+#else /* FreeBSD */
+	ADFD = adfp->_file;
+#endif
 	ACFD = open( MIXER_DEV, O_RDWR, 0);
 
 	ioctl(ADFD, SNDCTL_DSP_GETBLKSIZE, &abuf_size);
@@ -338,7 +381,7 @@ int	dtype;
 	ioctl(ADFD, SOUND_PCM_WRITE_CHANNELS, &arg);
 	arg = data_type[dtype].sample;
 	ioctl(ADFD, SOUND_PCM_WRITE_RATE, &arg);
-#endif /* LINUX */
+#endif /* LINUX || FreeBSD */
 
 #ifdef SPARC
 	audio_info_t	data;
@@ -383,7 +426,7 @@ float volume;
 {
 	int vol, arg;
 
-#ifdef LINUX
+#if defined(LINUX) || defined(FreeBSD)
 	vol = (int) ((MAXAMPGAIN*volume)/100);
 	
 	arg = vol | (vol << 8 );
@@ -406,7 +449,7 @@ float volume;
 void reset_audiodev()
 {
 
-#ifdef LINUX
+#if defined(LINUX) || defined(FreeBSD)
 	ACFD = open( MIXER_DEV, O_RDWR, 0);
 	ADFD = open( AUDIO_DEV, O_RDWR, 0);
 
@@ -417,7 +460,7 @@ void reset_audiodev()
 
 	close( ADFD);
 	close( ACFD);
-#endif /* LINUX */
+#endif /* LINUX or FreeBSD */
 
 #ifdef SPARC
 	ACFD = open(AUDIO_CTLDEV, O_RDWR, 0);

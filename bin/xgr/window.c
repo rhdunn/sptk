@@ -1,3 +1,42 @@
+/*
+  ----------------------------------------------------------------
+	Speech Signal Processing Toolkit (SPTK): version 3.0
+			 SPTK Working Group
+
+		   Department of Computer Science
+		   Nagoya Institute of Technology
+				and
+    Interdisciplinary Graduate School of Science and Engineering
+		   Tokyo Institute of Technology
+		      Copyright (c) 1984-2000
+			All Rights Reserved.
+
+  Permission is hereby granted, free of charge, to use and
+  distribute this software and its documentation without
+  restriction, including without limitation the rights to use,
+  copy, modify, merge, publish, distribute, sublicense, and/or
+  sell copies of this work, and to permit persons to whom this
+  work is furnished to do so, subject to the following conditions:
+
+    1. The code must retain the above copyright notice, this list
+       of conditions and the following disclaimer.
+
+    2. Any modifications must be clearly marked as such.
+
+  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF TECHNOLOGY,
+  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM
+  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT
+  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF
+  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE
+  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
+  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
+  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
+  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+  PERFORMANCE OF THIS SOFTWARE.
+ ----------------------------------------------------------------
+*/
+
 /****************************************************************
 *	Setup Window for xgr.					*
 ****************************************************************/
@@ -9,7 +48,7 @@
 #include	"xgr.h"
 
 Display		*display;
-Window		window;
+Window		main_window;
 int		screen;
 GC		gc, pixmapGC;
 unsigned long	forepix, backpix, highpix, brdrpix, mouspix;
@@ -132,35 +171,35 @@ init_window( argc, argv )
 	
 
 /**  Generate Window  **/
-	window = XCreateSimpleWindow(display, DefaultRootWindow(display),
+	main_window = XCreateSimpleWindow(display, DefaultRootWindow(display),
 			xsh.x, xsh.y, xsh.width, xsh.height,
 			bwidth,	brdrpix, backpix);
 
-	XSetStandardProperties(display, window, windowtitle, windowtitle,
+	XSetStandardProperties(display, main_window, windowtitle, windowtitle,
 		None, argv, argc, &xsh);
 
 /*	winatt.bit_gravity = SouthWestGravity;	*/
-	XChangeWindowAttributes(display, window, CWBitGravity, &winatt);
+	XChangeWindowAttributes(display, main_window, CWBitGravity, &winatt);
 
 /**  Map Window  **/
-	XSelectInput(display, window, StructureNotifyMask);
-	XMapWindow(display, window);
+	XSelectInput(display, main_window, StructureNotifyMask);
+	XMapWindow(display, main_window);
 	for (;;)  {
 		XNextEvent(display, &ev);
 		if (ev.type == MapNotify)
 			break;
 	}
-	XSelectInput(display, window,
+	XSelectInput(display, main_window,
 	ButtonPressMask | PointerMotionMask | KeyPressMask | ExposureMask);
 /*		KeyReleaseMask|ExposureMask|StructureNotifyMask);
 */
 /**  Cursor  **/
 	watch_cur = XCreateFontCursor(display, XC_watch);
-	XDefineCursor(display, window, watch_cur);
+	XDefineCursor(display, main_window, watch_cur);
 
 /**  GC  **/
 	gcval.line_width = 1;
-	gc = XCreateGC(display, window, GCLineWidth, &gcval);
+	gc = XCreateGC(display, main_window, GCLineWidth, &gcval);
 
 	XSetFunction(display, gc, GXcopy);
 	XSetGraphicsExposures(display, gc, False);
@@ -181,7 +220,7 @@ init_pixmap()
 		pixmap_w = YLENG / shrink;
 		pixmap_h = XLENG / shrink;
 	}
-	pixmap = XCreatePixmap(display, window, pixmap_w, pixmap_h,
+	pixmap = XCreatePixmap(display, main_window, pixmap_w, pixmap_h,
 			       DefaultDepth(display, screen));
 	pixmapGC = XCreateGC(display, pixmap, 0L, &gcval);
 	XFillRectangle(display, pixmap, pixmapGC, 0, 0, pixmap_w, pixmap_h);
@@ -197,7 +236,7 @@ close_window()
 	XFreeGC(display, gc);
 	XFreeGC(display, pixmapGC);
 	XFreePixmap(display, pixmap);
-	XDestroyWindow(display, window);
+	XDestroyWindow(display, main_window);
 /**/	exit(0);
 /**/	XCloseDisplay(display);		/* this function case an error !! */
 }
@@ -218,7 +257,7 @@ main_loop()
 		paper_h = XLENG / shrink;
 	}
 	set_all();
-	XUndefineCursor(display, window);
+	XUndefineCursor(display, main_window);
 	for (;;)  {
 	    XNextEvent(display, &ev);
 	    switch(ev.type)  {
@@ -323,15 +362,15 @@ realize()
 realize_part( src_x, src_y, width, height, dest_x, dest_y )
 	int	src_x, src_y, width, height, dest_x, dest_y;
 {
-	XDefineCursor(display, window, watch_cur);
-	XCopyArea(display, pixmap, window, gc,
+	XDefineCursor(display, main_window, watch_cur);
+	XCopyArea(display, pixmap, main_window, gc,
 		  src_x, src_y, width, height, dest_x, dest_y);
-	XUndefineCursor(display, window);
+	XUndefineCursor(display, main_window);
 }
 
 set_all()
 {
-	XCopyArea(display, window, pixmap, pixmapGC,
+	XCopyArea(display, main_window, pixmap, pixmapGC,
 		  0, 0, xsh.width, xsh.height, 0, 0);
 }	
 	
@@ -342,7 +381,7 @@ beep()
 
 get_window_size()
 {
-	XGetWindowAttributes(display, window, &wa);
+	XGetWindowAttributes(display, main_window, &wa);
 	window_x = wa.x;
 	window_y = wa.y;
 	window_w = wa.width;
