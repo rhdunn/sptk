@@ -1,135 +1,119 @@
 /*
-  ----------------------------------------------------------------
-	Speech Signal Processing Toolkit (SPTK): version 3.0
-			 SPTK Working Group
+  ---------------------------------------------------------------  
+            Speech Signal Processing Toolkit (SPTK)
 
-		   Department of Computer Science
-		   Nagoya Institute of Technology
-				and
-    Interdisciplinary Graduate School of Science and Engineering
-		   Tokyo Institute of Technology
-		      Copyright (c) 1984-2000
-			All Rights Reserved.
-
-  Permission is hereby granted, free of charge, to use and
-  distribute this software and its documentation without
-  restriction, including without limitation the rights to use,
-  copy, modify, merge, publish, distribute, sublicense, and/or
-  sell copies of this work, and to permit persons to whom this
-  work is furnished to do so, subject to the following conditions:
-
-    1. The code must retain the above copyright notice, this list
-       of conditions and the following disclaimer.
-
-    2. Any modifications must be clearly marked as such.
-
-  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF TECHNOLOGY,
-  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM
-  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT
-  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF
-  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE
-  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
-  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
-  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-  PERFORMANCE OF THIS SOFTWARE.
- ----------------------------------------------------------------
+                      SPTK Working Group                           
+                                                                   
+                  Department of Computer Science                   
+                  Nagoya Institute of Technology                   
+                               and                                 
+   Interdisciplinary Graduate School of Science and Engineering    
+                  Tokyo Institute of Technology                    
+                                                                   
+                     Copyright (c) 1984-2007                       
+                       All Rights Reserved.                        
+                                                                   
+  Permission is hereby granted, free of charge, to use and         
+  distribute this software and its documentation without           
+  restriction, including without limitation the rights to use,     
+  copy, modify, merge, publish, distribute, sublicense, and/or     
+  sell copies of this work, and to permit persons to whom this     
+  work is furnished to do so, subject to the following conditions: 
+                                                                   
+    1. The source code must retain the above copyright notice,     
+       this list of conditions and the following disclaimer.       
+                                                                   
+    2. Any modifications to the source code must be clearly        
+       marked as such.                                             
+                                                                   
+    3. Redistributions in binary form must reproduce the above     
+       copyright notice, this list of conditions and the           
+       following disclaimer in the documentation and/or other      
+       materials provided with the distribution.  Otherwise, one   
+       must contact the SPTK working group.                        
+                                                                   
+  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF TECHNOLOGY,   
+  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM   
+  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL       
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   
+  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF         
+  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE   
+  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY        
+  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
+  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTUOUS   
+  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR          
+  PERFORMANCE OF THIS SOFTWARE.                                    
+                                                                   
+  ---------------------------------------------------------------  
 */
 
 /********************************************************************
-    $Id: getmem.c,v 1.2 2002/12/25 05:34:41 sako Exp $
+    $Id: getmem.c,v 1.9 2007/09/30 16:20:25 heigazen Exp $
 
-    Memory Allocation Fanctions
+    Memory Allocation Functions
 
-	short	*sgetmem(leng)
-	long	*lgetmem(leng)
-	double	*dgetmem(leng)
-	float	*fgetmem(leng)
-	real	*rgetmem(leng)
-	float	**fgetmem(leng)
+    short  *sgetmem(leng)
+    long   *lgetmem(leng)
+    double *dgetmem(leng)
+    float  *fgetmem(leng)
+    real   *rgetmem(leng)
+    float  **fgetmem(leng)
 
-	int leng : data length
+    int leng : data length
 
-	char	*getmem(leng, type)
+    char *getmem(leng, size)
 
-	int     leng : data length
-	unsignd type : size of data type
+    size_t leng : data length
+    size_t size : size of data type
 
 **********************************************************************/
 
-#include	<stdio.h>
+#include <stdio.h>
+#include <stdlib.h>
 
-#ifdef	DOUBLE
-#define	real	double
+#ifdef DOUBLE
+#define real double
 #else
-#define	real	float
+#define real float
 #endif
 
-
-short *sgetmem(leng)
-int leng;
+char *getmem (const size_t leng, const size_t size)
 {
-    char *getmem();
+   char *p = NULL;
 
-    return ( (short *)getmem(leng, sizeof(short)) );
+   if ((p = (char *)calloc(leng, size)) == NULL){
+      fprintf(stderr, "Cannot allocate memory!\n");
+      exit(3);
+   }
+   return (p);
 }
 
-
-long *lgetmem(leng)
-int leng;
+short *sgetmem (const int leng)
 {
-    char *getmem();
-
-    return ( (long *)getmem(leng, sizeof(long)) );
+   return ( (short *)getmem((size_t)leng, sizeof(short)) );
 }
 
-
-double *dgetmem(leng)
-int leng;
+long *lgetmem (const int leng)
 {
-    char *getmem();
-
-    return ( (double *)getmem(leng, sizeof(double)) );
+   return ( (long *)getmem((size_t)leng, sizeof(long)) );
 }
 
-
-float *fgetmem(leng)
-int leng;
+double *dgetmem (const int leng)
 {
-    char *getmem();
-
-    return ( (float *)getmem(leng, sizeof(float)) );
+   return ( (double *)getmem((size_t)leng, sizeof(double)) );
 }
 
-
-real *rgetmem(leng)
-int leng;
+float *fgetmem (const int leng)
 {
-    char *getmem();
-
-    return ( (real *)getmem(leng, sizeof(real)) );
+   return ( (float *)getmem((size_t)leng, sizeof(float)) );
 }
 
-
-float **ffgetmem(leng)
-int leng;
+real *rgetmem (const int leng)
 {
-    char *getmem();
-
-    return ( (float **)getmem(leng, sizeof(float *)) );
+   return ( (real *)getmem((size_t)leng, sizeof(real)) );
 }
 
-
-char *getmem(leng, size)
-int	 leng;
-unsigned size;
+float **ffgetmem (const int leng)
 {
-    char *p = NULL;
-
-    if ((p = (char *)calloc(leng, size)) == NULL){
-	fprintf(stderr, "Memory allocation error !\n");
-	exit(3);
-    }
-    return (p);
+   return ( (float **)getmem((size_t)leng, sizeof(float *)) );
 }

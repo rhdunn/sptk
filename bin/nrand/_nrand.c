@@ -1,44 +1,54 @@
 /*
-  ----------------------------------------------------------------
-	Speech Signal Processing Toolkit (SPTK): version 3.0
-			 SPTK Working Group
+  ---------------------------------------------------------------  
+            Speech Signal Processing Toolkit (SPTK)
 
-		   Department of Computer Science
-		   Nagoya Institute of Technology
-				and
-    Interdisciplinary Graduate School of Science and Engineering
-		   Tokyo Institute of Technology
-		      Copyright (c) 1984-2000
-			All Rights Reserved.
-
-  Permission is hereby granted, free of charge, to use and
-  distribute this software and its documentation without
-  restriction, including without limitation the rights to use,
-  copy, modify, merge, publish, distribute, sublicense, and/or
-  sell copies of this work, and to permit persons to whom this
-  work is furnished to do so, subject to the following conditions:
-
-    1. The code must retain the above copyright notice, this list
-       of conditions and the following disclaimer.
-
-    2. Any modifications must be clearly marked as such.
-
-  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF TECHNOLOGY,
-  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM
-  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT
-  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF
-  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE
-  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
-  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
-  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-  PERFORMANCE OF THIS SOFTWARE.
- ----------------------------------------------------------------
+                      SPTK Working Group                           
+                                                                   
+                  Department of Computer Science                   
+                  Nagoya Institute of Technology                   
+                               and                                 
+   Interdisciplinary Graduate School of Science and Engineering    
+                  Tokyo Institute of Technology                    
+                                                                   
+                     Copyright (c) 1984-2007                       
+                       All Rights Reserved.                        
+                                                                   
+  Permission is hereby granted, free of charge, to use and         
+  distribute this software and its documentation without           
+  restriction, including without limitation the rights to use,     
+  copy, modify, merge, publish, distribute, sublicense, and/or     
+  sell copies of this work, and to permit persons to whom this     
+  work is furnished to do so, subject to the following conditions: 
+                                                                   
+    1. The source code must retain the above copyright notice,     
+       this list of conditions and the following disclaimer.       
+                                                                   
+    2. Any modifications to the source code must be clearly        
+       marked as such.                                             
+                                                                   
+    3. Redistributions in binary form must reproduce the above     
+       copyright notice, this list of conditions and the           
+       following disclaimer in the documentation and/or other      
+       materials provided with the distribution.  Otherwise, one   
+       must contact the SPTK working group.                        
+                                                                   
+  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF TECHNOLOGY,   
+  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM   
+  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL       
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   
+  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF         
+  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE   
+  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY        
+  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
+  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTUOUS   
+  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR          
+  PERFORMANCE OF THIS SOFTWARE.                                    
+                                                                   
+  ---------------------------------------------------------------  
 */
 
 /****************************************************************
-  $Id: _nrand.c,v 1.2 2002/12/25 05:32:02 sako Exp $
+  $Id: _nrand.c,v 1.7 2007/09/12 08:37:19 heigazen Exp $
 
     Generate Normal Distributed Random Value
         nrand(p, leng, seed)
@@ -49,69 +59,60 @@
 
 ****************************************************************/
 
-#include	<stdio.h>
-#include	<math.h>
-#include	<SPTK.h>
+#include <stdio.h>
+#include <math.h>
+#include <SPTK.h>
+
+#define RAND_MAX 32767
 
 
-#define	RAND_MAX	32767
-
-double	rnd();
-unsigned long	srnd();
-double	nrandom();
-int	nrand();
-
-
-int nrand(p, leng, seed)
-double	*p;
-int leng, seed;
+static double rnd (unsigned long *next)
 {
-    int i;
-    unsigned long next;
+   double r;
 
-	if (seed != 1)
-		next = srnd((unsigned)seed);
-	for (i=0;i<leng;i++)
-		p[i] = (double)nrandom(&next);
+   *next = *next * 1103515245L + 12345;
+   r = (*next / 65536L) % 32768L;
 
-	return(0);
+   return(r/RAND_MAX);
 }
 
-double nrandom(next)
-unsigned long *next;
+int nrand (double *p, const int leng, const int seed)
 {
-	static int	sw = 0;
-	static double	r1, r2, s;
+   int i;
+   unsigned long next;
 
-	if (sw == 0)  {
-		sw = 1;
-		do  {
-			r1 = 2 * rnd(next) - 1;
-			r2 = 2 * rnd(next) - 1;
-			s = r1 * r1 + r2 * r2;
-		}  while (s > 1 || s == 0);
-		s = sqrt(-2 * log(s) / s);
-		return ( r1 * s );
-	}
-	else  {
-		sw = 0;
-		return ( r2 * s );
-	}
+   if (seed!=1)
+      next = srnd((unsigned int)seed);
+   for (i=0; i<leng; i++)
+      p[i] = (double)nrandom(&next);
+
+   return(0);
 }
 
-double rnd(next)
-unsigned long *next;
+double nrandom (unsigned long *next)
 {
-	double	r;
+   static int sw=0;
+   static double r1, r2, s;
 
-	*next = *next * 1103515245L + 12345;
-	r = (*next / 65536L) % 32768L;
-
-	return ( r / RAND_MAX ); 
+   if (sw==0)  {
+      sw = 1;
+      do  {
+         r1 = 2 * rnd(next) - 1;
+         r2 = 2 * rnd(next) - 1;
+         s = r1 * r1 + r2 * r2;
+      }
+      while (s>1 || s==0);
+      s = sqrt(-2 * log(s) / s);
+      return (r1*s);
+   }
+   else  {
+      sw = 0;
+      return(r2*s);
+   }
 }
 
-unsigned long srnd( seed )
-	unsigned	seed;
+unsigned long srnd (const unsigned int seed)
 {
-	return(seed);
+   return(seed);
 }
+

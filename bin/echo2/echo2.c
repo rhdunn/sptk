@@ -1,116 +1,130 @@
 /*
-  ----------------------------------------------------------------
-	Speech Signal Processing Toolkit (SPTK): version 3.0
-			 SPTK Working Group
+  ---------------------------------------------------------------  
+            Speech Signal Processing Toolkit (SPTK)
 
-		   Department of Computer Science
-		   Nagoya Institute of Technology
-				and
-    Interdisciplinary Graduate School of Science and Engineering
-		   Tokyo Institute of Technology
-		      Copyright (c) 1984-2000
-			All Rights Reserved.
-
-  Permission is hereby granted, free of charge, to use and
-  distribute this software and its documentation without
-  restriction, including without limitation the rights to use,
-  copy, modify, merge, publish, distribute, sublicense, and/or
-  sell copies of this work, and to permit persons to whom this
-  work is furnished to do so, subject to the following conditions:
-
-    1. The code must retain the above copyright notice, this list
-       of conditions and the following disclaimer.
-
-    2. Any modifications must be clearly marked as such.
-
-  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF TECHNOLOGY,
-  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM
-  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT
-  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSITITUTE OF
-  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE
-  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,
-  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS
-  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
-  PERFORMANCE OF THIS SOFTWARE.
- ----------------------------------------------------------------
+                      SPTK Working Group                           
+                                                                   
+                  Department of Computer Science                   
+                  Nagoya Institute of Technology                   
+                               and                                 
+   Interdisciplinary Graduate School of Science and Engineering    
+                  Tokyo Institute of Technology                    
+                                                                   
+                     Copyright (c) 1984-2007                       
+                       All Rights Reserved.                        
+                                                                   
+  Permission is hereby granted, free of charge, to use and         
+  distribute this software and its documentation without           
+  restriction, including without limitation the rights to use,     
+  copy, modify, merge, publish, distribute, sublicense, and/or     
+  sell copies of this work, and to permit persons to whom this     
+  work is furnished to do so, subject to the following conditions: 
+                                                                   
+    1. The source code must retain the above copyright notice,     
+       this list of conditions and the following disclaimer.       
+                                                                   
+    2. Any modifications to the source code must be clearly        
+       marked as such.                                             
+                                                                   
+    3. Redistributions in binary form must reproduce the above     
+       copyright notice, this list of conditions and the           
+       following disclaimer in the documentation and/or other      
+       materials provided with the distribution.  Otherwise, one   
+       must contact the SPTK working group.                        
+                                                                   
+  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF TECHNOLOGY,   
+  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM   
+  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL       
+  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   
+  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF         
+  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE   
+  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY        
+  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
+  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTUOUS   
+  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR          
+  PERFORMANCE OF THIS SOFTWARE.                                    
+                                                                   
+  ---------------------------------------------------------------  
 */
 
 /************************************************************************
-*									*
-*    	echo arguments to the standard error				*
-*									*
-*					2000.5  T.Yoshimura		*
-*									*
-*	usage:								*
-*		echo2 [ options ] [ argument... ]			*
-*	options:							*
-*		-n  :  do not add the NEWLINE to the output. [FALSE]	*
-*									*
+*                                                                       *
+*       echo arguments to the standard error                            *
+*                                                                       *
+*                                       2000.5  T.Yoshimura             *
+*                                                                       *
+*       usage:                                                          *
+*               echo2 [ options ]                                       *
+*       options:                                                        *
+*               -n  :  no output newline                      [TRUE]    *
+*                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: echo2.c,v 1.3 2002/12/25 05:29:18 sako Exp $";
+static char *rcs_id = "$Id: echo2.c,v 1.14 2007/09/30 16:20:34 heigazen Exp $";
 
 
 /*  Standard C Libraries  */
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <SPTK.h>
 
-typedef enum _Boolean {FA, TR} Boolean;
-char *BOOL[] = {"FALSE", "TRUE"};
-
 
 /*  Default Values  */
-#define NEWLINE		TR
+#define NEWLINE TR
 
+char *BOOL[] = {"FALSE", "TRUE"};
 
 /*  Command Name  */
-char	*cmnd;
+char *cmnd;
 
-void usage(int status)
+void usage (int status)
 {
-    fprintf(stderr, "\n");
-    fprintf(stderr, " %s - echo arguments to the standard error\n",cmnd)
-;
-    fprintf(stderr, "\n");
-    fprintf(stderr, "  usage:\n");
-    fprintf(stderr, "       %s [ options ]\n", cmnd);
-    fprintf(stderr, "  options:\n");
-    fprintf(stderr, "       -n    : no output newline   [%s]\n", BOOL[NEWLINE]);
-    fprintf(stderr, "       -h    : print this message\n");
-    fprintf(stderr, "\n");
-    exit(status);
+   fprintf(stderr, "\n");
+   fprintf(stderr, " %s - echo arguments to the standard error\n",cmnd);
+   fprintf(stderr, "\n");
+   fprintf(stderr, "  usage:\n");
+   fprintf(stderr, "       %s [ options ]\n", cmnd);
+   fprintf(stderr, "  options:\n");
+   fprintf(stderr, "       -n    : no output newline   [%s]\n", BOOL[NEWLINE]);
+   fprintf(stderr, "       -h    : print this message\n");
+#ifdef PACKAGE_VERSION
+   fprintf(stderr, "\n");
+   fprintf(stderr, " SPTK: version %s\n", PACKAGE_VERSION);
+   fprintf(stderr, " CVS Info: %s", rcs_id);
+#endif
+   fprintf(stderr, "\n");
+   exit(status);
 }
 
-void main(short argc, char **argv)
+int main (int argc, char **argv)
 {
-    int  newline = NEWLINE;
+   int newline=NEWLINE;
 
-    if ((cmnd = strrchr(argv[0], '/')) == NULL)
-	cmnd = argv[0];
-    else
-	cmnd++;
-    while (--argc){
-	if (**++argv == '-') {
-	    switch (*(*argv+1)) {
-		case 'n':
-		    newline = 1 - newline;
-		    break;
-		case 'h':
-		    usage(0);
-		default:
-		    fprintf(stderr, "%s : Invalid option '%c' !\n", cmnd, *(*argv+1));
-		    usage(1);
-		}
-	} else {
-	    fputs(*argv, stderr);
-	    if (argc > 1) putc(' ', stderr);
-	}
-    }
+   if ((cmnd = strrchr(argv[0], '/'))==NULL)
+      cmnd = argv[0];
+   else
+      cmnd++;
+   while (--argc) {
+      if (**++argv=='-') {
+         switch (*(*argv+1)) {
+         case 'n':
+            newline = 1 - newline;
+            break;
+         case 'h':
+            usage(0);
+         default:
+            fprintf(stderr, "%s : Invalid option '%c'!\n", cmnd, *(*argv+1));
+            usage(1);
+         }
+      } 
+      else {
+         fputs(*argv, stderr);
+         if (argc>1) putc(' ', stderr);
+      }
+   }
 
-    if (newline) putc('\n', stderr);
+   if (newline) putc('\n', stderr);
     
-    exit(0);
+   return 0;
 }
