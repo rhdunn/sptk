@@ -1,59 +1,54 @@
-/*
-  ---------------------------------------------------------------  
-            Speech Signal Processing Toolkit (SPTK)
-
-                      SPTK Working Group                           
-                                                                   
-                  Department of Computer Science                   
-                  Nagoya Institute of Technology                   
-                               and                                 
-   Interdisciplinary Graduate School of Science and Engineering    
-                  Tokyo Institute of Technology                    
-                                                                   
-                     Copyright (c) 1984-2007                       
-                       All Rights Reserved.                        
-                                                                   
-  Permission is hereby granted, free of charge, to use and         
-  distribute this software and its documentation without           
-  restriction, including without limitation the rights to use,     
-  copy, modify, merge, publish, distribute, sublicense, and/or     
-  sell copies of this work, and to permit persons to whom this     
-  work is furnished to do so, subject to the following conditions: 
-                                                                   
-    1. The source code must retain the above copyright notice,     
-       this list of conditions and the following disclaimer.       
-                                                                   
-    2. Any modifications to the source code must be clearly        
-       marked as such.                                             
-                                                                   
-    3. Redistributions in binary form must reproduce the above     
-       copyright notice, this list of conditions and the           
-       following disclaimer in the documentation and/or other      
-       materials provided with the distribution.  Otherwise, one   
-       must contact the SPTK working group.                        
-                                                                   
-  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF TECHNOLOGY,   
-  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM   
-  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL       
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   
-  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF         
-  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE   
-  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY        
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
-  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTUOUS   
-  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR          
-  PERFORMANCE OF THIS SOFTWARE.                                    
-                                                                   
-  ---------------------------------------------------------------  
-*/
+/* ----------------------------------------------------------------- */
+/*             The Speech Signal Processing Toolkit (SPTK)           */
+/*             developed by SPTK Working Group                       */
+/*             http://sp-tk.sourceforge.net/                         */
+/* ----------------------------------------------------------------- */
+/*                                                                   */
+/*  Copyright (c) 1984-2007  Tokyo Institute of Technology           */
+/*                           Interdisciplinary Graduate School of    */
+/*                           Science and Engineering                 */
+/*                                                                   */
+/*                1996-2008  Nagoya Institute of Technology          */
+/*                           Department of Computer Science          */
+/*                                                                   */
+/* All rights reserved.                                              */
+/*                                                                   */
+/* Redistribution and use in source and binary forms, with or        */
+/* without modification, are permitted provided that the following   */
+/* conditions are met:                                               */
+/*                                                                   */
+/* - Redistributions of source code must retain the above copyright  */
+/*   notice, this list of conditions and the following disclaimer.   */
+/* - Redistributions in binary form must reproduce the above         */
+/*   copyright notice, this list of conditions and the following     */
+/*   disclaimer in the documentation and/or other materials provided */
+/*   with the distribution.                                          */
+/* - Neither the name of the SPTK working group nor the names of its */
+/*   contributors may be used to endorse or promote products derived */
+/*   from this software without specific prior written permission.   */
+/*                                                                   */
+/* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND            */
+/* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,       */
+/* INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF          */
+/* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE          */
+/* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS */
+/* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,          */
+/* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED   */
+/* TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,     */
+/* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON */
+/* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,   */
+/* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY    */
+/* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE           */
+/* POSSIBILITY OF SUCH DAMAGE.                                       */
+/* ----------------------------------------------------------------- */
 
 /****************************************************************
 
-    $Id: _mcep.c,v 1.12 2007/09/30 16:20:40 heigazen Exp $
+    $Id: _mcep.c,v 1.19 2008/06/16 05:48:40 heigazen Exp $
 
     Mel-Cepstral Analysis
 
-        int mcep(xw, flng, mc, m, a, itr1, itr2, dd, e);
+        int mcep(xw, flng, mc, m, a, itr1, itr2, dd, e, itype);
 
         double   *xw   : input sequence
         int      flng  : frame length
@@ -64,7 +59,10 @@
         int      itr2  : maximum number of iteration
         double   dd    : end condition
         double   e     : initial value for log-periodgram
-
+        double   f     : mimimum value of the determinant 
+                         of the normal matrix
+        int      itype : input data type
+                                
         return   value :    0 -> completed by end condition
                             -1-> completed by maximum iteration
 
@@ -73,44 +71,15 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <SPTK.h>
 
-static void frqtr (double *c1, int m1, double *c2, int m2, const double a)
-{
-   int i, j;
-   static double *d=NULL, *g;
-   static int size;
+#if defined(WIN32)
+#  include "SPTK.h"
+#else
+#  include <SPTK.h>
+#endif
 
-   if (d==NULL) {
-      size = m2;
-      d = dgetmem(size+size+2);
-      g = d + size + 1;
-   }
-
-   if (m2>size) {
-      free(d);
-      size = m2;
-      d = dgetmem(size+size+2);
-      g = d + size + 1;
-   }
-
-   fillz(g, sizeof(*g), m2+1);
-
-   for (i=-m1; i<=0; i++) {
-      if (0 <= m2) {
-         d[0] = g[0];
-         g[0] = c1[-i];
-      }
-      for (j=1; j<=m2; j++)
-         g[j] = d[j-1] + a*((d[j] = g[j]) - g[j-1]);
-   }
-
-   movem(g, c2, sizeof(*g), m2+1);
-
-   return;
-}
-
-int mcep (double *xw, const int flng, double *mc, const int m, const double a, const int itr1, const int itr2, const double dd, const double e)
+int mcep (double *xw, const int flng, double *mc, const int m, const double a, const int itr1, const int itr2, 
+          const double dd, const double e, const double f, const int itype)
 {
    int i, j;
    int flag=0, f2, m2;
@@ -149,17 +118,51 @@ int mcep (double *xw, const int flng, double *mc, const int m, const double a, c
 
    movem(xw, x, sizeof(*x), flng);
 
-   /*  power spectrum  */
-   fftr(x, y, flng);
+   switch (itype) {
+   case 0:   /* windowed data sequence */
+      fftr(x, y, flng);
+      for (i=0; i<flng; i++) {
+         x[i] = x[i]*x[i] + y[i]*y[i] + e;  /*  periodegram  */
+      }
+      break;
+   case 1:   /* dB */
+      for (i=0; i<=flng/2; i++) {
+         x[i] /= 20.0 / log(10.0);  /* dB -> amplitude spectrum */
+         x[i] = x[i]*x[i]+e;  /* amplitude -> periodgram */
+      }
+      break;
+   case 2:  /* log */
+      for (i=0; i<=flng/2; i++) {
+         x[i] = exp(x[i]);  /* log -> amplitude spectrum */
+         x[i] = x[i]*x[i]+e;  /* amplitude -> periodgram */
+      }
+      break;
+   case 3:  /* amplitude */
+      for (i=0; i<=flng/2; i++) {
+         x[i] = x[i]*x[i]+e;  /* amplitude -> periodgram */
+      }
+      break;
+   case 4:  /* periodgram */
+      for (i=0; i<=flng/2; i++) {
+         x[i] = x[i]+e;
+      }
+      break;
+   default:
+     fprintf(stderr, "mcep : input type %d is not supported!\n", itype);
+     exit(1);
+   }
+   if (itype>0) {
+      for (i=1; i<flng/2; i++)
+         x[flng-i] = x[i];
+   }
    for (i=0; i<flng; i++) {
-      x[i] = x[i]*x[i] + y[i]*y[i] + e;
-      if (x[i] <= 0) {
-         fprintf(stderr, "mcep : The log periodogram has '0', use '-e' option!\n");
+      if (x[i] <= 0.0) {
+         fprintf(stderr, "mcep : periodogram has '0', use '-e' option to floor it!\n");
          exit(1);
       }
       c[i] = log(x[i]);
    }
-
+   
    /*  1, (-a), (-a)^2, ..., (-a)^M  */
    al[0] = 1.0;
    for (i=1; i<=m; i++)
@@ -168,8 +171,8 @@ int mcep (double *xw, const int flng, double *mc, const int m, const double a, c
    /*  initial value of cepstrum  */
    ifftr(c, y, flng);            /*  c : IFFT[x]  */
 
-   c[0] /= 2.0;
-   c[flng/2] /= 2.0;
+   c[0]  /= 2.0;
+   c[f2] /= 2.0;
    freqt(c, f2, mc, m, a);         /*  mc : mel cep.  */
    s = c[0];
 
@@ -199,7 +202,7 @@ int mcep (double *xw, const int flng, double *mc, const int m, const double a, c
       for (i=2; i<=m;  i+=2) c[i] += c[0];
       c[0] += c[0];
 
-      if (theq(c, y, d, b, m+1, -1.0)) {
+      if (theq(c, y, d, b, m+1, f)) {
          fprintf(stderr,"mcep : Error in theq() at %dth iteration !\n", j);
          exit(1);
       }
@@ -225,3 +228,38 @@ int mcep (double *xw, const int flng, double *mc, const int m, const double a, c
         double a     : all-pass constant
 
 ***************************************************************/
+
+void frqtr (double *c1, int m1, double *c2, int m2, const double a)
+{
+   int i, j;
+   static double *d=NULL, *g;
+   static int size;
+
+   if (d==NULL) {
+      size = m2;
+      d = dgetmem(size+size+2);
+      g = d + size + 1;
+   }
+
+   if (m2>size) {
+      free(d);
+      size = m2;
+      d = dgetmem(size+size+2);
+      g = d + size + 1;
+   }
+
+   fillz(g, sizeof(*g), m2+1);
+
+   for (i=-m1; i<=0; i++) {
+      if (0 <= m2) {
+         d[0] = g[0];
+         g[0] = c1[-i];
+      }
+      for (j=1; j<=m2; j++)
+         g[j] = d[j-1] + a*((d[j] = g[j]) - g[j-1]);
+   }
+
+   movem(g, c2, sizeof(*g), m2+1);
+
+   return;
+}

@@ -1,51 +1,46 @@
-/*
-  ---------------------------------------------------------------  
-            Speech Signal Processing Toolkit (SPTK)
-
-                      SPTK Working Group                           
-                                                                   
-                  Department of Computer Science                   
-                  Nagoya Institute of Technology                   
-                               and                                 
-   Interdisciplinary Graduate School of Science and Engineering    
-                  Tokyo Institute of Technology                    
-                                                                   
-                     Copyright (c) 1984-2007                       
-                       All Rights Reserved.                        
-                                                                   
-  Permission is hereby granted, free of charge, to use and         
-  distribute this software and its documentation without           
-  restriction, including without limitation the rights to use,     
-  copy, modify, merge, publish, distribute, sublicense, and/or     
-  sell copies of this work, and to permit persons to whom this     
-  work is furnished to do so, subject to the following conditions: 
-                                                                   
-    1. The source code must retain the above copyright notice,     
-       this list of conditions and the following disclaimer.       
-                                                                   
-    2. Any modifications to the source code must be clearly        
-       marked as such.                                             
-                                                                   
-    3. Redistributions in binary form must reproduce the above     
-       copyright notice, this list of conditions and the           
-       following disclaimer in the documentation and/or other      
-       materials provided with the distribution.  Otherwise, one   
-       must contact the SPTK working group.                        
-                                                                   
-  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF TECHNOLOGY,   
-  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM   
-  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL       
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   
-  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF         
-  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE   
-  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY        
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
-  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTUOUS   
-  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR          
-  PERFORMANCE OF THIS SOFTWARE.                                    
-                                                                   
-  ---------------------------------------------------------------  
-*/
+/* ----------------------------------------------------------------- */
+/*             The Speech Signal Processing Toolkit (SPTK)           */
+/*             developed by SPTK Working Group                       */
+/*             http://sp-tk.sourceforge.net/                         */
+/* ----------------------------------------------------------------- */
+/*                                                                   */
+/*  Copyright (c) 1984-2007  Tokyo Institute of Technology           */
+/*                           Interdisciplinary Graduate School of    */
+/*                           Science and Engineering                 */
+/*                                                                   */
+/*                1996-2008  Nagoya Institute of Technology          */
+/*                           Department of Computer Science          */
+/*                                                                   */
+/* All rights reserved.                                              */
+/*                                                                   */
+/* Redistribution and use in source and binary forms, with or        */
+/* without modification, are permitted provided that the following   */
+/* conditions are met:                                               */
+/*                                                                   */
+/* - Redistributions of source code must retain the above copyright  */
+/*   notice, this list of conditions and the following disclaimer.   */
+/* - Redistributions in binary form must reproduce the above         */
+/*   copyright notice, this list of conditions and the following     */
+/*   disclaimer in the documentation and/or other materials provided */
+/*   with the distribution.                                          */
+/* - Neither the name of the SPTK working group nor the names of its */
+/*   contributors may be used to endorse or promote products derived */
+/*   from this software without specific prior written permission.   */
+/*                                                                   */
+/* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND            */
+/* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,       */
+/* INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF          */
+/* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE          */
+/* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS */
+/* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,          */
+/* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED   */
+/* TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,     */
+/* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON */
+/* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,   */
+/* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY    */
+/* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE           */
+/* POSSIBILITY OF SUCH DAMAGE.                                       */
+/* ----------------------------------------------------------------- */
 
 /**************************************************************************
 *                                                                         *
@@ -59,10 +54,14 @@
 *       options:                                                          *
 *               -m m   :  order of generalized cepstrum (input)   [25]    *
 *               -g g   :  gamma of generalized cepstrum (input)   [0]     *
+*               -c  c  :  gamma of generalized cepstrum (input)           *
+*                         gamma = -1 / (int) c                            *
 *               -n     :  regard input as normalized cepstrum     [FALSE] *
 *               -u     :  regard input as multiplied by gamma     [FALSE] *
 *               -M M   :  order of generalized cepstrum (output)  [25]    *
 *               -G G   :  gamma of generalized cepstrum (output)  [1]     *
+*               -C  C  :  gamma of generalized cepstrum (output)          *
+*                         gamma = -1 / (int) C                            *
 *               -N     :  regard output as normalized cepstrum    [FALSE] *
 *               -U     :  regard output as multiplied by gamma    [FALSE] *
 *       infile:                                                           *
@@ -72,22 +71,34 @@
 *               generalized cepstrum                                      *
 *                   , c'(0)(=c(0)), c'(1), ..., c'(M),                    *
 *       notice:                                                           *
-*               if g >= 1, g = -1 / g                                     *
-*               if G >= 1, G = -1 / G                                     *
+*               value of c and C must be c>=1, C>=1                       *
 *       require:                                                          *
 *               gc2gc(), gnorm(), ignorm()                                *
 *                                                                         *
 **************************************************************************/
 
-static char *rcs_id = "$Id: gc2gc.c,v 1.16 2007/09/30 16:20:31 heigazen Exp $";
+static char *rcs_id = "$Id: gc2gc.c,v 1.21 2008/11/06 15:40:51 tatsuyaito Exp $";
 
 
 /*  Standard C Libraries  */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <SPTK.h>
 
+#ifdef HAVE_STRING_H
+#  include <string.h>
+#else
+#  include <strings.h>
+#  ifndef HAVE_STRRCHR
+#     define strrchr rindex
+#  endif
+#endif
+
+
+#if defined(WIN32)
+#  include "SPTK.h"
+#else
+#  include <SPTK.h>
+#endif
 
 /*  Default Values  */
 #define ORDER1 25
@@ -115,10 +126,12 @@ void usage (int status)
    fprintf(stderr, "  options:\n");
    fprintf(stderr, "       -m m  : order of generalized cepstrum (input)  [%d]\n", ORDER1);
    fprintf(stderr, "       -g g  : gamma of generalized cepstrum (input)  [%g]\n", GAMMA1);
+   fprintf(stderr, "       -c c  : gamma of mel-generalized cepstrum = -1 / (int) c (input) \n");
    fprintf(stderr, "       -n    : regard input as normalized cepstrum    [%s]\n", BOOL[NORMFLG1]);
    fprintf(stderr, "       -u    : regard input as multiplied by gamma    [%s]\n", BOOL[MULGFLG1]);
    fprintf(stderr, "       -M M  : order of generalized cepstrum (output) [%d]\n", ORDER2);
    fprintf(stderr, "       -G G  : gamma of generalized cepstrum (output) [%g]\n", GAMMA2);
+   fprintf(stderr, "       -C C  : gamma of mel-generalized cepstrum = -1 / (int) C (output)\n");
    fprintf(stderr, "       -N    : regard output as normalized cepstrum   [%s]\n", BOOL[NORMFLG2]);
    fprintf(stderr, "       -U    : regard output as multiplied by gamma   [%s]\n", BOOL[MULGFLG2]);
    fprintf(stderr, "       -h    : print this message\n");
@@ -127,8 +140,7 @@ void usage (int status)
    fprintf(stderr, "  stdout:\n");
    fprintf(stderr, "       transformed generalized cepstrum (%s)\n", FORMAT);
    fprintf(stderr, "  notice:\n");
-   fprintf(stderr, "       if g >= 1, g = -1 / g\n");
-   fprintf(stderr, "       if G >= 1, G = -1 / G\n");
+   fprintf(stderr, "      value of c and C must be c>=1, C>=1 \n");
 #ifdef PACKAGE_VERSION
    fprintf(stderr, "\n");
    fprintf(stderr, " SPTK: version %s\n", PACKAGE_VERSION);
@@ -162,14 +174,24 @@ int main (int argc, char **argv)
             --argc;
             break;
          case 'g':
-            g1 = atof(*++argv);
-            --argc;
-            if (g1>=1.0) g1 = -1.0 / g1;
-            break;
+	    g1 = atof(*++argv);
+	    --argc;            
+            break;             
+         case 'c':             
+	    g1 = atoi(*++argv);
+	    --argc;         
+           if (g1 < 1) fprintf(stderr, "%s : value of c must be c>=1!\n", cmnd);   
+	    g1 = -1.0 / g1;    
+            break;             
          case 'G':
             g2 = atof(*++argv);
             --argc;
-            if (g2>=1.0) g2 = -1.0 / g2;
+            break;
+         case 'C':             
+	    g2 = atoi(*++argv);
+	    --argc;            
+            if (g2 < 1) fprintf(stderr, "%s : value of C must be C>=1!\n", cmnd);
+	    g2 = -1.0 / g2;    
             break;
          case 'n':
             norm1 = 1 - norm1;
@@ -191,7 +213,7 @@ int main (int argc, char **argv)
          }
       }
       else 
-         fp = getfp(*argv, "r");
+         fp = getfp(*argv, "rb");
 
    gc1 = dgetmem(m1+m2+2);
    gc2 = gc1 + m1 + 1;

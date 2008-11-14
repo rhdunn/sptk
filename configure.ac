@@ -1,10 +1,11 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT(SPTK, 3.1, dsp-cmnd@sp.nitech.ac.jp)
+AC_INIT(SPTK, 3.2, http://sourceforge.net/projects/sp-tk/)
 AC_CONFIG_AUX_DIR([config])
-AC_COPYRIGHT(Copyright 1984-2007 Nagoya Institute of Technology and Tokyo Institute of Technology)
-AM_INIT_AUTOMAKE(SPTK, 3.1, nostdinc no-installinfo no-installman)
+AC_COPYRIGHT(Copyright 1984-2007 Tokyo Institute of Technology)
+AC_COPYRIGHT(Copyright 1996-2008 Nagoya Institute of Technology)
+AM_INIT_AUTOMAKE(SPTK, 3.2, nostdinc no-installinfo no-installman)
 AC_SUBST(PACKAGE_NAME)
 AC_SUBST(PACKAGE_VERSION)
 
@@ -24,8 +25,7 @@ AC_PROG_AR
 AC_PATH_PROG(CSH,csh,csh)
 
 # Checks for libraries.
-AC_CHECK_LIB([m], [log])
-
+AC_CHECK_LIB([m],[log],,AC_MSG_ERROR(Cannot find libm))
 
 # Checks for X Window Systems
 AC_PATH_X
@@ -53,7 +53,20 @@ AC_CANONICAL_HOST
 AC_PROG_GCC_TRADITIONAL
 AC_FUNC_MALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([bzero memset pow sqrt strrchr])
+AC_CHECK_FUNC(pow,,AC_MSG_ERROR("Cannot find pow()"))
+AC_CHECK_FUNC(sqrt,,AC_MSG_ERROR("Cannot find sqrt()"))
+
+find_memset=no
+find_strrchr=no
+AC_CHECK_FUNCS([bzero memset],find_memset="yes",)
+AC_CHECK_FUNCS([strrchr rindex],find_strrchr="yes",)
+
+if test "$find_memset" != "yes"; then
+	AC_MSG_ERROR("Cannot find memset() or bzero()")
+fi
+if test "$find_strrchr" != "yes"; then
+	AC_MSG_ERROR("Cannot find strrchr() or rindex()")
+fi
 
 # Checks for double 
 use_double=no
@@ -151,8 +164,10 @@ AC_CONFIG_FILES([Makefile
                  bin/cdist/Makefile
                  bin/clip/Makefile
                  bin/da/Makefile
+                 bin/dct/Makefile
                  bin/decimate/Makefile
                  bin/delay/Makefile
+                 bin/delta/Makefile
                  bin/df2/Makefile
                  bin/dfs/Makefile
                  bin/dmp/Makefile
@@ -172,6 +187,7 @@ AC_CONFIG_FILES([Makefile
                  bin/gc2gc/Makefile
                  bin/gcep/Makefile
                  bin/glsadf/Makefile
+                 bin/gmm/Makefile
                  bin/gnorm/Makefile
                  bin/grpdelay/Makefile
                  bin/histogram/Makefile
@@ -223,7 +239,6 @@ AC_CONFIG_FILES([Makefile
                  bin/smcep/Makefile
                  bin/snr/Makefile
                  bin/sopr/Makefile
-                 bin/sp2mgc/Makefile
                  bin/spec/Makefile
                  bin/step/Makefile
                  bin/swab/Makefile

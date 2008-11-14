@@ -1,51 +1,46 @@
-/*
-  ---------------------------------------------------------------  
-            Speech Signal Processing Toolkit (SPTK)
-
-                      SPTK Working Group                           
-                                                                   
-                  Department of Computer Science                   
-                  Nagoya Institute of Technology                   
-                               and                                 
-   Interdisciplinary Graduate School of Science and Engineering    
-                  Tokyo Institute of Technology                    
-                                                                   
-                     Copyright (c) 1984-2007                       
-                       All Rights Reserved.                        
-                                                                   
-  Permission is hereby granted, free of charge, to use and         
-  distribute this software and its documentation without           
-  restriction, including without limitation the rights to use,     
-  copy, modify, merge, publish, distribute, sublicense, and/or     
-  sell copies of this work, and to permit persons to whom this     
-  work is furnished to do so, subject to the following conditions: 
-                                                                   
-    1. The source code must retain the above copyright notice,     
-       this list of conditions and the following disclaimer.       
-                                                                   
-    2. Any modifications to the source code must be clearly        
-       marked as such.                                             
-                                                                   
-    3. Redistributions in binary form must reproduce the above     
-       copyright notice, this list of conditions and the           
-       following disclaimer in the documentation and/or other      
-       materials provided with the distribution.  Otherwise, one   
-       must contact the SPTK working group.                        
-                                                                   
-  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF TECHNOLOGY,   
-  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM   
-  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL       
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   
-  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF         
-  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE   
-  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY        
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
-  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTUOUS   
-  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR          
-  PERFORMANCE OF THIS SOFTWARE.                                    
-                                                                   
-  ---------------------------------------------------------------  
-*/
+/* ----------------------------------------------------------------- */
+/*             The Speech Signal Processing Toolkit (SPTK)           */
+/*             developed by SPTK Working Group                       */
+/*             http://sp-tk.sourceforge.net/                         */
+/* ----------------------------------------------------------------- */
+/*                                                                   */
+/*  Copyright (c) 1984-2007  Tokyo Institute of Technology           */
+/*                           Interdisciplinary Graduate School of    */
+/*                           Science and Engineering                 */
+/*                                                                   */
+/*                1996-2008  Nagoya Institute of Technology          */
+/*                           Department of Computer Science          */
+/*                                                                   */
+/* All rights reserved.                                              */
+/*                                                                   */
+/* Redistribution and use in source and binary forms, with or        */
+/* without modification, are permitted provided that the following   */
+/* conditions are met:                                               */
+/*                                                                   */
+/* - Redistributions of source code must retain the above copyright  */
+/*   notice, this list of conditions and the following disclaimer.   */
+/* - Redistributions in binary form must reproduce the above         */
+/*   copyright notice, this list of conditions and the following     */
+/*   disclaimer in the documentation and/or other materials provided */
+/*   with the distribution.                                          */
+/* - Neither the name of the SPTK working group nor the names of its */
+/*   contributors may be used to endorse or promote products derived */
+/*   from this software without specific prior written permission.   */
+/*                                                                   */
+/* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND            */
+/* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,       */
+/* INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF          */
+/* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE          */
+/* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS */
+/* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,          */
+/* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED   */
+/* TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,     */
+/* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON */
+/* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,   */
+/* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY    */
+/* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE           */
+/* POSSIBILITY OF SUCH DAMAGE.                                       */
+/* ----------------------------------------------------------------- */
 
 /****************************************************************************************
 *                                                                                       *
@@ -77,16 +72,29 @@
 *                                                                                       *
 ****************************************************************************************/
 
-static char *rcs_id = "$Id: mlpg.c,v 1.18 2007/09/30 18:37:52 heigazen Exp $";
+static char *rcs_id = "$Id: mlpg.c,v 1.26 2008/07/02 07:06:40 heigazen Exp $";
 
 
 /* Standard C Libraries */
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#include <SPTK.h>
 
+#ifdef HAVE_STRING_H
+#  include <string.h>
+#else
+#  include <strings.h>
+#  ifndef HAVE_STRRCHR
+#     define strrchr rindex
+#  endif
+#endif
+
+#include <ctype.h>
+
+#if defined(WIN32)
+#  include "SPTK.h"
+#else
+#  include <SPTK.h>
+#endif
 
 /* default values */
 #define  ORDER  25
@@ -99,7 +107,7 @@ char  *cmnd;
 
 
 /*  Other Definitions  */
-#ifdef DOULBE
+#ifdef DOUBLE
 typedef double real;
 #else
 typedef float real;
@@ -156,13 +164,11 @@ typedef struct _PStream {
 } PStream;
 
 /*  Required Functions  */
-int isfloat(char *c);
 void InitPStream(PStream *pst);
 void InitDWin(PStream *pst);
 double *dcalloc(int x, int xoff);
 double **ddcalloc(int x, int y, int xoff, int yoff);
 double ***dddcalloc(int x, int y, int z, int xoff, int yoff, int zoff);
-int str2darray(char *c, double **x);
 double *mlpg(PStream *pst);
 int doupdate(PStream *pst, int d);
 void calc_pi(PStream *pst, int d);
@@ -216,7 +222,6 @@ int main (int argc, char **argv)
    int coeflen;
    PStream pst;
    int i, j;
-   int isfloat(char *);
    void InitPStream(PStream *);
    double *mlpg(PStream *);
 
@@ -316,10 +321,7 @@ int main (int argc, char **argv)
          }
       }
       else
-         if ((pdffp = fopen(*argv, "r"))==NULL) {
-            fprintf(stderr, "%s : Cannot open file %s!\n", cmnd, *argv);
-            return(2);
-         }
+         pdffp = getfp(*argv, "rb");
    }
 
    InitPStream(&pst);
@@ -353,48 +355,6 @@ int main (int argc, char **argv)
 
    return(0);
 }
-
-
-int isfloat (char *c)
-{
-   int isnum=0, wfe=1;
-   int i=0;
-
-   if (strlen(c)==0)
-      return(0);
-
-   if ((c[i]=='+') || (c[i]=='-'))
-      i++;
-   while ((c[i] >= '0') && (c[i] <= '9')) {
-      isnum = 1;
-      i++;
-   }
-   if (c[i]=='.') {
-      i++;
-      while ((c[i] >= '0') && (c[i] <= '9')) {
-         isnum = 1;
-         i++;
-      }
-   }
-   if ((c[i]=='e') || (c[i]=='E')) {
-      wfe = 0;
-      i++;
-      if ((c[i]=='+') || (c[i]=='-'))
-         i++;
-      while ((c[i] >= '0') && (c[i] <= '9')) {
-         wfe = 1;
-         i++;
-      }
-   }
-   if ((c[i]=='f') || (c[i]=='F') || (c[i]=='l') || (c[i]=='L'))
-      i++;
-
-   if ((c[i]=='\0') && isnum && wfe)
-      return(1);
-   else
-      return(0);
-}
-
 
 void InitPStream(PStream *pst)
 {
@@ -445,11 +405,10 @@ void InitPStream(PStream *pst)
 
 void InitDWin(PStream *pst)
 {
-   double  *dcalloc(int, int);
-   int  str2darray(char *, double **);
+   double *dcalloc(int, int);
    int i, j;
    int  fsize, leng;
-   double  x, s4, s2, s0;
+   double  x, a0, a1, a2;
    FILE  *fp;
 
    /* memory allocation */
@@ -478,11 +437,9 @@ void InitDWin(PStream *pst)
          if (pst->dw.fn[i][0]==' ') {
             fsize = str2darray(pst->dw.fn[i], &(pst->dw.coef[i]));
          }
-         else {      /* read from file */
-            if ((fp=fopen(pst->dw.fn[i], "r"))==NULL) {
-               fprintf(stderr, "%s : Cannot open file %s!\n", cmnd, pst->dw.fn[i]);
-               exit(1);
-            }
+         else {      
+            /* read from file */
+            fp = getfp(pst->dw.fn[i], "rb");
 
             /* check the number of coefficients */
             fseek(fp, 0L, 2);
@@ -517,28 +474,15 @@ void InitDWin(PStream *pst)
       }
 
       leng = atoi(pst->dw.fn[1]);
-      s2 = 1;
-      for (j=2; j <= leng; j++) {
-         x = j * j;
-         s2 += x;
-      }
-      s2 += s2;
+      for (a1=0,j=-leng; j<=leng; a1+=j*j,j++);
       for (j=-leng; j<=leng; j++)
-         pst->dw.coef[1][j] = j / s2;
+         pst->dw.coef[1][j] = (double)j / (double)a1;
 
       if (pst->dw.num>2) {
          leng = atoi(pst->dw.fn[2]);
-         s2 = s4 = 1;
-         for (j=2; j<=leng; j++) {
-            x = j * j;
-            s2 += x;
-            s4 += x * x;
-         }
-         s2 += s2;
-         s4 += s4;
-         s0 = leng + leng + 1;
+         for (a0=a1=a2=0,j=-leng; j<=leng; a0++,a1+=j*j,a2+=j*j*j*j,j++);
          for (j=-leng; j<=leng; j++)
-            pst->dw.coef[2][j] = (s0*j*j - s2)/(s4*s0 - s2*s2)/2;
+            pst->dw.coef[2][j] = ((double)(a0*j*j - a1))/((double)(a2*a0 - a1*a1))/2;
       }
    }
 
@@ -599,38 +543,6 @@ double ***dddcalloc(int x, int y, int z, int xoff, int yoff, int zoff)
    ptr += xoff;
    return(ptr);
 }
-
-int str2darray(char *c, double **x)
-{
-   int i, size, sp;
-   char *p, *buf;
-
-   while (isspace(*c))
-      c++;
-   if (*c=='\0') {
-      *x = NULL;
-      return(0);
-   }
-
-   size = 1;
-   sp = 0;
-   for (p=c; *p!='\0'; p++) {
-      if (!isspace(*p)) {
-         if (sp==1) {
-            size++;
-            sp = 0;
-         }
-      }
-      else
-         sp = 1;
-   }
-   buf = getmem(strlen(c), sizeof(*buf));
-   *x = dgetmem(size);
-   for (i=0; i<size; i++)
-      (*x)[i] = strtod(c, &c);
-   return(size);
-}
-
 
 /*--------------------------------------------------------------------*/
 

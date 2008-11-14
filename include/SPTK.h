@@ -1,54 +1,49 @@
-/*
-  ---------------------------------------------------------------  
-            Speech Signal Processing Toolkit (SPTK)
-
-                      SPTK Working Group                           
-                                                                   
-                  Department of Computer Science                   
-                  Nagoya Institute of Technology                   
-                               and                                 
-   Interdisciplinary Graduate School of Science and Engineering    
-                  Tokyo Institute of Technology                    
-                                                                   
-                     Copyright (c) 1984-2007                       
-                       All Rights Reserved.                        
-                                                                   
-  Permission is hereby granted, free of charge, to use and         
-  distribute this software and its documentation without           
-  restriction, including without limitation the rights to use,     
-  copy, modify, merge, publish, distribute, sublicense, and/or     
-  sell copies of this work, and to permit persons to whom this     
-  work is furnished to do so, subject to the following conditions: 
-                                                                   
-    1. The source code must retain the above copyright notice,     
-       this list of conditions and the following disclaimer.       
-                                                                   
-    2. Any modifications to the source code must be clearly        
-       marked as such.                                             
-                                                                   
-    3. Redistributions in binary form must reproduce the above     
-       copyright notice, this list of conditions and the           
-       following disclaimer in the documentation and/or other      
-       materials provided with the distribution.  Otherwise, one   
-       must contact the SPTK working group.                        
-                                                                   
-  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF TECHNOLOGY,   
-  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM   
-  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL       
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   
-  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF         
-  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE   
-  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY        
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
-  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTUOUS   
-  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR          
-  PERFORMANCE OF THIS SOFTWARE.                                    
-                                                                   
-  ---------------------------------------------------------------  
-*/
+/* ----------------------------------------------------------------- */
+/*             The Speech Signal Processing Toolkit (SPTK)           */
+/*             developed by SPTK Working Group                       */
+/*             http://sp-tk.sourceforge.net/                         */
+/* ----------------------------------------------------------------- */
+/*                                                                   */
+/*  Copyright (c) 1984-2007  Tokyo Institute of Technology           */
+/*                           Interdisciplinary Graduate School of    */
+/*                           Science and Engineering                 */
+/*                                                                   */
+/*                1996-2008  Nagoya Institute of Technology          */
+/*                           Department of Computer Science          */
+/*                                                                   */
+/* All rights reserved.                                              */
+/*                                                                   */
+/* Redistribution and use in source and binary forms, with or        */
+/* without modification, are permitted provided that the following   */
+/* conditions are met:                                               */
+/*                                                                   */
+/* - Redistributions of source code must retain the above copyright  */
+/*   notice, this list of conditions and the following disclaimer.   */
+/* - Redistributions in binary form must reproduce the above         */
+/*   copyright notice, this list of conditions and the following     */
+/*   disclaimer in the documentation and/or other materials provided */
+/*   with the distribution.                                          */
+/* - Neither the name of the SPTK working group nor the names of its */
+/*   contributors may be used to endorse or promote products derived */
+/*   from this software without specific prior written permission.   */
+/*                                                                   */
+/* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND            */
+/* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,       */
+/* INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF          */
+/* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE          */
+/* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS */
+/* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,          */
+/* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED   */
+/* TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,     */
+/* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON */
+/* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,   */
+/* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY    */
+/* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE           */
+/* POSSIBILITY OF SUCH DAMAGE.                                       */
+/* ----------------------------------------------------------------- */
 
 /***********************************************************
-   $Id: SPTK.h,v 1.12 2007/09/18 03:52:41 heigazen Exp $ 
+   $Id: SPTK.h,v 1.22 2008/07/02 07:06:40 heigazen Exp $ 
    
    Speech Signal Processing Toolkit
    SPTK.h
@@ -95,13 +90,30 @@ typedef struct {
    double im;
 } complex;
 
+/* struct for Gaussian distribution */
+typedef struct _Gauss {
+   double *mean;
+   double *var;
+   double gconst;
+} Gauss;
+
+/* structure for GMM */
+typedef struct _GMM {
+   int nmix;
+   double *weight;
+   Gauss *gauss;
+} GMM;
+
 
 /* library routines */
 double agexp (double r, double x, double y);
 int cholesky (double *c, double *a, double *b, const int n, double eps);
+int freada (double *p, const int bl, FILE *fp);
+int fwritex (void *ptr, const size_t size, const int nitems, FILE *fp);
+int freadx (void *ptr, const size_t size, const int nitems, FILE *fp);
 #ifdef DOUBLE
-#define fwritef fwrite
-#define freadf  fread
+int fwritef (float *ptr, const size_t size, const int nitems, FILE *fp);
+int freadf  (float *ptr, const size_t size, const int nitems, FILE *fp);
 #else
 int fwritef (double *ptr, const size_t size, const int nitems, FILE *fp);
 int freadf  (double *ptr, const size_t size, const int nitems, FILE *fp);
@@ -150,9 +162,14 @@ int fftr (double *x, double *y, const int m);
 int fftr2 (double x[], double y[], const int n);
 void freqt (double *c1, const int m1, double *c2, const int m2, const double a);
 void gc2gc (double *c1, const int m1, const double g1, double *c2, const int m2, const double g2);
-int gcep (double *xw, const int flng, double *gc, const int m, const double g, const int itr1, const int itr2, const double d, const double e);
+int gcep (double *xw, const int flng, double *gc, const int m, const double g, const int itr1, const int itr2, const double d, const double e, const double f, const int itype);
 double glsadf (double x, double *c, const int m, const int n, double *d);
 double glsadf1 (double x, double *c, const int m, const int n, double *d);
+double cal_gconst (double *var, const int D);
+void fillz_gmm (GMM *gmm, const int M, const int L);
+double log_wgd (GMM *gmm, const int m, double *dat, const int L);
+double log_add (double logx, double logy);
+double log_outp (GMM *gmm, double *dat, const int M, const int L);
 void gnorm (double *c1, double *c2, int m, const double g);
 void grpdelay (double *x, double *gd, const int size, const int is_arma);
 int histogram (double *x, const int size, const double min, const double max, const double step, double *h);
@@ -171,7 +188,7 @@ void lbg (double *x, const int l, const int tnum, double *icb, int icbsize, doub
 int levdur (double *r, double *a, const int m, double eps);
 double lmadf (double x, double *c, const int m, const int pd, double *d);
 double lmadf1 (double x, double *c, const int m, double *d, const int m1, const int m2, const int pd);
-int lpc (double *x, const int flng, double *a, const int m);
+int lpc (double *x, const int flng, double *a, const int m, const double f);
 void lpc2c (double *a, int m1, double *c, const int m2);
 int lpc2lsp (double *lpc, double *lsp, const int order, const int numsp, const int maxitr, const double eps);
 int lpc2par (double *a, double *k, const int m);
@@ -182,15 +199,20 @@ double lspdf_even (double x, double *f, const int m, double *d);
 double lspdf_odd (double x, double *f, const int m, double *d);
 double ltcdf (double x, double *k, int m, double *d);
 void mc2b (double *mc, double *b, int m, const double a);
-int mcep (double *xw, const int flng, double *mc, const int m, const double a, const int itr1, const int itr2, const double dd, const double e);
+int mcep (double *xw, const int flng, double *mc, const int m, const double a, 
+          const int itr1, const int itr2, const double dd, const double e, const double f, const int itype);
+void frqtr (double *c1, int m1, double *c2, int m2, const double a);
 void mgc2mgc (double *c1, const int m1, const double a1, const double g1, double *c2, const int m2, const double a2, const double g2);
 void mgc2sp (double *mgc, const int m, const double a, const double g, double *x, double *y, const int flng);
-int mgcep (double *xw, int flng, double *b, const int m, const double a, const double g, const int n, const int itr1, const int itr2, const double dd, const double e);
-double newton (double *x, const int flng, double *c, const int m, const double a, const double g, const int n, const int j);
+int mgcep (double *xw, int flng, double *b, const int m, const double a, const double g, const int n, 
+           const int itr1, const int itr2, const double dd, const double e, const double f, const int itype);
+double newton (double *x, const int flng, double *c, const int m, const double a, const double g, const int n, const int j, const double f);
 double mglsadf (double x, double *b, const int m, const double a, const int n, double *d);
 double mglsadf1 (double x, double *b, const int m, const double a, const int n, double *d);
 double mglsadft (double x, double *b, const int m, const double a, const int n, double *d);
 double mglsadf1t (double x, double *b, const int m, const double a, const int n, double *d);
+int str2darray (char *c, double **x);
+int isfloat (char *c);
 double mlsadf (double x, double *b, const int m, const double a, const int pd, double *d);
 void msvq (double *x, double *cb, const int l, int *cbsize, const int stage, int *index);
 void norm0 (double *x, double *y, int m);
@@ -208,11 +230,9 @@ double rmse (double *x, double *y, const int n);
 void output_root_pol (complex *x, int odr, int form);
 void root_pol (double *a, const int odr, complex *x, const int a_zero, const double eps, const int itrat);
 complex *cplx_getmem (const int leng);
-int sp2mgc (double *xw, const int flng, double *b, const int m, const double a, const double g, const int n, 
-            const int itr1, const int itr2, const double dd, const double e, const int itype);
 int smcep (double *xw, const int flng, double *mc, const int m, const int fftsz, const double a,
-           const double t, const int itr1, const int itr2, const double dd, const double e);
-int uels (double *xw, const int flng, double *c, const int m, const int itr1, const int itr2, const double dd, const double e);
+           const double t, const int itr1, const int itr2, const double dd, const double e, const double f, const int itype);
+int uels (double *xw, const int flng, double *c, const int m, const int itr1, const int itr2, const double dd, const double e, const int itype);
 double ulaw_c (const double x, const double max, const double mu);
 double ulaw_d (const double x, const double max, const double mu);
 int vq (double *x, double *cb, const int l, const int cbsize);

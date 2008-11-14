@@ -1,54 +1,49 @@
-/*
-  ---------------------------------------------------------------  
-            Speech Signal Processing Toolkit (SPTK)
-
-                      SPTK Working Group                           
-                                                                   
-                  Department of Computer Science                   
-                  Nagoya Institute of Technology                   
-                               and                                 
-   Interdisciplinary Graduate School of Science and Engineering    
-                  Tokyo Institute of Technology                    
-                                                                   
-                     Copyright (c) 1984-2007                       
-                       All Rights Reserved.                        
-                                                                   
-  Permission is hereby granted, free of charge, to use and         
-  distribute this software and its documentation without           
-  restriction, including without limitation the rights to use,     
-  copy, modify, merge, publish, distribute, sublicense, and/or     
-  sell copies of this work, and to permit persons to whom this     
-  work is furnished to do so, subject to the following conditions: 
-                                                                   
-    1. The source code must retain the above copyright notice,     
-       this list of conditions and the following disclaimer.       
-                                                                   
-    2. Any modifications to the source code must be clearly        
-       marked as such.                                             
-                                                                   
-    3. Redistributions in binary form must reproduce the above     
-       copyright notice, this list of conditions and the           
-       following disclaimer in the documentation and/or other      
-       materials provided with the distribution.  Otherwise, one   
-       must contact the SPTK working group.                        
-                                                                   
-  NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF TECHNOLOGY,   
-  SPTK WORKING GROUP, AND THE CONTRIBUTORS TO THIS WORK DISCLAIM   
-  ALL WARRANTIES WITH REGARD TO THIS SOFTWARE, INCLUDING ALL       
-  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS, IN NO EVENT   
-  SHALL NAGOYA INSTITUTE OF TECHNOLOGY, TOKYO INSTITUTE OF         
-  TECHNOLOGY, SPTK WORKING GROUP, NOR THE CONTRIBUTORS BE LIABLE   
-  FOR ANY SPECIAL, INDIRECT OR CONSEQUENTIAL DAMAGES OR ANY        
-  DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS,  
-  WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTUOUS   
-  ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR          
-  PERFORMANCE OF THIS SOFTWARE.                                    
-                                                                   
-  ---------------------------------------------------------------  
-*/
+/* ----------------------------------------------------------------- */
+/*             The Speech Signal Processing Toolkit (SPTK)           */
+/*             developed by SPTK Working Group                       */
+/*             http://sp-tk.sourceforge.net/                         */
+/* ----------------------------------------------------------------- */
+/*                                                                   */
+/*  Copyright (c) 1984-2007  Tokyo Institute of Technology           */
+/*                           Interdisciplinary Graduate School of    */
+/*                           Science and Engineering                 */
+/*                                                                   */
+/*                1996-2008  Nagoya Institute of Technology          */
+/*                           Department of Computer Science          */
+/*                                                                   */
+/* All rights reserved.                                              */
+/*                                                                   */
+/* Redistribution and use in source and binary forms, with or        */
+/* without modification, are permitted provided that the following   */
+/* conditions are met:                                               */
+/*                                                                   */
+/* - Redistributions of source code must retain the above copyright  */
+/*   notice, this list of conditions and the following disclaimer.   */
+/* - Redistributions in binary form must reproduce the above         */
+/*   copyright notice, this list of conditions and the following     */
+/*   disclaimer in the documentation and/or other materials provided */
+/*   with the distribution.                                          */
+/* - Neither the name of the SPTK working group nor the names of its */
+/*   contributors may be used to endorse or promote products derived */
+/*   from this software without specific prior written permission.   */
+/*                                                                   */
+/* THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND            */
+/* CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,       */
+/* INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF          */
+/* MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE          */
+/* DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS */
+/* BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,          */
+/* EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED   */
+/* TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,     */
+/* DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON */
+/* ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,   */
+/* OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY    */
+/* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE           */
+/* POSSIBILITY OF SUCH DAMAGE.                                       */
+/* ----------------------------------------------------------------- */
 
 /****************************************************************
-* $Id: plot.c,v 1.12 2007/09/21 14:46:31 heigazen Exp $         *
+* $Id: plot.c,v 1.17 2008/06/16 05:48:33 heigazen Exp $         *
 *          Interpret X-Y Ploter Commands                        *
 ****************************************************************/
 
@@ -72,33 +67,33 @@
 
 Cord pb;
 
-static int sp = 1;
-static int cw = FCW, ch = FCH, th = 0;
+static int sp=1;
+static int cw=FCW, ch=FCH, th=0;
 
-extern Display  *display;
-extern Window  main_window;
-extern int  screen;
-extern GC  gc;
+extern Display *display;
+extern Window main_window;
+extern int screen;
+extern GC gc;
 extern unsigned long forepix, backpix;
-extern float  shrink;
-extern int  landscape;
-extern int  c_flg, mono_flg;
-extern int  fno;
+extern float shrink;
+extern int landscape;
+extern int c_flg, mono_flg;
+extern int fno;
 
-static XPoint  points[SIZE];
-static int  line_width = 1;
-static int  line_style = LineSolid;
-static int  join_style = JoinMiter;
+static XPoint points[SIZE];
+static int line_width=1;
+static int line_style=LineSolid;
+static int join_style=JoinMiter;
 static XRectangle rect;
 
 
-static char *symbol_upper = "ABGDEZHQIKLMNXOPRSTUFCYW";
-static char *symbol_lower = "abgdezhqiklmnxoprstufcyw";
-#define  INFTY 165
-#define  SPACE 32
+static char *symbol_upper="ABGDEZHQIKLMNXOPRSTUFCYW";
+static char *symbol_lower="abgdezhqiklmnxoprstufcyw";
+#define INFTY 165
+#define SPACE 32
 
-static void line(XPoint *points,int n );
-static void fillpoly(XPoint *points,int type,int n );
+static void line(XPoint *points, int n);
+static void fillpoly(XPoint *points, int type, int n);
 static void reset_fill (void);
 static void dplot (int density, short x, short y, short w, short h);
 static void fillbox (int type, short x, short y, short w, short h);
@@ -170,9 +165,9 @@ static void line (XPoint *points, int n)
    XDrawLines(display, main_window, gc, points, n, CoordModeOrigin);
 }
 
-static void polyline (XPoint *points, int frame, int fill, int n )
+static void polyline (XPoint *points, int frame, int fill, int n)
 {  
-   if ( fill!=-1 && (fill%=10)!=9 )  {
+   if (fill!=-1 && (fill%=10)!=9)  {
       fillpoly(points, fill+6, n+1);
       reset_fill();
    }
@@ -202,13 +197,13 @@ static void dplot (int density, short x, short y, short w, short h)
 
    n_max = ++w * ++h;
    n_plot = (density * n_max) / LEVEL;
-
-#if BSD
-   bzero((char *)flg, sizeof(*flg)*POINTS);
-#else
+   
+#if defined(HAVE_MEMSET)
    memset(flg, 0, sizeof(*flg)*POINTS);
+#elif defined(HAVE_BZERO)
+   bzero((char *)flg, sizeof(*flg)*POINTS);
 #endif
-
+   
    for (n=0; n<n_plot; n++)  {
       p = (int)(n_max * (double)rand() / (double)INT_MAX);
       if (flg[p]==0)  {
@@ -220,7 +215,7 @@ static void dplot (int density, short x, short y, short w, short h)
    XDrawPoints(display, main_window, gc, pos, n_plot, CoordModeOrigin);
 }
 
-static void hatching(int type )
+static void hatching (int type)
 {
    int n;
    int  frame;
@@ -235,7 +230,7 @@ static void hatching(int type )
    points[n].x = points[0].x;
    points[n].y = points[0].y;
 
-   switch ( type-=20 )  {
+   switch (type-=20)  {
    case 1:
       frame = 1;
       type = -1;
@@ -285,7 +280,7 @@ static void fillbox (int type, short x, short y, short w, short h)
    XFreePixmap(display, till_pmap);
 }
 
-static void fillpoly(XPoint *points,int type,int n )
+static void fillpoly(XPoint *points, int type, int n)
 {
    Pixmap till_pmap;
 
@@ -379,7 +374,7 @@ static int text (char *s, int n, int fn)
                   points[0].x, points[0].y, s, n);
    else  {
       xadj = ccw / shrink;
-      yadj = (cch>FCH ? 0.75 : 1.25) * cch / shrink;
+      yadj = ((cch>FCH) ? 0.75 : 1.25) * cch / shrink;
       while (n)  {
          cx = points[0].x - xadj;
          cy = points[0].y - yadj * --n;
@@ -391,7 +386,7 @@ static int text (char *s, int n, int fn)
    return 0;
 }
 
-static void newpen(int w )
+static void newpen (int w)
 {
    if (w<0 || w>10)
       w = 1;
@@ -436,7 +431,7 @@ static int line_type (int w)
    return(0);
 }
 
-static void clip(int xmin,int ymin,int xmax,int ymax )
+static void clip (int xmin,int ymin,int xmax,int ymax)
 {
    rect.x = xmin;
    rect.y = ymin;
@@ -446,7 +441,7 @@ static void clip(int xmin,int ymin,int xmax,int ymax )
    XSetClipRectangles(display, gc, 0, 0, &rect, 1, Unsorted);
 }
 
-static void mark(int w )
+static void mark (int w)
 {
    Pixmap mark_pmap;
 
@@ -463,7 +458,7 @@ static void mark(int w )
    XFreePixmap(display, mark_pmap);
 }
 
-static void circle(int x0,int y0,int r1,int r2,int arg1,int arg2 )
+static void circle (int x0, int y0, int r1, int r2, int arg1, int arg2)
 {
    int  x, y;
    unsigned int width, height;

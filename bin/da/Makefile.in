@@ -49,8 +49,8 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)" "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am__dawrite_SOURCES_DIST = da.h dawrite.c
-@USEDA_TRUE@am_dawrite_OBJECTS = dawrite.$(OBJEXT)
+am__dawrite_SOURCES_DIST = da.h dawrite.c winplay.c winplay.h
+@USEDA_TRUE@am_dawrite_OBJECTS = dawrite.$(OBJEXT) winplay.$(OBJEXT)
 dawrite_OBJECTS = $(am_dawrite_OBJECTS)
 @USEDA_TRUE@dawrite_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
@@ -165,7 +165,7 @@ sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 @USEDA_TRUE@INCLUDES = -I$(top_srcdir)/include
 @USEDA_TRUE@bin_SCRIPTS = da.sh
-@USEDA_TRUE@dawrite_SOURCES = da.h dawrite.c 
+@USEDA_TRUE@dawrite_SOURCES = da.h dawrite.c winplay.c winplay.h
 @USEDA_TRUE@dawrite_LDADD = $(top_srcdir)/lib/libSPTK.a
 EXTRA_DIST = da.in
 CLEANFILES = $(bin_PROGRAMS) $(bin_SCRIPTS)
@@ -243,6 +243,7 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dawrite.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/winplay.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

@@ -166,8 +166,10 @@ SUBDIRS = acep \
 	cdist \
 	clip \
 	da \
+	dct \
 	decimate \
 	delay \
+	delta \
 	df2 \
 	dfs \
 	dmp \
@@ -187,6 +189,7 @@ SUBDIRS = acep \
 	gc2gc \
 	gcep \
 	glsadf \
+	gmm \
 	gnorm \
 	grpdelay \
 	histogram \
@@ -238,7 +241,6 @@ SUBDIRS = acep \
 	smcep \
 	snr \
 	sopr \
-	sp2mgc \
 	spec \
 	step \
 	swab \

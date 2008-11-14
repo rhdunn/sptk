@@ -36,8 +36,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = sp2mgc$(EXEEXT)
-subdir = bin/sp2mgc
+bin_PROGRAMS = gmm$(EXEEXT) gmmp$(EXEEXT)
+subdir = bin/gmm
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -48,9 +48,12 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_sp2mgc_OBJECTS = _sp2mgc.$(OBJEXT) sp2mgc.$(OBJEXT)
-sp2mgc_OBJECTS = $(am_sp2mgc_OBJECTS)
-sp2mgc_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+am_gmm_OBJECTS = _gmm.$(OBJEXT) gmm.$(OBJEXT)
+gmm_OBJECTS = $(am_gmm_OBJECTS)
+gmm_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+am_gmmp_OBJECTS = _gmm.$(OBJEXT) gmmp.$(OBJEXT)
+gmmp_OBJECTS = $(am_gmmp_OBJECTS)
+gmmp_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -58,8 +61,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(sp2mgc_SOURCES)
-DIST_SOURCES = $(sp2mgc_SOURCES)
+SOURCES = $(gmm_SOURCES) $(gmmp_SOURCES)
+DIST_SOURCES = $(gmm_SOURCES) $(gmmp_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -160,8 +163,10 @@ sharedstatedir = @sharedstatedir@
 sysconfdir = @sysconfdir@
 target_alias = @target_alias@
 INCLUDES = -I$(top_srcdir)/include
-sp2mgc_SOURCES = _sp2mgc.c sp2mgc.c
-sp2mgc_LDADD = $(top_srcdir)/lib/libSPTK.a
+gmm_SOURCES = _gmm.c gmm.c gmm.h
+gmm_LDADD = $(top_srcdir)/lib/libSPTK.a
+gmmp_SOURCES = _gmm.c gmmp.c gmm.h
+gmmp_LDADD = $(top_srcdir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:
@@ -175,9 +180,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  bin/sp2mgc/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  bin/gmm/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  bin/sp2mgc/Makefile
+	  $(AUTOMAKE) --gnu  bin/gmm/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -218,9 +223,12 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-sp2mgc$(EXEEXT): $(sp2mgc_OBJECTS) $(sp2mgc_DEPENDENCIES) 
-	@rm -f sp2mgc$(EXEEXT)
-	$(LINK) $(sp2mgc_LDFLAGS) $(sp2mgc_OBJECTS) $(sp2mgc_LDADD) $(LIBS)
+gmm$(EXEEXT): $(gmm_OBJECTS) $(gmm_DEPENDENCIES) 
+	@rm -f gmm$(EXEEXT)
+	$(LINK) $(gmm_LDFLAGS) $(gmm_OBJECTS) $(gmm_LDADD) $(LIBS)
+gmmp$(EXEEXT): $(gmmp_OBJECTS) $(gmmp_DEPENDENCIES) 
+	@rm -f gmmp$(EXEEXT)
+	$(LINK) $(gmmp_LDFLAGS) $(gmmp_OBJECTS) $(gmmp_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -228,8 +236,9 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_sp2mgc.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sp2mgc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_gmm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gmm.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gmmp.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	if $(COMPILE) -MT $@ -MD -MP -MF "$(DEPDIR)/$*.Tpo" -c -o $@ $<; \

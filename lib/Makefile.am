@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 ##
-## $Id: Makefile.am,v 1.1 2007/09/22 17:44:06 s_sako Exp $
+## $Id: Makefile.am,v 1.4 2008/07/02 07:06:40 heigazen Exp $
 INCLUDES=-I$(top_srcdir)/include
 lib_LIBRARIES = libSPTK.a
 libSPTK_a_SOURCES = agexp.c \
@@ -40,6 +40,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/gc2gc/_gc2gc.c \
 		$(top_srcdir)/bin/gcep/_gcep.c \
 		$(top_srcdir)/bin/glsadf/_glsadf.c \
+		$(top_srcdir)/bin/gmm/_gmm.c \
 		$(top_srcdir)/bin/gnorm/_gnorm.c \
 		$(top_srcdir)/bin/grpdelay/_grpdelay.c \
 		$(top_srcdir)/bin/histogram/_histogram.c \
@@ -67,6 +68,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/mgc2sp/_mgc2sp.c \
 		$(top_srcdir)/bin/mgcep/_mgcep.c \
 		$(top_srcdir)/bin/mglsadf/_mglsadf.c \
+		$(top_srcdir)/bin/mlpg/_mlpg.c \
 		$(top_srcdir)/bin/mlsadf/_mlsadf.c \
 		$(top_srcdir)/bin/msvq/_msvq.c \
 		$(top_srcdir)/bin/norm0/_norm0.c \
@@ -79,7 +81,6 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/rmse/_rmse.c \
 		$(top_srcdir)/bin/root_pol/_root_pol.c \
 		$(top_srcdir)/bin/smcep/_smcep.c \
-		$(top_srcdir)/bin/sp2mgc/_sp2mgc.c \
 		$(top_srcdir)/bin/uels/_uels.c \
 		$(top_srcdir)/bin/ulaw/_ulaw.c \
 		$(top_srcdir)/bin/vq/_vq.c \
