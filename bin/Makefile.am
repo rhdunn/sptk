@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 ##
-## $Id: Makefile.am,v 1.7 2008/11/11 09:45:21 s_sako Exp $
+## $Id: Makefile.am,v 1.10 2009/12/16 07:39:28 uratec Exp $
 
 SUBDIRS = acep \
 	acorr \
@@ -46,9 +46,7 @@ SUBDIRS = acep \
 	histogram \
 	ifft \
 	ifft2 \
-	iglsadf \
 	ignorm \
-	imglsadf \
 	impulse \
 	imsvq \
 	interpolate \
@@ -80,11 +78,13 @@ SUBDIRS = acep \
 	norm0 \
 	nrand \
 	par2lpc \
+	pca \
 	phase \
 	pitch \
 	poledf \
 	psgr \
 	ramp \
+	rawtowav \
 	reverse \
 	rmse \
 	root_pol \

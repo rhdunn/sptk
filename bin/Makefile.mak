@@ -22,14 +22,14 @@ all: acep.exe acorr.exe agcep.exe amcep.exe \
 	decimate.exe delay.exe delta.exe df2.exe dfs.exe dmp.exe ds.exe echo2.exe \
 	excite.exe extract.exe fd.exe fft.exe fft2.exe fftcep.exe fftr.exe fftr2.exe \
 	frame.exe freqt.exe gc2gc.exe gcep.exe glsadf.exe gmm.exe gnorm.exe \
-	grpdelay.exe histogram.exe ifft.exe ifft2.exe iglsadf.exe \
-	ignorm.exe imglsadf.exe impulse.exe imsvq.exe interpolate.exe ivq.exe \
+	grpdelay.exe histogram.exe ifft.exe ifft2.exe \
+	ignorm.exe impulse.exe imsvq.exe interpolate.exe ivq.exe \
 	lbg.exe levdur.exe linear_intpl.exe lmadf.exe lpc.exe lpc2c.exe lpc2lsp.exe \
 	lpc2par.exe lsp2lpc.exe lspcheck.exe lspdf.exe ltcdf.exe mc2b.exe mcep.exe \
 	merge.exe mgc2mgc.exe mgc2sp.exe mgcep.exe mglsadf.exe minmax.exe mlpg.exe \
-	mlsadf.exe msvq.exe nan.exe norm0.exe nrand.exe par2lpc.exe phase.exe pitch.exe \
+	mlsadf.exe msvq.exe nan.exe norm0.exe nrand.exe pca.exe pcap.exe par2lpc.exe phase.exe pitch.exe \
 	poledf.exe psgr.exe \
-	ramp.exe reverse.exe rmse.exe root_pol.exe sin.exe smcep.exe snr.exe \
+	ramp.exe rawtowav.exe reverse.exe rmse.exe root_pol.exe sin.exe smcep.exe snr.exe \
 	sopr.exe spec.exe step.exe swab.exe train.exe uels.exe ulaw.exe \
 	us.exe vopr.exe vq.exe vstat.exe vsum.exe window.exe x2x.exe \
 	zcross.exe zerodf.exe 
@@ -204,15 +204,7 @@ ifft2.exe : ifft2\ifft2.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
-iglsadf.exe : iglsadf\iglsadf.obj
-	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
-	$(CL) /OUT:$@ $(LIBS) $(@B).obj
-
 ignorm.exe : ignorm\ignorm.obj
-	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
-	$(CL) /OUT:$@ $(LIBS) $(@B).obj
-
-imglsadf.exe : imglsadf\imglsadf.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
@@ -340,6 +332,14 @@ par2lpc.exe : par2lpc\par2lpc.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
+pca.exe : pca\pca.obj
+	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
+	$(CL) /OUT:$@ $(LIBS) $(@B).obj
+
+pcap.exe : pcap\pcap.obj
+	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
+	$(CL) /OUT:$@ $(LIBS) $(@B).obj
+
 phase.exe : phase\phase.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
@@ -359,6 +359,10 @@ psgr.exe : psgr\psgr.obj psgr\dict.obj psgr\plot.obj psgr\eps.obj
 	$(CL) /OUT:$@ $(LIBS) psgr.obj dict.obj plot.obj eps.obj
 
 ramp.exe : ramp\ramp.obj
+	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
+	$(CL) /OUT:$@ $(LIBS) $(@B).obj
+
+rawtowav.exe : rawtowav\rawtowav.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
