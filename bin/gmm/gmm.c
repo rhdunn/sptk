@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -46,7 +46,9 @@
  *                                                                       *
  *    Gaussian Mixture Model                                             *
  *                                                                       *
- *                                       2000.7  C. Miyajima             *
+ *                                       2000.7   C. Miyajima            *
+ *                                       2010.4   A. Saito               *
+ *                                       2010.9   A. Tamamori            *
  *                                                                       *
  *       usage:                                                          *
  *               gmm [options] [infile] > stdout                         *
@@ -54,11 +56,13 @@
  *               -l l  :  length of vector                    [26]       *
  *               -m m  :  number of Gaussian components       [16]       *
  *               -t t  :  number of training vectors          [EOF]      *
+ *               -s s  :  seed of random var. for LBG algo.   [1]        *
  *               -a a  :  minimum number of EM iterations     [0]        *
  *               -b b  :  maximum number of EM iterations     [20]       *
  *               -e e  :  convergence factor                  [0.00001]  *
  *               -v v  :  floor value of variances            [0.001]    *
  *               -w w  :  floor value of weights (1/m)*w      [0.001]    *
+ *               -f    :  full covariance                     [FALSE]    *
  *       infile:                                                         *
  *               training data sequence                       [stdin]    *
  *       stdout:                                                         *
@@ -69,7 +73,7 @@
  *                                                                       *
  ************************************************************************/
 
-static char *rcs_id = "$Id: gmm.c,v 1.6 2009/12/16 13:12:32 uratec Exp $";
+static char *rcs_id = "$Id: gmm.c,v 1.11 2010/12/10 10:44:21 mataki Exp $";
 
 /*  Standard C Libraries  */
 #include <stdio.h>
@@ -98,6 +102,7 @@ static char *rcs_id = "$Id: gmm.c,v 1.6 2009/12/16 13:12:32 uratec Exp $";
 #define DEF_L       26
 #define DEF_M       16
 #define DEF_T       -1
+#define DEF_S       1
 #define DEF_IMIN    0
 #define DEF_IMAX    20
 #define DEF_E       0.00001
@@ -107,6 +112,12 @@ static char *rcs_id = "$Id: gmm.c,v 1.6 2009/12/16 13:12:32 uratec Exp $";
 #define END         0.0001
 #define EPSILON     1.0e-6
 #define MAXVALUE    1.0e10
+#define FULL        0
+
+/* Default values for lbg */
+#define ITER 1000
+#define CENTUP 1
+#define MINTRAIN 1
 
 char *BOOL[] = { "FALSE", "TRUE" };
 
@@ -126,6 +137,8 @@ void usage(int status)
    fprintf(stderr, "       -m m  : number of Gaussian components      [%d]\n",
            DEF_M);
    fprintf(stderr, "       -t t  : number of training vectors         [N/A]\n");
+   fprintf(stderr, "       -s s  : seed of random var. for LBG algo.  [%d]\n",
+           DEF_S);
    fprintf(stderr, "       -a a  : minimum number of EM iterations    [%d]\n",
            DEF_IMIN);
    fprintf(stderr, "       -b b  : maximum number of EM iterations    [%d]\n",
@@ -136,6 +149,8 @@ void usage(int status)
            DEF_V);
    fprintf(stderr, "       -w w  : flooring value for weights (1/m)*w [%g]\n",
            DEF_W);
+   fprintf(stderr, "       -f    : full covariance                    [%s]\n",
+           BOOL[FULL]);
    fprintf(stderr, "       -h    : print this message\n");
    fprintf(stderr, "  infile:\n");
    fprintf(stderr,
@@ -168,12 +183,14 @@ void usage(int status)
 int main(int argc, char **argv)
 {
    FILE *fp = stdin;
-   GMM gmm, tgmm;
+   GMM gmm, tgmm, floor;
    double E = DEF_E, V = DEF_V, W = DEF_W,
-       *dat, *pd, *cb, *icb, *logwgd, logb, *sum, diff, sum_w,
+       *dat, *pd, *cb, *icb, *logwgd, logb, *sum, *sum_m, **sum_v, diff, sum_w,
        ave_logp0, ave_logp1, change = MAXVALUE, tmp1, tmp2;
-   int ispipe, l, L = DEF_L, m, M = DEF_M, N, t, T = DEF_T,
-       i, Imin = DEF_IMIN, Imax = DEF_IMAX, *tindex, *cntcb;
+   int ispipe, l, ll, L = DEF_L, m, M = DEF_M, N, t, T = DEF_T, S =
+       DEF_S, full = FULL, n1, i, j, Imin = DEF_IMIN, Imax =
+       DEF_IMAX, *tindex, *cntcb;
+
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -199,6 +216,10 @@ int main(int argc, char **argv)
             T = atoi(*++argv);
             --argc;
             break;
+         case 's':
+            S = atoi(*++argv);
+            --argc;
+            break;
          case 'a':
             Imin = atoi(*++argv);
             --argc;
@@ -219,6 +240,9 @@ int main(int argc, char **argv)
             W = atof(*++argv);
             --argc;
             break;
+         case 'f':
+            full = 1 - full;
+            break;
          default:
             fprintf(stderr, "%s: Illegal option \"%s\".\n", cmnd, *argv);
             usage(1);
@@ -229,7 +253,7 @@ int main(int argc, char **argv)
 
    /* -- Count number of training vectors -- */
    if (T == -1) {
-      ispipe = fseek(fp, 0L, 2);
+      ispipe = fseek(fp, 0L, SEEK_END);
       T = (int) (ftell(fp) / (double) L / (double) sizeof(float));
       rewind(fp);
 
@@ -261,8 +285,25 @@ int main(int argc, char **argv)
    for (m = 0; m < M; m++) {
       gmm.gauss[m].mean = dgetmem(L);
       gmm.gauss[m].var = dgetmem(L);
+
+      if (full == 1) {
+         gmm.gauss[m].cov = (double **) malloc(sizeof(double *) * L);
+         gmm.gauss[m].inv = (double **) malloc(sizeof(double *) * L);
+         for (l = 0; l < L; l++) {
+            gmm.gauss[m].cov[l] = dgetmem(L);
+            gmm.gauss[m].inv[l] = dgetmem(L);
+         }
+      }
    }
 
+   if (full == 1) {
+      floor.gauss = (Gauss *) getmem(1, sizeof(Gauss));
+      floor.gauss[0].cov = (double **) malloc(sizeof(double *) * L);
+      for (l = 0; l < L; l++)
+         floor.gauss[0].cov[l] = dgetmem(L);
+      sum_m = dgetmem(L);
+      sum_v = (double **) malloc(sizeof(double *) * L);
+   }
    /* temporary */
    tgmm.weight = dgetmem(M);
    tgmm.gauss = (Gauss *) getmem(M, sizeof(Gauss));
@@ -270,11 +311,19 @@ int main(int argc, char **argv)
    for (m = 0; m < M; m++) {
       tgmm.gauss[m].mean = dgetmem(L);
       tgmm.gauss[m].var = dgetmem(L);
+
+      if (full == 1) {
+         tgmm.gauss[m].cov = (double **) malloc(sizeof(double *) * L);
+         tgmm.gauss[m].inv = (double **) malloc(sizeof(double *) * L);
+         for (l = 0; l < L; l++) {
+            tgmm.gauss[m].cov[l] = dgetmem(L);
+            tgmm.gauss[m].inv[l] = dgetmem(L);
+         }
+      }
    }
 
    logwgd = dgetmem(M);
    sum = dgetmem(M);
-
 
    /*  Read training data */
    freadf(dat, sizeof(*dat), T * L, fp);
@@ -282,7 +331,7 @@ int main(int argc, char **argv)
    /* Initialization of GMM parameters */
    /* LBG */
    vaverage(dat, L, T, icb);
-   lbg(dat, L, T, icb, 1, cb, N, DELTA, END);
+   lbg(dat, L, T, icb, 1, cb, N, ITER, MINTRAIN, S, CENTUP, DELTA, END);
 
    for (t = 0, pd = dat; t < T; t++, pd += L) {
       tindex[t] = vq(pd, cb, L, M);
@@ -299,7 +348,6 @@ int main(int argc, char **argv)
 
    /* flooring value for weights */
    W = 1.0 / (double) M *(double) W;
-
 
    /* weights */
    for (m = 0, sum_w = 0.0; m < M; m++) {
@@ -319,32 +367,109 @@ int main(int argc, char **argv)
 
 
    /* variance */
-   for (t = 0, pd = dat; t < T; t++, pd += L)
-      for (l = 0; l < L; l++) {
-         diff = gmm.gauss[tindex[t]].mean[l] - pd[l];
-         gmm.gauss[tindex[t]].var[l] += sq(diff);
+   if (full != 1) {
+      for (t = 0, pd = dat; t < T; t++, pd += L)
+         for (l = 0; l < L; l++) {
+            diff = gmm.gauss[tindex[t]].mean[l] - pd[l];
+            gmm.gauss[tindex[t]].var[l] += sq(diff);
+         }
+
+      for (m = 0; m < M; m++)
+         for (l = 0; l < L; l++) {
+            gmm.gauss[m].var[l] /= (double) cntcb[m];
+            if (gmm.gauss[m].var[l] < V)
+               gmm.gauss[m].var[l] = V;
+         }
+
+      for (m = 0; m < M; m++)
+         gmm.gauss[m].gconst = cal_gconst(gmm.gauss[m].var, L);
+   }
+   /* full covariance */
+   else {
+      for (t = 0, pd = dat; t < T; t++, pd += L) {
+         for (l = 0; l < L; l++) {
+            for (i = 0; i <= l; i++) {
+               if (l == i) {
+                  diff =
+                      (gmm.gauss[tindex[t]].mean[l] -
+                       pd[l]) * (gmm.gauss[tindex[t]].mean[i] - pd[i]);
+                  floor.gauss[0].cov[l][i] += diff;
+               }
+            }
+         }
       }
 
-   for (m = 0; m < M; m++)
       for (l = 0; l < L; l++) {
-         gmm.gauss[m].var[l] /= (double) cntcb[m];
-         if (gmm.gauss[m].var[l] < V)
-            gmm.gauss[m].var[l] = V;
+         for (i = 0; i <= l; i++) {
+            if (l == i) {
+               floor.gauss[0].cov[l][i] /= T;
+               floor.gauss[0].cov[l][i] *= V;
+            }
+         }
       }
 
-   for (m = 0; m < M; m++)
-      gmm.gauss[m].gconst = cal_gconst(gmm.gauss[m].var, L);
+      for (t = 0, pd = dat; t < T; t++, pd += L) {
+         for (l = 0; l < L; l++) {
+            for (i = 0; i <= l; i++) {
+               diff =
+                   (gmm.gauss[tindex[t]].mean[l] -
+                    pd[l]) * (gmm.gauss[tindex[t]].mean[i] - pd[i]);
+               gmm.gauss[tindex[t]].cov[l][i] += diff;
+            }
+         }
+      }
 
+      for (m = 0; m < M; m++)
+         for (l = 0; l < L; l++)
+            for (i = 0; i <= l; i++) {
+               gmm.gauss[m].cov[l][i] /= (double) cntcb[m];
+            }
+   }
 
    /* EM training of GMM parameters */
    for (i = 0; (i <= Imax) && ((i <= Imin) || (fabs(change) > E)); i++) {
-      fillz_gmm(&tgmm, M, L);
+      if (full != 1)
+         fillz_gmm(&tgmm, M, L);
+      else
+         fillz_gmmf(&tgmm, M, L);
       fillz(sum, sizeof(double), M);
+
+      if (full != 1) {
+         for (m = 0; m < M; m++)
+            gmm.gauss[m].gconst = cal_gconst(gmm.gauss[m].var, L);
+      } else {
+         for (m = 0, n1 = 0; m < M; m++) {
+            gmm.gauss[m].gconst = cal_gconstf(gmm.gauss[m].cov, L);
+
+            if (gmm.gauss[m].gconst == 0) {
+               n1++;
+               for (l = 0; l < L; l++)
+                  gmm.gauss[m].cov[l][l] += floor.gauss[0].cov[l][l];
+               gmm.gauss[m].gconst = cal_gconstf(gmm.gauss[m].cov, L);
+            }
+            if (gmm.gauss[m].gconst == 0) {
+               fprintf(stderr, "ERROR : Can't caluculate covdet");
+               exit(EXIT_FAILURE);
+            }
+
+            /* calculate inv */
+            cal_inv(gmm.gauss[m].cov, gmm.gauss[m].inv, L);
+         }
+      }
+      if (full == 1)
+         fprintf(stderr, "%d cov can't caluculate covdet\n", n1);
 
       for (t = 0, ave_logp1 = 0.0, pd = dat; t < T; t++, pd += L) {
          for (m = 0, logb = LZERO; m < M; m++) {
-            logwgd[m] = log_wgd(&gmm, m, pd, L);
-            logb = log_add(logb, logwgd[m]);
+            if (full != 1) {
+               logwgd[m] = log_wgd(&gmm, m, pd, L);
+               logb = log_add(logb, logwgd[m]);
+            }
+            /* full */
+            else {
+               logwgd[m] = log_wgdf(&gmm, m, pd, L);
+               logb = log_add(logb, logwgd[m]);
+            }
          }
          ave_logp1 += logb;
 
@@ -355,7 +480,16 @@ int main(int argc, char **argv)
             for (l = 0; l < L; l++) {
                tmp2 = tmp1 * pd[l];
                tgmm.gauss[m].mean[l] += tmp2;
-               tgmm.gauss[m].var[l] += tmp2 * pd[l];
+               if (full != 1)
+                  tgmm.gauss[m].var[l] += tmp2 * pd[l];
+               else {
+                  for (j = 0; j <= l; j++) {
+                     tgmm.gauss[m].cov[l][j] +=
+                         tmp1 * (pd[l] - gmm.gauss[m].mean[l]) * (pd[j] -
+                                                                  gmm.gauss[m].
+                                                                  mean[j]);
+                  }
+               }
             }
          }
       }
@@ -384,24 +518,41 @@ int main(int argc, char **argv)
          for (l = 0; l < L; l++)
             gmm.gauss[m].mean[l] = tgmm.gauss[m].mean[l] / sum[m];
 
-         for (l = 0; l < L; l++) {
-            gmm.gauss[m].var[l] =
-                tgmm.gauss[m].var[l] / sum[m] - sq(gmm.gauss[m].mean[l]);
-            if (gmm.gauss[m].var[l] < V)
-               gmm.gauss[m].var[l] = V;
+         if (full != 1) {
+            for (l = 0; l < L; l++) {
+               gmm.gauss[m].var[l] =
+                   tgmm.gauss[m].var[l] / sum[m] - sq(gmm.gauss[m].mean[l]);
+               if (gmm.gauss[m].var[l] < V)
+                  gmm.gauss[m].var[l] = V;
+            }
+         }
+         /* full */
+         else {
+            for (l = 0; l < L; l++) {
+               for (j = 0; j <= l; j++) {
+                  gmm.gauss[m].cov[l][j] = tgmm.gauss[m].cov[l][j] / sum[m];
+               }
+            }
          }
       }
-
-      for (m = 0; m < M; m++)
-         gmm.gauss[m].gconst = cal_gconst(gmm.gauss[m].var, L);
    }
 
    /*  Output GMM parameters */
    fwritef(gmm.weight, sizeof(double), M, stdout);
-   for (m = 0; m < M; m++) {
-      fwritef(gmm.gauss[m].mean, sizeof(double), L, stdout);
-      fwritef(gmm.gauss[m].var, sizeof(double), L, stdout);
+   if (full != 1) {
+      for (m = 0; m < M; m++) {
+         fwritef(gmm.gauss[m].mean, sizeof(double), L, stdout);
+         fwritef(gmm.gauss[m].var, sizeof(double), L, stdout);
+      }
+   } else {
+      for (m = 0; m < M; m++) {
+         fwritef(gmm.gauss[m].mean, sizeof(double), L, stdout);
+         for (i = 0; i < L; i++)
+            for (j = 0; j < i; j++)
+               gmm.gauss[m].cov[j][i] = gmm.gauss[m].cov[i][j];
+         for (l = 0; l < L; l++)
+            fwritef(gmm.gauss[m].cov[l], sizeof(double), L, stdout);
+      }
    }
-
    return (0);
 }

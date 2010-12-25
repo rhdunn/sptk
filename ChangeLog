@@ -1,3 +1,413 @@
+2010-12-14 10:16  uratec
+
+	* AUTHORS, README: Add 'Akira Tamamori' to AUTHORS and README.
+	  Update configure for building reference.
+
+2010-12-11 02:28  uratec
+
+	* ChangeLog, NEWS, bin/b2mc/_b2mc.c, bin/c2acr/_c2acr.c,
+	  bin/c2ir/_c2ir.c, bin/mc2b/_mc2b.c, bin/poledf/_poledf.c,
+	  bin/ulaw/_ulaw.c, lib/Makefile.lib.in: Remove old file
+	  (Makefile.lib.in)
+
+2010-12-11 01:53  uratec
+
+	* Makefile.mak, bin/Makefile.mak, lib/Makefile.mak: Fix
+	  double-compile for nmake.
+
+2010-12-10 19:44  mataki
+
+	* COPYING, ChangeLog, NEWS, README, configure.ac, bin/acep/_acep.c,
+	  bin/acep/acep.c, bin/acorr/_acorr.c, bin/acorr/acorr.c,
+	  bin/agcep/_agcep.c, bin/agcep/agcep.c, bin/amcep/_amcep.c,
+	  bin/amcep/amcep.c, bin/average/_average.c, bin/average/average.c,
+	  bin/b2mc/b2mc.c, bin/bcp/bcp.c, bin/bcut/bcut.c,
+	  bin/c2acr/c2acr.c, bin/c2ir/c2ir.c, bin/c2sp/_c2sp.c,
+	  bin/c2sp/c2sp.c, bin/cat2/cat2.c, bin/cdist/cdist.c,
+	  bin/clip/_clip.c, bin/clip/clip.c, bin/da/da.h, bin/da/da.in,
+	  bin/da/dawrite.c, bin/da/winplay.c, bin/da/winplay.h,
+	  bin/dct/dct.c, bin/decimate/decimate.c, bin/delay/delay.c,
+	  bin/delta/delta.c, bin/df2/_df2.c, bin/df2/df2.c, bin/dfs/_dfs.c,
+	  bin/dfs/dfs.c, bin/dmp/dmp.c, bin/ds/ds.c, bin/echo2/echo2.c,
+	  bin/excite/excite.c, bin/extract/extract.c, bin/fd/fd.c,
+	  bin/fft/_fft.c, bin/fft/fft.c, bin/fft2/_fft2.c, bin/fft2/fft2.c,
+	  bin/fftcep/_fftcep.c, bin/fftcep/fftcep.c, bin/fftr/_fftr.c,
+	  bin/fftr/fftr.c, bin/fftr2/_fftr2.c, bin/fftr2/fftr2.c,
+	  bin/fig+fdrw/fdrw.c, bin/fig+fdrw/fig.c, bin/fig+fdrw/fig.h,
+	  bin/fig+fdrw/fig0.c, bin/fig+fdrw/fig1.c, bin/fig+fdrw/plot.c,
+	  bin/fig+fdrw/plot.h, bin/fig+fdrw/plsub.c, bin/frame/frame.c,
+	  bin/freqt/_freqt.c, bin/freqt/freqt.c, bin/gc2gc/_gc2gc.c,
+	  bin/gc2gc/gc2gc.c, bin/gcep/_gcep.c, bin/glsadf/_glsadf.c,
+	  bin/glsadf/glsadf.c, bin/gmm/_gmm.c, bin/gmm/gmm.c,
+	  bin/gmm/gmm.h, bin/gmm/gmmp.c, bin/gnorm/_gnorm.c,
+	  bin/gnorm/gnorm.c, bin/grpdelay/_grpdelay.c,
+	  bin/grpdelay/grpdelay.c, bin/histogram/_histogram.c,
+	  bin/histogram/histogram.c, bin/ifft/_ifft.c, bin/ifft/ifft.c,
+	  bin/ifft2/_ifft2.c, bin/ifft2/ifft2.c, bin/ignorm/_ignorm.c,
+	  bin/ignorm/ignorm.c, bin/impulse/impulse.c, bin/imsvq/_imsvq.c,
+	  bin/imsvq/imsvq.c, bin/interpolate/interpolate.c, bin/ivq/_ivq.c,
+	  bin/ivq/ivq.c, bin/lbg/_lbg.c, bin/lbg/lbg.c,
+	  bin/levdur/_levdur.c, bin/levdur/levdur.c,
+	  bin/linear_intpl/linear_intpl.c, bin/lpc/_lpc.c, bin/lpc/lpc.c,
+	  bin/lpc2c/_lpc2c.c, bin/lpc2c/lpc2c.c, bin/lpc2lsp/_lpc2lsp.c,
+	  bin/lpc2lsp/lpc2lsp.c, bin/lpc2par/_lpc2par.c,
+	  bin/lpc2par/lpc2par.c, bin/lsp2lpc/_lsp2lpc.c,
+	  bin/lsp2lpc/lsp2lpc.c, bin/lspcheck/_lspcheck.c,
+	  bin/lspcheck/lspcheck.c, bin/lspdf/_lspdf.c, bin/lspdf/lspdf.c,
+	  bin/ltcdf/_ltcdf.c, bin/ltcdf/ltcdf.c, bin/mc2b/mc2b.c,
+	  bin/mcep/_mcep.c, bin/mcep/mcep.c, bin/merge/merge.c,
+	  bin/mgc2mgc/_mgc2mgc.c, bin/mgc2mgc/mgc2mgc.c,
+	  bin/mgc2sp/_mgc2sp.c, bin/mgc2sp/mgc2sp.c, bin/mgcep/_mgcep.c,
+	  bin/mgcep/mgcep.c, bin/mglsadf/_mglsadf.c, bin/mglsadf/mglsadf.c,
+	  bin/minmax/minmax.c, bin/mlpg/_mlpg.c, bin/mlpg/mlpg.c,
+	  bin/msvq/_msvq.c, bin/msvq/msvq.c, bin/nan/nan.c,
+	  bin/norm0/_norm0.c, bin/norm0/norm0.c, bin/nrand/_nrand.c,
+	  bin/nrand/nrand.c, bin/par2lpc/_par2lpc.c, bin/par2lpc/par2lpc.c,
+	  bin/pca/pca.c, bin/pca/pcap.c, bin/phase/_phase.c,
+	  bin/phase/phase.c, bin/pitch/_pitch.c, bin/pitch/pitch.c,
+	  bin/poledf/poledf.c, bin/psgr/dict.c, bin/psgr/eps.c,
+	  bin/psgr/plot.c, bin/psgr/psgr.c, bin/psgr/psgr.h,
+	  bin/ramp/ramp.c, bin/rawtowav/rawtowav.c, bin/reverse/_reverse.c,
+	  bin/reverse/reverse.c, bin/rmse/_rmse.c, bin/rmse/rmse.c,
+	  bin/root_pol/_root_pol.c, bin/root_pol/root_pol.c, bin/sin/sin.c,
+	  bin/smcep/_smcep.c, bin/smcep/smcep.c, bin/snr/snr.c,
+	  bin/sopr/sopr.c, bin/spec/spec.c, bin/step/step.c,
+	  bin/train/train.c, bin/uels/_uels.c, bin/ulaw/ulaw.c,
+	  bin/us/us.c, bin/us/us16.in, bin/us/uscd.in, bin/vopr/vopr.c,
+	  bin/vq/_vq.c, bin/vq/vq.c, bin/vstat/vstat.c, bin/vsum/vsum.c,
+	  bin/window/_window.c, bin/window/window.c, bin/x2x/x2x.c,
+	  bin/xgr/config.h, bin/xgr/gcdata.h, bin/xgr/plot.c,
+	  bin/xgr/window.c, bin/xgr/xgr.c, bin/xgr/xgr.h,
+	  bin/zcross/_zcross.c, bin/zcross/zcross.c, bin/zerodf/_zerodf.c,
+	  bin/zerodf/zerodf.c, include/SPTK.h, lib/agexp.c, lib/cholesky.c,
+	  lib/fillz.c, lib/getfp.c, lib/getmem.c, lib/gexp.c, lib/glog.c,
+	  lib/ifftr.c, lib/matrix.c, lib/movem.c, lib/mseq.c, lib/theq.c,
+	  lib/toeplitz.c, script/bell.in: Update all documents to SPTK-3.4.
+	  Unify linefeed code of all source code to <LF>.  Fix all indent
+	  in all source code by using 'indent -kr -nut -i 3 -l 80' command.
+
+2010-12-10 17:22  sawada11
+
+	* bin/sopr/sopr.c: fix help message
+
+2010-12-09 13:47  mataki
+
+	* lib/fileio.c: Fixed a source code for double I/O compilation
+
+2010-12-08 17:09  mataki
+
+	* bin/Makefile.mak: Fixed some indentations (from SPACE to TAB).
+
+2010-12-08 16:57  mataki
+
+	* Makefile.mak, bin/Makefile.mak: Fixed Makefile.mak for double I/O
+	  compilation
+
+2010-12-07 22:06  sawada11
+
+	* bin/sopr/sopr.c: add -magic and -MAGIC option (for magic number)
+
+2010-12-05 22:04  mataki
+
+	* include/SPTK.h, lib/fileio.c: Fixed sources for double I/O
+	  compilation
+
+2010-11-29 16:38  mataki
+
+	* script/wav2raw.in: a bug of macro for path is fixed.
+
+2010-11-24 20:11  mataki
+
+	* bin/mglsadf/_mglsadf.c: Fix a bug suggested by Heiga Zen of
+	  Toshiba Research Europe Ltd. Cambridge Research Laboratory :
+	  delete unnecessary fprintf()
+
+2010-11-24 18:27  mataki
+
+	* bin/mglsadf/mglsadf.c: Fix a bug suggested by Heiga Zen of
+	  Toshiba Research Europe Ltd. Cambridge Research Laboratory:
+	  inverse filtering in mglsadf
+
+2010-11-19 17:00  sawada11
+
+	* bin/x2x/x2x.c: Bug fixing
+
+2010-10-26 18:00  mataki
+
+	* bin/: da/dawrite.c, dct/dct.c, pca/pca.c, pca/pcap.c,
+	  rawtowav/rawtowav.c, x2x/x2x.c: Fix the sources for wrapping
+	  function of SPTK
+
+2010-10-12 19:16  sawada11
+
+	* script/: glogsp.in, grlogsp.in, gwave.in: Bug fixing for -F
+	  option
+
+2010-10-12 19:08  sawada11
+
+	* bin/fig+fdrw/: fdrw.c, fig.c, fig0.c, plot.c, plot.h, plsub.c:
+	  Bug fixing for the maximum drawing area
+
+2010-10-12 19:04  sawada11
+
+	* bin/psgr/: psgr.c, eps.c: Bug fixing for making bounding box
+
+2010-10-12 18:54  sawada11
+
+	* bin/x2x/x2x.c: add new data type and modify -o option
+
+2010-10-08 19:30  mataki
+
+	* bin/Makefile.mak: Add fig.exe and fdrw.exe
+
+2010-10-06 19:20  mataki
+
+	* bin/: da/dawrite.c, dct/dct.c, delta/delta.c, gmm/_gmm.c,
+	  gmm/gmm.c, mlpg/mlpg.c, rawtowav/rawtowav.c: Modified source
+	  files for wrapper function of SPTK
+
+2010-09-01 21:07  mataki
+
+	* bin/fig+fdrw/plot.c: Modified for compilation in Windows
+
+2010-09-01 21:01  mataki
+
+	* bin/gmm/gmm.c: Add -s option for specifying seed
+
+2010-09-01 14:57  mataki
+
+	* bin/vstat/: Makefile.am, _vstat.c, vstat.c: Remove _vstat.c
+
+2010-09-01 14:47  mataki
+
+	* include/SPTK.h: Remove tool routine functions for vstat
+
+2010-09-01 14:45  mataki
+
+	* lib/: Makefile.am, Makefile.mak: Remove _vstat.c and _vstat.obj
+
+2010-08-31 20:59  mataki
+
+	* bin/lbg/_lbg.c: Modified the source for centroid update
+
+2010-08-31 20:43  mataki
+
+	* bin/lbg/lbg.c: Modified the comment and help
+
+2010-08-31 19:54  mataki
+
+	* include/SPTK.h: Add modules for vstat and lbg is modified
+
+2010-08-31 19:45  mataki
+
+	* bin/vstat/_vstat.c: Add -o 3 option for confidence interval
+
+2010-08-31 19:40  mataki
+
+	* bin/vstat/vstat.c: Add -o 3 option for confidence interval
+
+2010-08-31 18:21  sawada11
+
+	* bin/x2x/x2x.c: add -o (clipping) and -w (warning) option
+
+2010-08-31 18:12  mataki
+
+	* bin/vstat/Makefile.am: vstat: Add -o 3 option for confidence
+	  interval
+
+2010-08-31 17:58  mataki
+
+	* lib/: Makefile.mak, Makefile.am: vstat: Add -o 3 option for
+	  confidence interval
+
+2010-08-26 16:07  mataki
+
+	* bin/Makefile.mak: Add dct.exe and gmmp.exe
+
+2010-08-25 22:01  mataki
+
+	* lib/Makefile.mak: Fix a bug for compilation using Visual Studio
+	  C++
+
+2010-08-25 21:50  mataki
+
+	* bin/Makefile.mak: Fix a bug for compilation using Visual Studio
+	  C++
+
+2010-08-25 21:38  mataki
+
+	* bin/Makefile.mak: Fix a bug for compilation using Visual Studio
+	  C++
+
+2010-08-06 19:34  mataki
+
+	* bin/mgcep/_mgcep.c: Fix a bug suggested by Takashi Nose of Tokyo
+	  Institute of Technology:_mgcep.c
+
+2010-08-06 19:31  mataki
+
+	* bin/mcep/_mcep.c: Fix a bug suggested by Takashi Nose of Tokyo
+	  Institute of Technology: _mcep.c
+
+2010-08-06 19:29  mataki
+
+	* bin/mcep/_mcep.c: Fix a bug suggested by Takashi Nose of Tokyo
+	  Institute of Technology:_mcep.c
+
+2010-07-01 14:26  sawada11
+
+	* script/: glogsp.in, grlogsp.in, gwave.in: add -F option
+
+2010-07-01 14:10  sawada11
+
+	* bin/psgr/eps.c: Bug fixing about bounding box
+
+2010-07-01 14:08  sawada11
+
+	* bin/psgr/psgr.c: add papersize (A0,A1,A2,B0,B1,B2,B3)
+
+2010-06-30 20:23  mataki
+
+	* bin/lbg/: lbg.c, _lbg.c: Add -S option for specifying seed and -k
+	  option
+
+2010-06-29 13:17  mataki
+
+	* bin/sopr/sopr.c: Merge patch code by Heiga Zen of Toshiba
+	  Research Europe Ltd. Cambridge ResearchLaboratory: sopr.c.patch
+
+2010-06-21 14:06  mataki
+
+	* include/SPTK.h: Add new option -m of lbg command for specifying
+	  minimum number of train vector for each cell
+
+2010-06-21 13:52  mataki
+
+	* bin/lbg/_lbg.c: Add new option for specifying minimum number of
+	  train vector for each cell
+
+2010-06-21 13:49  mataki
+
+	* bin/lbg/lbg.c: Add new option -m for specifying minimum number of
+	  train vector for each cell
+
+2010-05-20 17:15  mataki
+
+	* bin/mgc2sp/mgc2sp.c: Add -o 3 option.
+
+2010-05-19 20:05  mataki
+
+	* bin/spec/spec.c: Add -o 3 option.
+
+2010-04-28 20:39  mataki
+
+	* bin/mlpg/mlpg.c: Modified mlpg.c by applying patch
+
+2010-04-23 18:31  sawada11
+
+	* bin/train/train.c: floating-point support (-p option)
+
+2010-04-12 18:25  uratec
+
+	* bin/fig+fdrw/fdrw.c, bin/fig+fdrw/fig0.c, bin/gmm/_gmm.c,
+	  bin/gmm/gmm.c, include/SPTK.h: Fix all indent in all source code
+	  by using 'indent -kr -nut -i 3 -l 80' command.
+
+2010-04-03 13:50  mataki
+
+	* bin/sopr/sopr.c: The commit date is modefied.
+
+2010-04-03 13:36  mataki
+
+	* bin/sopr/sopr.c: Substitute macro LOG2(x) for log2(x).
+
+2010-04-02 14:51  senzaimin
+
+	* include/SPTK.h: add functions for full covariance.
+
+2010-04-02 14:47  senzaimin
+
+	* bin/gmm/_gmm.c: add -f option. (full covariance)
+
+2010-04-02 14:46  senzaimin
+
+	* bin/gmm/gmm.c: add -f option. ( full covariance )
+
+2010-04-02 14:41  senzaimin
+
+	* bin/fig+fdrw/: fig.c, fig0.c, fdrw.c: Bug fixing. ( -F option )
+
+2010-04-01 21:27  uratec
+
+	* bin/lmadf/lmadf.c, bin/mlsadf/mlsadf.c, bin/swab/swab.c,
+	  bin/x2x/x2x.c, script/raw2wav.in, script/wav2raw.in: Add i3
+	  option to raw2wav.  Re-check *.c (using indent -kr -nut -i 3 -l
+	  80).
+
+2010-04-01 13:41  mataki
+
+	* bin/x2x/x2x.c: Change the specification of output '+a' option
+	  when specifying the column number
+
+2010-03-30 15:14  mataki
+
+	* bin/swab/swab.c: Add some descriptions for +i3 and +i option in
+	  the usage
+
+2010-03-30 15:03  mataki
+
+	* bin/swab/swab.c: Add +i3 and +i options.
+
+2010-03-25 22:03  uratec
+
+	* bin/: gcep/gcep.c, lmadf/_lmadf.c, lmadf/lmadf.c,
+	  mlsadf/_mlsadf.c, mlsadf/mlsadf.c, uels/uels.c, x2x/x2x.c: Change
+	  the appearance of *.c by using 'indent -kr -nut -i 3 -l 80'
+	  command.
+
+2010-03-25 21:40  mataki
+
+	* script/wav2raw.in: Modefication for linear PCM and other format
+
+2010-03-25 18:03  mataki
+
+	* script/wav2raw.in: The implimentation of wav2raw is revised.
+
+2010-03-23 16:44  mataki
+
+	* script/Makefile.am: Add description for wav2raw.
+
+2010-03-23 16:41  mataki
+
+	* script/wav2raw.in: Source file for wav2raw.sh
+
+2010-03-23 15:31  tatsuyaito
+
+	* bin/lmadf/_lmadf.c, bin/lmadf/lmadf.c, bin/mlsadf/_mlsadf.c,
+	  bin/mlsadf/mlsadf.c, include/SPTK.h: Mar.23.2010 transpose filter
+	  for mlsadf lmadf updated
+
+2010-03-20 11:40  mataki
+
+	* bin/x2x/x2x.c: short modefication for x2x.c
+
+2010-03-19 12:27  mataki
+
+	* bin/x2x/x2x.c: New option i3(integer, 3byte) is added.
+
+2010-03-08 10:50  senzaimin
+
+	* bin/uels/uels.c: Bug fixing.
+
+2010-03-08 10:48  senzaimin
+
+	* bin/gcep/gcep.c: Bug fixing
+
+2010-02-23 16:43  senzaimin
+
+	* script/raw2wav.in: add "set path", "set sptkver", and "set
+	  cvsid".
+
 2009-12-25 03:22  uratec
 
 	* ChangeLog, NEWS, bin/agcep/agcep.c, bin/average/average.c,

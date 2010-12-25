@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -43,7 +43,7 @@
 /* ----------------------------------------------------------------- */
 
 /***********************************************************
-   $Id: SPTK.h,v 1.25 2009/12/16 13:12:39 uratec Exp $ 
+   $Id: SPTK.h,v 1.33 2010/12/10 10:44:24 mataki Exp $ 
    
    Speech Signal Processing Toolkit
    SPTK.h
@@ -94,6 +94,8 @@ typedef struct {
 typedef struct _Gauss {
    double *mean;
    double *var;
+   double **cov;
+   double **inv;
    double gconst;
 } Gauss;
 
@@ -111,13 +113,8 @@ int cholesky(double *c, double *a, double *b, const int n, double eps);
 int freada(double *p, const int bl, FILE * fp);
 int fwritex(void *ptr, const size_t size, const int nitems, FILE * fp);
 int freadx(void *ptr, const size_t size, const int nitems, FILE * fp);
-#ifdef DOUBLE
-int fwritef(float *ptr, const size_t size, const int nitems, FILE * fp);
-int freadf(float *ptr, const size_t size, const int nitems, FILE * fp);
-#else
 int fwritef(double *ptr, const size_t size, const int nitems, FILE * fp);
 int freadf(double *ptr, const size_t size, const int nitems, FILE * fp);
-#endif                          /* DOUBLE */
 void fillz(void *ptr, const size_t size, const int nitem);
 FILE *getfp(char *name, char *opt);
 short *sgetmem(const int leng);
@@ -182,8 +179,11 @@ double glsadf1(double x, double *c, const int m, const int n, double *d);
 double glsadft(double x, double *c, const int m, const int n, double *d);
 double glsadf1t(double x, double *c, const int m, const int n, double *d);
 double cal_gconst(double *var, const int D);
+double cal_gconstf(double **var, const int D);
 void fillz_gmm(GMM * gmm, const int M, const int L);
+void fillz_gmmf(GMM * gmm, const int M, const int L);
 double log_wgd(GMM * gmm, const int m, double *dat, const int L);
+double log_wgdf(GMM * gmm, const int m, double *dat, const int L);
 double log_add(double logx, double logy);
 double log_outp(GMM * gmm, double *dat, const int M, const int L);
 void gnorm(double *c1, double *c2, int m, const double g);
@@ -209,11 +209,15 @@ void imsvq(int *index, double *cb, const int l, int *cbsize, const int stage,
            double *x);
 void ivq(const int index, double *cb, const int l, double *x);
 void lbg(double *x, const int l, const int tnum, double *icb, int icbsize,
-         double *cb, const int ecbsize, const double delta, const double end);
+         double *cb, const int ecbsize, const int iter, const int mintnum,
+         const int seed, const int centup, const double delta,
+         const double end);
 int levdur(double *r, double *a, const int m, double eps);
 double lmadf(double x, double *c, const int m, const int pd, double *d);
+double lmadft(double x, double *c, const int m, const int pd, double *d);
 double lmadf1(double x, double *c, const int m, double *d, const int m1,
               const int m2, const int pd);
+double lmadf1t(double x, double *b, const int m, const int pd, double *d);
 int lpc(double *x, const int flng, double *a, const int m, const double f);
 void lpc2c(double *a, int m1, double *c, const int m2);
 int lpc2lsp(double *lpc, double *lsp, const int order, const int numsp,

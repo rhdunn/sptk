@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -67,7 +67,7 @@
 *                                                                            *
 *****************************************************************************/
 
-static char *rcs_id = "$Id: dawrite.c,v 1.25 2009/12/24 18:22:07 uratec Exp $";
+static char *rcs_id = "$Id: dawrite.c,v 1.28 2010/12/10 10:44:20 mataki Exp $";
 
 
 /* Standard C Libraries */
@@ -268,16 +268,10 @@ int main(int argc, char *argv[])
          }
       }
 
-   if ((x = (double *) calloc(SIZE, sizeof(double))) == NULL) {
-      fprintf(stderr, "%s : Cannot allocate memory!\n", cmnd);
-      return (1);
-   }
+   x = dgetmem(SIZE);
    xf = (float *) x;
    xs = (short *) x;
-   if ((y = (short *) calloc(SIZE * 2, sizeof(double))) == NULL) {
-      fprintf(stderr, "%s : Cannot allocate memory!\n", cmnd);
-      return (1);
-   }
+   y = sgetmem(2 * SIZE);
 
    sndinit();
    i = (gain < 0) ? -gain : gain;
@@ -288,15 +282,12 @@ int main(int argc, char *argv[])
 
    if (nfiles) {
       for (i = 0; i < nfiles; i++) {
-         if ((fp = fopen(infile[i], "rb")) == NULL) {
-            fprintf(stderr, "%s : Cannot open file %s!\n", cmnd, infile[i]);
-         } else {
-            if (is_verbose) {
-               fprintf(stderr, "%s : %s\n", cmnd, infile[i]);
-            }
-            direct(fp);
-            fclose(fp);
+         fp = getfp(infile[i], "rb");
+         if (is_verbose) {
+            fprintf(stderr, "%s : %s\n", cmnd, infile[i]);
          }
+         direct(fp);
+         fclose(fp);
       }
    } else
       direct(stdin);
@@ -414,10 +405,7 @@ void init_audiodev(int dtype)
 #if defined(LINUX) || defined(FreeBSD)
    int arg;
 
-   if ((adfp = fopen(AUDIO_DEV, "wb")) == NULL) {
-      fprintf(stderr, "%s : Cannot open audio device\n", cmnd);
-      exit(1);
-   }
+   adfp = getfp(AUDIO_DEV, "wb");
 #ifdef LINUX
    ADFD = adfp->_fileno;
 #else                           /* FreeBSD */
@@ -444,7 +432,7 @@ void init_audiodev(int dtype)
    audio_info_t data;
 
    ACFD = open(AUDIO_CTLDEV, O_RDWR, 0);
-   adfp = fopen(AUDIO_DEV, "wb");
+   adfp = getfp(AUDIO_DEV, "wb");
    ADFD = adfp->_file;
 
    AUDIO_INITINFO(&data);

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -58,7 +58,7 @@
 *               input is assumed to be double                           *
 *                                                                       *
 ************************************************************************/
-static char *rcs_id = "$Id: dct.c,v 1.11 2009/12/16 13:12:27 uratec Exp $";
+static char *rcs_id = "$Id: dct.c,v 1.14 2010/12/10 10:44:20 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -147,8 +147,8 @@ int dft(float *pReal, float *pImag, const int nDFTLength)
    int k, n;
    double dTempReal, dTempImag;
 
-   pTempReal = (float *) malloc(sizeof(float) * nDFTLength);
-   pTempImag = (float *) malloc(sizeof(float) * nDFTLength);
+   pTempReal = fgetmem(nDFTLength);
+   pTempImag = fgetmem(nDFTLength);
 
    memcpy(pTempReal, pReal, sizeof(float) * nDFTLength);
    memcpy(pTempImag, pImag, sizeof(float) * nDFTLength);
@@ -201,8 +201,7 @@ int dct_create_table_fft(const int nSize)
       return (0);
    } else {
       dct_table_size_fft = nSize;
-      dct_workspace2 =
-          (double *) malloc(sizeof(double) * (dct_table_size_fft * 6));
+      dct_workspace2 = dgetmem(dct_table_size_fft * 6);
       pWeightReal2 = dct_workspace2;
       pWeightImag2 = dct_workspace2 + dct_table_size_fft;
       pLocalReal2 = dct_workspace2 + (2 * dct_table_size_fft);
@@ -247,7 +246,7 @@ int dct_create_table(const int nSize)
       return (0);
    } else {
       dct_table_size = nSize;
-      dct_workspace = (float *) malloc(sizeof(float) * (dct_table_size * 6));
+      dct_workspace = fgetmem(dct_table_size * 6);
       pWeightReal = dct_workspace;
       pWeightImag = dct_workspace + dct_table_size;
       pLocalReal = dct_workspace + (2 * dct_table_size);
@@ -378,15 +377,9 @@ int main(int argc, char *argv[])
    pReal2 = dgetmem(size2 = size + size);
    y = x + size;
    pImag2 = pReal2 + size;
-   if ((pReal = (float *) calloc(size2, sizeof(float))) == NULL) {
-      fprintf(stderr, "No memory allocated : pReal\n");
-      exit(1);
-   }
+   pReal = fgetmem(size2);
    pImag = pReal + size;
-   if ((x2 = (float *) calloc(size2, sizeof(float))) == NULL) {
-      fprintf(stderr, "No memory allocated : x2\n");
-      exit(1);
-   }
+   x2 = fgetmem(size2);
    y2 = x2 + size;
 
    while (!feof(fp)) {

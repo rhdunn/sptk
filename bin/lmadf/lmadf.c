@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -58,6 +58,7 @@
 *               -P P     :  order of Pade approximation   [4]           *
 *               -k       :  filtering without gain        [FALSE]       *
 *               -v       :  inverse filter                [FALSE]       *
+*               -t       :  transpose filter              [FALSE]       *
 *       infile:                                                         *
 *               cepstral coefficients                                   *
 *                       , c~(0), c~(1), ..., c~(M),                     *
@@ -73,7 +74,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: lmadf.c,v 1.24 2009/12/24 18:22:08 uratec Exp $";
+static char *rcs_id = "$Id: lmadf.c,v 1.27 2010/04/01 12:27:46 uratec Exp $";
 
 
 /*  Standard C Libraries  */
@@ -104,6 +105,7 @@ static char *rcs_id = "$Id: lmadf.c,v 1.24 2009/12/24 18:22:08 uratec Exp $";
 #define PADEORD 4
 #define NGAIN FA
 #define INVERSE   FA
+#define TRANSPOSE FA
 
 char *BOOL[] = { "FALSE", "TRUE" };
 
@@ -128,6 +130,8 @@ void usage(int status)
            PADEORD);
    fprintf(stderr, "       -v    : inverse filter              [%s]\n",
            BOOL[INVERSE]);
+   fprintf(stderr, "       -t    : transpose filter            [%s]\n",
+           BOOL[TRANSPOSE]);
    fprintf(stderr, "       -k    : filtering without gain      [%s]\n",
            BOOL[NGAIN]);
    fprintf(stderr, "       -h    : print this message\n");
@@ -154,7 +158,7 @@ int main(int argc, char **argv)
    int m = ORDER, fprd = FPERIOD, iprd = IPERIOD, i, j, pd = PADEORD;
    FILE *fp = stdin, *fpc = NULL;
    double *c, *inc, *cc, *d, x;
-   Boolean ngain = NGAIN, inverse = INVERSE;
+   Boolean ngain = NGAIN, inverse = INVERSE, transpose = TRANSPOSE;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -174,6 +178,9 @@ int main(int argc, char **argv)
          case 'i':
             iprd = atoi(*++argv);
             --argc;
+            break;
+         case 't':
+            transpose = 1 - transpose;
             break;
          case 'P':
             pd = atoi(*++argv);
@@ -247,7 +254,10 @@ int main(int argc, char **argv)
 
          if (!ngain)
             x *= exp(c[0]);
-         x = lmadf(x, c, m, pd, d);
+         if (transpose)
+            x = lmadft(x, c, m, pd, d);
+         else
+            x = lmadf(x, c, m, pd, d);
          fwritef(&x, sizeof(x), 1, stdout);
 
          if (!--i) {

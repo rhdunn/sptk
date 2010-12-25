@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 ##
-## $Id: Makefile.am,v 1.5 2009/12/16 13:12:39 uratec Exp $
+## $Id: Makefile.am,v 1.7 2010/09/01 05:45:20 mataki Exp $
 INCLUDES=-I$(top_srcdir)/include
 lib_LIBRARIES = libSPTK.a
 libSPTK_a_SOURCES = agexp.c \

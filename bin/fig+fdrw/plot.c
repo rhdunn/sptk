@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -46,7 +46,8 @@
 /****************************************************************
 *         XY-Plotter Library                                    * 
 *                                                               *
-*                                        1985  T. Kobayashi     *
+*                                        1985    T. Kobayashi   *
+*                                        2010.9  A. Tamamori    *
 *                                                               *
 *         Calling sequence :                                    *
 *                 plopen(mode);                                 *
@@ -66,7 +67,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
-#include <unistd.h>
+#if defined(WIN32)
+#  include <windows.h>
+#  define sleep(x) Sleep(x)
+#else
+#  include <unistd.h>
+#endif
 #include "plot.h"
 
 struct co_ord _org = { 0.0, 0.0 };
@@ -175,4 +181,10 @@ void origin(double x, double y)
    _org.xo = x;
    _org.yo = y;
    plot(0., 0., 3);
+}
+
+void org(double x, double y)
+{
+   _org.xo = x;
+   _org.yo = y;
 }

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -59,6 +59,7 @@
 *               -b       :  mcep is filter coefficient b [FALSE]        *
 *               -P P     :  order of Pade approximation  [4]            *
 *               -k       :  filtering without gain       [FALSE]        *
+*               -t       :  transpose filter             [FALSE]        *
 *               -v       :  inverse filter               [FALSE]        *
 *       infile:                                                         *
 *               mel cepstral coefficients                               *
@@ -75,7 +76,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: mlsadf.c,v 1.26 2009/12/24 18:22:08 uratec Exp $";
+static char *rcs_id = "$Id: mlsadf.c,v 1.29 2010/04/01 12:27:46 uratec Exp $";
 
 
 /*  Standard C Libraries  */
@@ -107,6 +108,7 @@ static char *rcs_id = "$Id: mlsadf.c,v 1.26 2009/12/24 18:22:08 uratec Exp $";
 #define BFLAG     FA
 #define PADEORDER 4
 #define NGAIN     FA
+#define TRANSPOSE FA
 #define INVERSE   FA
 
 char *BOOL[] = { "FALSE", "TRUE" };
@@ -135,6 +137,8 @@ void usage(int status)
            PADEORDER);
    fprintf(stderr, "       -k    : filtering without gain       [%s]\n",
            BOOL[NGAIN]);
+   fprintf(stderr, "       -t    : transpose filter             [%s]\n",
+           BOOL[TRANSPOSE]);
    fprintf(stderr, "       -v    : inverse filter               [%s]\n",
            BOOL[INVERSE]);
    fprintf(stderr, "       -h    : print this message\n");
@@ -161,7 +165,8 @@ int main(int argc, char **argv)
    int m = ORDER, pd = PADEORDER, fprd = FPERIOD, iprd = IPERIOD, i, j;
    FILE *fp = stdin, *fpc = NULL;
    double *c, *inc, *cc, *d, x, a = ALPHA;
-   Boolean bflag = BFLAG, ngain = NGAIN, inverse = INVERSE;
+   Boolean bflag = BFLAG, ngain = NGAIN, transpose = TRANSPOSE, inverse =
+       INVERSE;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -189,6 +194,9 @@ int main(int argc, char **argv)
          case 'P':
             pd = atoi(*++argv);
             --argc;
+            break;
+         case 't':
+            transpose = 1 - transpose;
             break;
          case 'v':
             inverse = 1 - inverse;
@@ -267,7 +275,10 @@ int main(int argc, char **argv)
 
          if (!ngain)
             x *= exp(c[0]);
-         x = mlsadf(x, c, m, a, pd, d);
+         if (transpose)
+            x = mlsadft(x, c, m, a, pd, d);
+         else
+            x = mlsadf(x, c, m, a, pd, d);
 
          fwritef(&x, sizeof(x), 1, stdout);
 

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,13 +44,14 @@
 
 /****************************************************************
 
-    $Id: _gmm.c,v 1.4 2009/12/16 13:12:32 uratec Exp $
+    $Id: _gmm.c,v 1.8 2010/12/10 10:44:21 mataki Exp $
 
     GMM output prob calculation functions
 
 *****************************************************************/
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <math.h>
 
 #if defined(WIN32)
@@ -60,6 +61,27 @@
 #endif
 
 #include "gmm.h"
+
+double cal_det(double **var, const int D)
+{
+   int i, j, l;
+   double ldet = 0.0, **tri;
+
+   tri = (double **) malloc(sizeof(double *) * D);
+   for (l = 0; l < D; l++)
+      tri[l] = dgetmem(D);
+
+   for (i = 0; i < D; i++)
+      for (j = 0; j < D; j++)
+         tri[i][j] = 0.0;
+
+   if (choleski(var, tri, D)) {
+      for (l = 0; l < D; l++)
+         ldet += log(tri[l][l]);
+      return (2.0 * ldet);
+   } else
+      return 0;
+}
 
 double cal_gconst(double *var, const int D)
 {
@@ -73,9 +95,97 @@ double cal_gconst(double *var, const int D)
    return (gconst);
 }
 
+double cal_gconstf(double **var, const int D)
+{
+   int d;
+   double gconst, tmp;
+
+   tmp = cal_det(var, D);
+   if (tmp == 0) {
+      return 0;
+   }
+   gconst = D * log(M_2PI);
+   gconst += tmp;
+
+   return (gconst);
+}
+
+void cal_tri_inv(double **S, double **S_inv, const int L)
+{
+   int i, j, k;
+
+   for (i = 0; i < L; i++) {
+      S_inv[i][i] = 1.0 / S[i][i];
+   }
+   for (i = 1; i < L; i++)
+      for (j = i - 1; j >= 0; j--)
+         for (k = j; k < i; k++) {
+            S_inv[i][j] = S_inv[i][j] - S[i][k] * S_inv[k][j] / S[i][i];
+         }
+}
+
+int choleski(double **cov, double **S, const int L)
+{
+   int i, j, k;
+   double tmp;
+
+   for (i = 0; i < L; i++) {
+      for (j = 0; j < i; j++) {
+         tmp = cov[i][j];
+         for (k = 0; k < j; k++)
+            tmp -= S[i][k] * S[j][k];
+         S[i][j] = tmp / S[j][j];
+      }
+      tmp = cov[i][i];
+      for (k = 0; k < i; k++)
+         tmp -= S[i][k] * S[i][k];
+      if (tmp <= 0) {
+         return 0;
+      }
+      S[i][i] = sqrt(tmp);
+   }
+   return 1;
+}
+
+void cal_inv(double **cov, double **inv, const int L)
+{
+   int i, j, k;
+   double **S, **S_inv;
+
+   S = (double **) malloc(sizeof(double *) * L);
+   S_inv = (double **) malloc(sizeof(double *) * L);
+
+   for (i = 0; i < L; i++) {
+      S[i] = dgetmem(L);
+      S_inv[i] = dgetmem(L);
+   }
+
+   for (i = 0; i < L; i++) {
+      for (j = 0; j < L; j++) {
+         S[i][j] = 0.0;
+         S_inv[i][j] = 0.0;
+         inv[i][j] = 0.0;
+      }
+   }
+
+   if (choleski(cov, S, L) == 0)
+      return;
+   cal_tri_inv(S, S_inv, L);
+
+   for (i = 0; i < L; i++)
+      for (j = 0; j < L; j++) {
+         if (i > j)
+            for (k = i; k < L; k++)
+               inv[i][j] = inv[i][j] + S_inv[k][i] * S_inv[k][j];
+         else
+            for (k = j; k < L; k++)
+               inv[i][j] = inv[i][j] + S_inv[k][i] * S_inv[k][j];
+      }
+}
+
 void fillz_gmm(GMM * gmm, const int M, const int L)
 {
-   int m, l, ll;
+   int m, l;
 
    for (m = 0; m < M; m++) {
       gmm->weight[m] = 0.;
@@ -86,8 +196,26 @@ void fillz_gmm(GMM * gmm, const int M, const int L)
       for (l = 0; l < L; l++)
          gmm->gauss[m].var[l] = 0.;
    }
+}
 
-   return;
+void fillz_gmmf(GMM * gmm, const int M, const int L)
+{
+   int m, l, ll;
+
+   for (m = 0; m < M; m++) {
+      gmm->weight[m] = 0.;
+
+      for (l = 0; l < L; l++)
+         gmm->gauss[m].mean[l] = 0.;
+
+      for (l = 0; l < L; l++)
+         for (ll = 0; ll < L; ll++)
+            gmm->gauss[m].cov[l][ll] = 0.;
+
+      for (l = 0; l < L; l++)
+         for (ll = 0; ll < L; ll++)
+            gmm->gauss[m].inv[l][ll] = 0.;
+   }
 }
 
 double log_wgd(GMM * gmm, const int m, double *dat, const int L)
@@ -101,9 +229,27 @@ double log_wgd(GMM * gmm, const int m, double *dat, const int L)
       diff = dat[l] - gmm->gauss[m].mean[l];
       sum += sq(diff) / gmm->gauss[m].var[l];
    }
-
    lwgd = log(gmm->weight[m]) - 0.5 * sum;
+   return (lwgd);
+}
 
+double log_wgdf(GMM * gmm, const int m, double *dat, const int L)
+{
+   int l, ll;
+   double sum, *diff, tmp, lwgd;
+
+   diff = dgetmem(L);
+   sum = gmm->gauss[m].gconst;
+
+   for (l = 0; l < L; l++)
+      diff[l] = dat[l] - gmm->gauss[m].mean[l];
+
+   for (l = 0; l < L; l++) {
+      for (ll = 0, tmp = 0.; ll < L; ll++)
+         tmp += diff[ll] * gmm->gauss[m].inv[ll][l];
+      sum += tmp * diff[l];
+   }
+   lwgd = log(gmm->weight[m]) - 0.5 * sum;
    return (lwgd);
 }
 
@@ -137,6 +283,5 @@ double log_outp(GMM * gmm, double *dat, const int M, const int L)
       logwgd = log_wgd(gmm, m, dat, L);
       logb = log_add(logb, logwgd);
    }
-
    return (logb);
 }

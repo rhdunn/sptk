@@ -1,27 +1,28 @@
-# Makefile for VC++ 2005 nmake tool
-#
-#            2007.10  Jong-Jin Kim
-# 
-
 CC		= cl
 CL		= link
 CPU		= win32
 
 SPTKCFG	= /I..\include
-SYSCFG	= /O2 /Ot /GL /FD /EHsc /MT /W3 /nologo /c /Zi /TC /D "FORMAT=\"float\"" /D "NDEBUG" /D "HAVE_MEMSET" /D "HAVE_STRING_H" /D "WIN32" /D "_WINDOWS" /D "_CONSOLE" /D "_MBCS" /D "_CRT_SECURE_NO_WARNINGS"
+SYSCFG	= /O2 /Ot /GL /FD /EHsc /MT /W3 /nologo /c /Zi /TC /D "NDEBUG" /D "HAVE_MEMSET" /D "HAVE_STRING_H" /D "WIN32" /D "_WINDOWS" /D "_CONSOLE" /D "_MBCS" /D "_CRT_SECURE_NO_WARNINGS"
+
+!IFNDEF DOUBLE
+SYSCFG	= $(SYSCFG) /D "FORMAT=\"float\""
+!ELSE
+SYSCFG	= $(SYSCFG) /D "FORMAT=\"double\""
+!ENDIF
+
 CFLAGS	= $(SYSCFG) $(SPTKCFG)
 
 SPTKLIB	= ..\lib\SPTK.lib
 SYSLIB	= kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib
 LIBS	=  /NOLOGO /SUBSYSTEM:CONSOLE /MACHINE:X86 $(SPTKLIB) $(SYSLIB)
 
-       
 all: acep.exe acorr.exe agcep.exe amcep.exe \
 	average.exe b2mc.exe bcp.exe bcut.exe c2acr.exe \
-	c2ir.exe c2sp.exe cat2.exe cdist.exe clip.exe da.exe \
+	c2ir.exe c2sp.exe cat2.exe cdist.exe clip.exe da.exe dct.exe\
 	decimate.exe delay.exe delta.exe df2.exe dfs.exe dmp.exe ds.exe echo2.exe \
-	excite.exe extract.exe fd.exe fft.exe fft2.exe fftcep.exe fftr.exe fftr2.exe \
-	frame.exe freqt.exe gc2gc.exe gcep.exe glsadf.exe gmm.exe gnorm.exe \
+	excite.exe extract.exe fd.exe fdrw.exe fft.exe fft2.exe fftcep.exe fftr.exe fftr2.exe \
+	fig.exe frame.exe freqt.exe gc2gc.exe gcep.exe glsadf.exe gmm.exe gmmp.exe gnorm.exe \
 	grpdelay.exe histogram.exe ifft.exe ifft2.exe \
 	ignorm.exe impulse.exe imsvq.exe interpolate.exe ivq.exe \
 	lbg.exe levdur.exe linear_intpl.exe lmadf.exe lpc.exe lpc2c.exe lpc2lsp.exe \
@@ -34,8 +35,7 @@ all: acep.exe acorr.exe agcep.exe amcep.exe \
 	us.exe vopr.exe vq.exe vstat.exe vsum.exe window.exe x2x.exe \
 	zcross.exe zerodf.exe 
 
-
-acep.exe : acep\acep.c
+acep.exe : acep\acep.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
@@ -96,6 +96,10 @@ da.exe : da\dawrite.obj da\winplay.obj
 	$(CC) $(CFLAGS) /c da\winplay.c
 	$(CL) /OUT:$@ $(LIBS) winmm.lib dawrite.obj winplay.obj
 
+dct.exe : dct\dct.obj
+	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
+	$(CL) /OUT:$@ $(LIBS) $(@B).obj
+    
 decimate.exe : decimate\decimate.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
@@ -140,6 +144,12 @@ fd.exe : fd\fd.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
+fdrw.exe : fig+fdrw\fdrw.obj fig+fdrw\plot.obj fig+fdrw\plsub.obj
+	$(CC) $(CFLAGS) /c fig+fdrw\fig.c
+	$(CC) $(CFLAGS) /c fig+fdrw\plot.c
+	$(CC) $(CFLAGS) /c fig+fdrw\plsub.c
+	$(CL) /OUT:$@ $(LIBS) fdrw.obj plot.obj plsub.obj
+
 fft.exe : fft\fft.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
@@ -159,6 +169,15 @@ fftr.exe : fftr\fftr.obj
 fftr2.exe : fftr2\fftr2.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
+
+fig.exe : fig+fdrw\fig.obj fig+fdrw\fig0.obj fig+fdrw\fig1.obj \
+	fig+fdrw\plot.obj fig+fdrw\plsub.obj
+	$(CC) $(CFLAGS) /c fig+fdrw\fig.c
+	$(CC) $(CFLAGS) /c fig+fdrw\fig0.c
+	$(CC) $(CFLAGS) /c fig+fdrw\fig1.c
+	$(CC) $(CFLAGS) /c fig+fdrw\plot.c
+	$(CC) $(CFLAGS) /c fig+fdrw\plsub.c
+	$(CL) /OUT:$@ $(LIBS) fig.obj fig0.obj fig1.obj plot.obj plsub.obj
 
 frame.exe : frame\frame.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
@@ -182,6 +201,10 @@ glsadf.exe : glsadf\glsadf.obj
 
 gmm.exe : gmm\gmm.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
+	$(CL) /OUT:$@ $(LIBS) $(@B).obj
+
+gmmp.exe : gmm\gmmp.obj
+	$(CC) $(CFLAGS) /c gmm\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
 gnorm.exe : gnorm\gnorm.obj
@@ -336,8 +359,8 @@ pca.exe : pca\pca.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
-pcap.exe : pcap\pcap.obj
-	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
+pcap.exe : pca\pcap.obj
+	$(CC) $(CFLAGS) /c pca\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
 phase.exe : phase\phase.obj
@@ -461,4 +484,3 @@ zerodf.exe : zerodf\zerodf.obj
 clean:	
 	del *.exe
 	del *.obj
-

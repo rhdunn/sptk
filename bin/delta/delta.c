@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -65,7 +65,7 @@
 *                                                                                       *
 ****************************************************************************************/
 
-static char *rcs_id = "$Id: delta.c,v 1.3 2009/12/16 13:12:27 uratec Exp $";
+static char *rcs_id = "$Id: delta.c,v 1.5 2010/12/10 10:44:20 mataki Exp $";
 
 
 /*  Standard C Libralies  */
@@ -175,7 +175,7 @@ int main(int argc, char *argv[])
                   dw_coeflen += strlen(argv[i]) + 1;
                }
                dw_coeflen += 1;
-               coef = dw_fn[dw_num] = (char *) calloc(dw_coeflen, sizeof(char));
+               coef = dw_fn[dw_num] = getmem(dw_coeflen, sizeof(char));
                for (j = 0; j < i; j++) {
                   sprintf(coef, " %s", *argv);
                   coef += strlen(*argv) + 1;

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -42,50 +42,58 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-/************************************************************************
-*                                                                       *
-*    Execute Scalar Operations                                          *
-*                                                                       *
-*                                     1990.11 T.Kobayashi               *
-*                                     1996.5  K.Koishida                *
-*                                     2000.5  T.Kobayashi               *
-*       usage:                                                          *
-*               sopr [ options ] [ infile ] > stdout                    *
-*       options:                                                        *
-*               -a a     :  addition          (in + a)                  *
-*               -s s     :  subtraction       (in - s)                  *
-*               -m m     :  multiplication    (in * m)                  *
-*               -d d     :  division          (in / d)                  *
-*               -ABS     :  absolute          (abs(in))                 *
-*               -INV     :  inverse           (1 / in)                  *
-*               -P       :  square            (in * in)                 *
-*               -R       :  root              (sqrt(in))                *
-*               -SQRT    :  root              (sqrt(in))                *
-*               -LN      :  logarithm         (log(in))                 *
-*               -LOG2    :  logarithm         (log2(in))                *
-*               -LOG10   :  logarithm         (log10(in))               *
-*               -EXP     :  exponential       (exp(in))                 *
-*               -POW2    :  power of 2        (2^(in))                  *
-*               -POW10   :  power of 10       (10^(in))                 *
-*               -FIX     :  round             ((int)in)                 *
-*               -UNIT    :  unit step         (u(in))                   *
-*               -CLIP    :  clipping          (in * u(in)               *
-*               -SIN     :  sin               (sin(in))                 *
-*               -COS     :  cos               (cos(in))                 *
-*               -TAN     :  tan               (tan(in))                 *
-*               -ATAN    :  atan              (atan(in))                *
-*                                                                       *
-*               -r mn    :  read from memory register n                 *
-*               -w mn    :  write to memory register n                  *
-*                                                                       *
-*      infile:                                                          *
-*               data sequences (float)                                  *
-*      stdout:                                                          *
-*               data sequences after operations                         *
-*                                                                       *
-************************************************************************/
+/*******************************************************************************
+*                                                                              *
+*    Execute Scalar Operations                                                 *
+*                                                                              *
+*                                     1990.11 T.Kobayashi                      *
+*                                     1996.5  K.Koishida                       *
+*                                     2000.5  T.Kobayashi                      *
+*                                     2010.6  A.Tamamori                       *
+*                                     2010.12 T.Sawada                         *
+*       usage:                                                                 *
+*               sopr [ options ] [ infile ] > stdout                           *
+*       options:                                                               *
+*               -a a         :  addition             (in + a)                  *
+*               -s s         :  subtraction          (in - s)                  *
+*               -m m         :  multiplication       (in * m)                  *
+*               -d d         :  division             (in / d)                  *
+*               -f f         :  flooring             (in < f -> f)             *
+*               -c c         :  ceiling              (in > f -> f)             *
+*               -ABS         :  absolute             (abs(in))                 *
+*               -INV         :  inverse              (1 / in)                  *
+*               -P           :  square               (in * in)                 *
+*               -R           :  root                 (sqrt(in))                *
+*               -SQRT        :  root                 (sqrt(in))                *
+*               -LN          :  logarithm            (log(in))                 *
+*               -LOG2        :  logarithm            (log2(in))                *
+*               -LOG10       :  logarithm            (log10(in))               *
+*               -EXP         :  exponential          (exp(in))                 *
+*               -POW2        :  power of 2           (2^(in))                  *
+*               -POW10       :  power of 10          (10^(in))                 *
+*               -FIX         :  round                ((int)in)                 *
+*               -UNIT        :  unit step            (u(in))                   *
+*               -CLIP        :  clipping             (in * u(in)               *
+*               -SIN         :  sin                  (sin(in))                 *
+*               -COS         :  cos                  (cos(in))                 *
+*               -TAN         :  tan                  (tan(in))                 *
+*               -ATAN        :  atan                 (atan(in))                *
+*                                                                              *
+*               -magic magic :  remove magic number                            *
+*               -MAGIC MAGIC :  replace magic number by MAGIIC                 *
+*                               if -magic option is not given,                 *
+*                               return error                                   *
+*               -r mn    :  read from memory register n                        *
+*               -w mn    :  write to memory register n                         *
+*                                                                              *
+*      infile:                                                                 *
+*               data sequences (float)                                         *
+*      stdout:                                                                 *
+*               data sequences after operations                                *
+*                                                                              *
+*******************************************************************************/
 
-static char *rcs_id = "$Id: sopr.c,v 1.23 2009/12/24 18:22:08 uratec Exp $";
+static char *rcs_id = "$Id: sopr.c,v 1.29 2010/12/10 10:44:24 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -116,6 +124,8 @@ char *cmnd;
 
 /* Default Value  */
 #define MEMSIZE  10
+#define MAGIC    FA
+#define REP      FA
 
 void usage(int status)
 {
@@ -125,33 +135,52 @@ void usage(int status)
    fprintf(stderr, "  usage:\n");
    fprintf(stderr, "       %s [ options ] [ infile ] > stdout\n", cmnd);
    fprintf(stderr, "  options:\n");
-   fprintf(stderr, "       -a a   : addition            (in + a)\n");
-   fprintf(stderr, "       -s s   : subtraction         (in - s)\n");
-   fprintf(stderr, "       -m m   : multiplication      (in * m)\n");
-   fprintf(stderr, "       -d d   : division            (in / d)\n");
-   fprintf(stderr, "       -ABS   : absolute            (abs(in))\n");
-   fprintf(stderr, "       -INV   : inverse             (1 / in)\n");
-   fprintf(stderr, "       -P     : square              (in * in)\n");
-   fprintf(stderr, "       -R     : root                (sqrt(in))\n");
-   fprintf(stderr, "       -SQRT  : root                (sqrt(in))\n");
-   fprintf(stderr, "       -LN    : logarithm           (log(in))\n");
-   fprintf(stderr, "       -LOG2  : logarithm           (log2(in))\n");
-   fprintf(stderr, "       -LOG10 : logarithm           (log10(in))\n");
-   fprintf(stderr, "       -EXP   : exponential         (exp(in))\n");
-   fprintf(stderr, "       -POW2  : power of 2          (2^(in))\n");
-   fprintf(stderr, "       -POW10 : power of 10         (10^(in))\n");
-   fprintf(stderr, "       -FIX   : round               ((int)in)\n");
-   fprintf(stderr, "       -UNIT  : unit step           (u(in))\n");
-   fprintf(stderr, "       -CLIP  : clipping            (in * u(in))\n");
-   fprintf(stderr, "       -SIN   : sin                 (sin(in))\n");
-   fprintf(stderr, "       -COS   : cos                 (cos(in))\n");
-   fprintf(stderr, "       -TAN   : tan                 (tan(in))\n");
-   fprintf(stderr, "       -ATAN  : atan                (atan(in))\n");
+   fprintf(stderr, "       -a a         : addition             (in + a)\n");
+   fprintf(stderr, "       -s s         : subtraction          (in - s)\n");
+   fprintf(stderr, "       -m m         : multiplication       (in * m)\n");
+   fprintf(stderr, "       -d d         : division             (in / d)\n");
+   fprintf(stderr,
+           "       -f f         : flooring             (f if in < f)\n");
+   fprintf(stderr,
+           "       -c c         : ceiling              (c if in > c)\n");
+   fprintf(stderr, "       -magic magic : remove magic number  \n");
+   fprintf(stderr, "       -MAGIC MAGIC : replace magic number by MAGIC\n");
+   fprintf(stderr, "                      if -magic option is not given,\n");
+   fprintf(stderr, "                      return error\n");
    fprintf(stderr, "\n");
-   fprintf(stderr, "       -r mn  : read from memory register n\n");
-   fprintf(stderr, "       -w mn  : write to memory register n\n");
+   fprintf(stderr,
+           "       if the argument of the above operation option is `dB'\n");
+   fprintf(stderr,
+           "       then the value 20/log_e(10) is assigned. Also if 'pi' or\n");
+   fprintf(stderr,
+           "       `ln(x)',`exp(x)',`sqrt(x)' such as `ln2',`exp10',`sqrt30' \n");
+   fprintf(stderr,
+           "       is written after the operation option, then its value\n");
+   fprintf(stderr, "       will be used\n");
    fprintf(stderr, "\n");
-   fprintf(stderr, "       -h     : print this message\n");
+   fprintf(stderr, "       -ABS         : absolute             (abs(in))\n");
+   fprintf(stderr, "       -INV         : inverse              (1 / in)\n");
+   fprintf(stderr, "       -P           : square               (in * in)\n");
+   fprintf(stderr, "       -R           : root                 (sqrt(in))\n");
+   fprintf(stderr, "       -SQRT        : root                 (sqrt(in))\n");
+   fprintf(stderr, "       -LN          : logarithm            (log(in))\n");
+   fprintf(stderr, "       -LOG2        : logarithm            (log2(in))\n");
+   fprintf(stderr, "       -LOG10       : logarithm            (log10(in))\n");
+   fprintf(stderr, "       -EXP         : exponential          (exp(in))\n");
+   fprintf(stderr, "       -POW2        : power of 2           (2^(in))\n");
+   fprintf(stderr, "       -POW10       : power of 10          (10^(in))\n");
+   fprintf(stderr, "       -FIX         : round                ((int)in)\n");
+   fprintf(stderr, "       -UNIT        : unit step            (u(in))\n");
+   fprintf(stderr, "       -CLIP        : clipping             (in * u(in))\n");
+   fprintf(stderr, "       -SIN         : sin                  (sin(in))\n");
+   fprintf(stderr, "       -COS         : cos                  (cos(in))\n");
+   fprintf(stderr, "       -TAN         : tan                  (tan(in))\n");
+   fprintf(stderr, "       -ATAN        : atan                 (atan(in))\n");
+   fprintf(stderr, "\n");
+   fprintf(stderr, "       -r mn        : read from memory register n\n");
+   fprintf(stderr, "       -w mn        : write to memory register n\n");
+   fprintf(stderr, "\n");
+   fprintf(stderr, "       -h           : print this message\n");
    fprintf(stderr, "  infile:\n");
    fprintf(stderr, "       data sequence (%s)        [stdin]\n", FORMAT);
    fprintf(stderr, "  stdout:\n");
@@ -165,20 +194,25 @@ void usage(int status)
    exit(status);
 }
 
-double log2(double);
+#define LOG2(x) (log(x)/log(2))
 
 struct operation {
    char op[4];
    double d;
+   Boolean magic;
+   Boolean ifrep;
 } *optbl;
 int nopr = 0;
+int mopr = 0;
+int ropr = 0;
 
 static double mem[MEMSIZE];
 
 int main(int argc, char *argv[])
 {
+   int i, count = 0;
    FILE *fp;
-   char *s, c;
+   char *s, *m, c;
    char *infile = NULL;
    int sopr(FILE * fp);
 
@@ -198,11 +232,33 @@ int main(int argc, char *argv[])
          }
          switch (c) {
          case 'a':
+         case 'c':
          case 'd':
+         case 'f':
          case 'm':
          case 's':
          case 'r':
          case 'w':
+         case 'M':
+            if ((c == 'm') && strncmp("agic", s, 4) == 0) {
+               optbl[nopr].magic = 1 - MAGIC;
+               mopr = nopr;
+               s = *++argv;
+               --argc;
+            }
+            if (c == 'M') {
+               if (!optbl[mopr].magic) {
+                  fprintf(stderr,
+                          "%s : Cannnot find -magic option befor -MAGIC option!\n",
+                          cmnd);
+                  usage(1);
+               } else {
+                  optbl[mopr].ifrep = 1 - REP;
+                  ropr = nopr;
+               }
+               s = *++argv;
+               --argc;
+            }
             if (strncmp("dB", s, 2) == 0)
                optbl[nopr].d = 20 / log(10.0);
             else if (strncmp("pi", s, 2) == 0)
@@ -252,7 +308,6 @@ int main(int argc, char *argv[])
       } else
          infile = s;
    }
-
    if (infile) {
       fp = getfp(infile, "rb");
       sopr(fp);
@@ -266,6 +321,7 @@ int sopr(FILE * fp)
 {
    double x, y;
    int k, i;
+   Boolean ig_mg = MAGIC;
 
    while (freadf(&x, sizeof(x), 1, fp) == 1) {
       for (k = 0; k < MEMSIZE; ++k)
@@ -298,10 +354,23 @@ int sopr(FILE * fp)
             x -= y;
             break;
          case 'm':
-            x *= y;
+            if (optbl[k].magic) {
+               if (x == y)
+                  if (optbl[k].ifrep)
+                     x = optbl[ropr].d;
+                  else
+                     ig_mg = 1 - MAGIC;
+            } else
+               x *= y;
             break;
          case 'd':
             x /= y;
+            break;
+         case 'f':
+            x = (x < y) ? y : x;
+            break;
+         case 'c':
+            x = (x > y) ? y : x;
             break;
          case 'A':
             if (optbl[k].op[1] == 'T')
@@ -343,7 +412,7 @@ int sopr(FILE * fp)
             if (optbl[k].op[3] == '1')
                x = log10(x);
             else if (optbl[k].op[3] == '2')
-               x = log2(x);
+               x = LOG2(x);
             else
                x = log(x);
             break;
@@ -362,11 +431,15 @@ int sopr(FILE * fp)
                x = 0;
             else
                x = 1;
+         case 'M':
+
          default:
             break;
          }
       }
-      fwritef(&x, sizeof(x), 1, stdout);
+      if (!ig_mg)
+         fwritef(&x, sizeof(x), 1, stdout);
+      ig_mg = MAGIC;
    }
    return (0);
 }

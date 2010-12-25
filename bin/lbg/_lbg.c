@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -42,13 +42,13 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-/************************************************************************
+/**********************************************************************************************
 
-    $Id: _lbg.c,v 1.13 2009/12/16 13:12:33 uratec Exp $
+    $Id: _lbg.c,v 1.17 2010/12/10 10:44:22 mataki Exp $
 
-    LBG Algorithm for Vector Qauntizer Design
+    LBG Algorithm for Vector Quantizer Design
 
-       void lbg(x, l, tnum, icb, icbsize, cb, ecbsize, delta, end)
+       void lbg(x, l, tnum, icb, icbsize, cb, ecbsize, iter, mintnum, seed, centup, delta, end)
 
        double *x      :   training vector
        double l       :   length of vector
@@ -57,10 +57,14 @@
        int    icbsize :   initial codebook size
        double *cb     :   final codebook
        int    ecbsize :   final codebook size
+       int    iter    :   maximum number of iteration for centroid update
+       int    mintnum :   minimum number of training vectors for each cell
+       int    seed    :   seed for normalized random vector
+       int    centup  :   type of exception procedure for centroid update
        double delta   :   splitting factor
        double end     :   end condition
 
-************************************************************************/
+***********************************************************************************************/
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,20 +76,21 @@
 #endif
 
 #define MAXVALUE 1e23
+#define SEED 1
 #define abs(x) ( (x<0) ? (-(x)) : (x) )
 
-
 void lbg(double *x, const int l, const int tnum, double *icb, int icbsize,
-         double *cb, const int ecbsize, const double delta, const double end)
+         double *cb, const int ecbsize, const int iter, const int mintnum,
+         const int seed, const int centup, const double delta, const double end)
 {
-   int i, j, k, maxindex;
+   int i, j, k, it, maxindex, tnum1, tnum2;
    static int *cntcb, *tindex, size, sizex, sizecb;
-   double d0, d1, dl, err;
-   static double *rnd = NULL, *cb1;
+   unsigned long next = SEED;
+   double d0, d1, dl, err, tmp, rand;
+   static double *cb1 = NULL;
    double *p, *q, *r;
 
-   if (rnd == NULL) {
-      rnd = dgetmem(l);
+   if (cb1 == NULL) {
       cb1 = dgetmem(ecbsize * l);
       tindex = (int *) dgetmem(tnum);
       cntcb = (int *) dgetmem(ecbsize);
@@ -94,9 +99,7 @@ void lbg(double *x, const int l, const int tnum, double *icb, int icbsize,
       sizecb = ecbsize;
    }
    if (l > size) {
-      free(rnd);
       free(cb1);
-      rnd = dgetmem(l);
       cb1 = dgetmem(ecbsize * l);
       size = l;
    }
@@ -114,13 +117,15 @@ void lbg(double *x, const int l, const int tnum, double *icb, int icbsize,
 
    movem(icb, cb, sizeof(*icb), icbsize * l);
 
+   if (seed != 1)
+      next = srnd((unsigned int) seed);
+
    for (; icbsize * 2 <= ecbsize;) {
       q = cb;
-      r = cb + icbsize * l;     /* splitting */
+      r = cb + icbsize * l;
       for (i = 0; i < icbsize; i++) {
-         nrand(rnd, l, i);
          for (j = 0; j < l; j++) {
-            dl = delta * rnd[j];
+            dl = delta * nrandom(&next);
             *r = *q - dl;
             r++;
             *q = *q + dl;
@@ -130,7 +135,7 @@ void lbg(double *x, const int l, const int tnum, double *icb, int icbsize,
       icbsize *= 2;
 
       d0 = MAXVALUE;
-      for (;;) {
+      for (it = 1; it <= iter; it++) {
          fillz((double *) cntcb, sizeof(*cntcb), icbsize);
          d1 = 0.0;
          p = x;
@@ -147,13 +152,12 @@ void lbg(double *x, const int l, const int tnum, double *icb, int icbsize,
          err = abs((d0 - d1) / d1);
 
          if (err < end)
-            break;              /* check distortion */
-
+            break;
 
          d0 = d1;
          fillz(cb1, sizeof(*cb), icbsize * l);
 
-         p = x;                 /* get new centroid */
+         p = x;
          for (i = 0; i < tnum; i++) {
             q = cb1 + tindex[i] * l;
             for (j = 0; j < l; j++)
@@ -171,14 +175,40 @@ void lbg(double *x, const int l, const int tnum, double *icb, int icbsize,
          q = cb;
          r = cb1;
          for (i = 0; i < icbsize; i++, r += l, q += l)
-            if (cntcb[i] > 0)
+            if (cntcb[i] >= mintnum)
                for (j = 0; j < l; j++)
                   q[j] = r[j] / (double) cntcb[i];
             else {
-               nrand(rnd, l, i);
-               p = cb + maxindex * l;
-               for (j = 0; j < l; j++)
-                  q[j] = p[j] + delta * rnd[j];
+               if (centup == 1) {
+                  p = cb + maxindex * l;
+                  for (j = 0; j < l; j++) {
+                     rand = nrandom(&next);
+                     q[j] = p[j] + delta * rand;
+                     p[j] = p[j] - delta * rand;
+                  }
+               } else if (centup == 2) {
+                  if (i < icbsize / 2) {
+                     p = q + icbsize / 2 * l;
+                     tnum1 = cntcb[i];
+                     tnum2 = cntcb[i + icbsize / 2];
+                     for (j = 0; j < l; j++) {
+                        tmp = (tnum2 * q[j] + tnum1 * p[j]) / (tnum1 + tnum2);
+                        rand = nrandom(&next);
+                        q[j] = tmp + delta * rand;
+                        p[j] = tmp - delta * rand;
+                     }
+                  } else {
+                     p = q - icbsize / 2 * l;
+                     tnum1 = cntcb[i];
+                     tnum2 = cntcb[i - icbsize / 2];
+                     for (j = 0; j < l; j++) {
+                        tmp = (tnum2 * q[j] + tnum1 * p[j]) / (tnum1 + tnum2);
+                        rand = nrandom(&next);
+                        q[j] = tmp + delta * rand;
+                        p[j] = tmp - delta * rand;
+                     }
+                  }
+               }
             }
       }
       if (icbsize == ecbsize)

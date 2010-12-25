@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -62,7 +62,7 @@
 *                                                                          *
 ****************************************************************************/
 
-static char *rcs_id = "$Id: pcap.c,v 1.6 2009/12/16 13:12:36 uratec Exp $";
+static char *rcs_id = "$Id: pcap.c,v 1.8 2010/12/10 10:44:23 mataki Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -124,10 +124,7 @@ double **malloc_matrix(int row, int col)
    double *mtmp;
    int i, j;
 
-   if ((mtmp = (double *) malloc(sizeof(double) * row * col)) == NULL) {
-      fprintf(stderr, "Can't malloc in %s\n", cmnd);
-      exit(EXIT_FAILURE);
-   }
+   mtmp = dgetmem(row * col);
    if ((m = (double **) malloc(sizeof(double *) * row)) == NULL) {
       fprintf(stderr, "Can't malloc in %s\n", cmnd);
       exit(EXIT_FAILURE);

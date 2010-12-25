@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _lmadf.c,v 1.12 2009/12/16 13:12:33 uratec Exp $
+    $Id: _lmadf.c,v 1.14 2010/03/25 13:03:26 uratec Exp $
 
     LMA Digital Filter
 
@@ -147,4 +147,77 @@ double lmadf1(double x, double *c, const int m, double *d, const int m1,
    y += (pt[0] = x);
 
    return (y);
+}
+
+/* transpose */
+
+double lmadf1t(double x, double *b, const int m, const int pd, double *d)
+{
+   double v, out = 0.0, *pt;
+   int i;
+
+   pt = &d[pd + 1];
+
+   for (i = pd; i >= 1; i--) {
+      d[i] = pt[i - 1];
+      pt[i] = d[i] * b[1];
+      v = pt[i] * ppade[i];
+
+      x += (1 & i) ? v : -v;
+      out += v;
+   }
+
+   pt[0] = x;
+   out += x;
+
+   return (out);
+}
+
+static double lmafirt(double x, double *b, const int m, double *d)
+{
+   int i;
+   double y = 0.0;
+
+   y = d[0];
+
+   d[m] = b[m] * x;
+   for (i = m - 1; i > 1; i--)
+      d[i] += b[i] * x;
+   d[1] += 0;
+
+   for (i = 0; i < m; i++)
+      d[i] = d[i + 1];
+
+   return (y);
+}
+
+static double lmadf2t(double x, double *b, const int m, const int pd, double *d)
+{
+   double v, out = 0.0, *pt;
+   int i;
+
+   pt = &d[pd * (m + 2)];
+
+   for (i = pd; i >= 1; i--) {
+      pt[i] = lmafirt(pt[i - 1], b, m, &d[(i - 1) * (m + 2)]);
+      v = pt[i] * ppade[i];
+
+      x += (1 & i) ? v : -v;
+      out += v;
+   }
+
+   pt[0] = x;
+   out += x;
+
+   return (out);
+}
+
+double lmadft(double x, double *c, const int m, const int pd, double *d)
+{
+   ppade = &pade[pd * (pd + 1) / 2];
+
+   x = lmadf1t(x, c, m, pd, d);
+   x = lmadf2t(x, c, m, pd, &d[2 * (pd + 1)]);
+
+   return (x);
 }

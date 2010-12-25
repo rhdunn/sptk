@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -53,7 +53,7 @@
 *      Ver. 0.99  '93.8                                 *
 ********************************************************/
 
-static char *rcs_id = "$Id: psgr.c,v 1.16 2009/12/16 13:12:37 uratec Exp $";
+static char *rcs_id = "$Id: psgr.c,v 1.19 2010/12/10 10:44:23 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -81,14 +81,21 @@ static char *rcs_id = "$Id: psgr.c,v 1.16 2009/12/16 13:12:37 uratec Exp $";
 char *BOOL[] = { "FALSE", "TRUE" };
 
 
-#define MaxPaperTypes 6         /*  Paper Media  */
+#define MaxPaperTypes 13        /*  Paper Media  */
 
 struct page_media paper[] = {
    {"Letter", 612, 792},
+   {"A0", 2378, 3362},
+   {"A1", 1682, 2378},
+   {"A2", 1190, 1682},
    {"A3", 842, 1190},
    {"A4", 842, 842},
 /* {"A4",      595,  842}, */
    {"A5", 420, 595},
+   {"B0", 2917, 4124},
+   {"B1", 2063, 2917},
+   {"B2", 1459, 2063},
+   {"B3", 1032, 1459},
    {"B4", 729, 1032},
    {"B5", 516, 729},
 };
@@ -130,7 +137,8 @@ void usage(int status)
    fprintf(stderr, "       -x x  : x offset <mm>        [%d]\n", XOFFSET);
    fprintf(stderr, "       -y y  : y offset <mm>        [%d]\n", YOFFSET);
    fprintf(stderr, "       -p p  : paper                [%s]\n", MEDIA);
-   fprintf(stderr, "               (Letter,A3,A4,A5,B4,B5)\n");
+   fprintf(stderr,
+           "               (Letter,A0,A1,A2,A3,A4,A5,B0,B1,B2,B3,B4,B5)\n");
    fprintf(stderr, "       -l    : landscape            [%s]\n",
            BOOL[LANDSCAPE]);
    fprintf(stderr, "       -r r  : resolution           [%d dpi]\n",
@@ -158,7 +166,7 @@ void usage(int status)
 char *progname, *filename = NULL, *title = NULL;
 char *media = MEDIA, *orientation = ORIENTATION;
 
-int paper_num = PAPERNUM, xleng = XLENG, yleng = 842, resolution = RESOLUTION;
+int paper_num = PAPERNUM, xleng = XLENG, yleng = YLENG, resolution = RESOLUTION;
 int font_no = FONTNO, psmode = PSMODE, landscape = LANDSCAPE, clip_mode =
     CLIPMODE;
 
@@ -237,7 +245,7 @@ int main(int argc, char *argv[])
          filename = str;
    }
    for (i = 0; i < MaxPaperTypes; i++) {
-      if (strcmp(media, paper[i].size)) {
+      if (strcmp(media, paper[i].size) == 0) {
          paper_num = i;
          break;
       }
@@ -251,7 +259,6 @@ int main(int argc, char *argv[])
    }
    xleng *= SCALE;
    yleng *= SCALE;
-
    orientation = orientations[landscape];
 
    if (filename != NULL) {

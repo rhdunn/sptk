@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2009  Nagoya Institute of Technology          */
+/*                1996-2010  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _mlsadf.c,v 1.13 2009/12/16 13:12:35 uratec Exp $
+    $Id: _mlsadf.c,v 1.15 2010/03/25 13:03:26 uratec Exp $
 
     MLSA Digital Filter
 
@@ -177,4 +177,38 @@ static double mlsafirt(double x, double *b, const int m, const double a,
       d[i] = d[i + 1];
 
    return (y);
+}
+
+static double mlsadf2t(double x, double *b, const int m, const double a,
+                       const int pd, double *d)
+{
+   double v, out = 0.0, *pt, aa;
+   int i;
+
+   aa = 1 - a * a;
+   pt = &d[pd * (m + 2)];
+
+   for (i = pd; i >= 1; i--) {
+      pt[i] = mlsafirt(pt[i - 1], b, m, a, &d[(i - 1) * (m + 2)]);
+      v = pt[i] * ppade[i];
+
+      x += (1 & i) ? v : -v;
+      out += v;
+   }
+
+   pt[0] = x;
+   out += x;
+
+   return (out);
+}
+
+double mlsadft(double x, double *b, const int m, const double a, const int pd,
+               double *d)
+{
+   ppade = &pade[pd * (pd + 1) / 2];
+
+   x = mlsadf1(x, b, m, a, pd, d);
+   x = mlsadf2t(x, b, m, a, pd, &d[2 * (pd + 1)]);
+
+   return (x);
 }
