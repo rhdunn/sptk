@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2010  Nagoya Institute of Technology          */
+/*                1996-2011  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -69,7 +69,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: minmax.c,v 1.22 2010/12/10 10:44:23 mataki Exp $";
+static char *rcs_id = "$Id: minmax.c,v 1.24 2011/04/27 13:46:42 mataki Exp $";
 
 
 /* Standard C Libraries */
@@ -401,5 +401,7 @@ int minmax(FILE * fp, int dim, int nbest, Boolean outnum)
          fwritef(max, sizeof(*max), nbest, stdout);
       }
    }
+   free(nmaxpos);
+   free(nminpos);
    return (0);
 }

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2010  Nagoya Institute of Technology          */
+/*                1996-2011  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -65,7 +65,7 @@
 *                                                                                       *
 ****************************************************************************************/
 
-static char *rcs_id = "$Id: delta.c,v 1.5 2010/12/10 10:44:20 mataki Exp $";
+static char *rcs_id = "$Id: delta.c,v 1.7 2011/04/27 13:46:38 mataki Exp $";
 
 
 /*  Standard C Libralies  */
@@ -145,7 +145,7 @@ void usage(int status)
 
 int main(int argc, char *argv[])
 {
-   FILE *fp = stdin;
+   FILE *fp = stdin, *fpc;
    char *coef = NULL;
    double *x = NULL, *dx = NULL, **dw_coef = NULL;
    int i, j, l, d, t, tj, ispipe, fsize, leng = LENG, total = T;
@@ -292,16 +292,16 @@ int main(int argc, char *argv[])
             fsize = str2darray(dw_fn[i], &(dw_coef[i]));
          } else {
             /* read from file */
-            fp = getfp(dw_fn[i], "rb");
+            fpc = getfp(dw_fn[i], "rb");
 
             /* check the number of coefficients */
-            fseek(fp, 0L, 2);
-            fsize = ftell(fp) / sizeof(real);
-            fseek(fp, 0L, 0);
+            fseek(fpc, 0L, 2);
+            fsize = ftell(fpc) / sizeof(real);
+            fseek(fpc, 0L, 0);
 
             /* read coefficients */
             dw_coef[i] = dgetmem(fsize);
-            freadf(dw_coef[i], sizeof(**(dw_coef)), fsize, fp);
+            freadf(dw_coef[i], sizeof(**(dw_coef)), fsize, fpc);
          }
 
          /* set pointer */

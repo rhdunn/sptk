@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2010  Nagoya Institute of Technology          */
+/*                1996-2011  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -49,7 +49,7 @@
 *                                           2009.9 A.Tamamori              *
 *                                                                          *
 *       usage:                                                             *
-*                pcap [ options ] pcafile [ infile ] > stdout              *
+*                pcas [ options ] pcafile [ infile ] > stdout              *
 *       options:                                                           *
 *                -l    : length of vector                       [3]        *
 *                -p n  : order of pricipal component            [2]        *
@@ -62,7 +62,7 @@
 *                                                                          *
 ****************************************************************************/
 
-static char *rcs_id = "$Id: pcap.c,v 1.8 2010/12/10 10:44:23 mataki Exp $";
+static char *rcs_id = "$Id: pcas.c,v 1.2 2011/04/27 13:46:42 mataki Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>

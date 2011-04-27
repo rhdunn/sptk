@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2010  Nagoya Institute of Technology          */
+/*                1996-2011  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -58,7 +58,7 @@
 *               input is assumed to be double                           *
 *                                                                       *
 ************************************************************************/
-static char *rcs_id = "$Id: dct.c,v 1.14 2010/12/10 10:44:20 mataki Exp $";
+static char *rcs_id = "$Id: dct.c,v 1.16 2011/04/27 13:46:38 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -413,6 +413,11 @@ int main(int argc, char *argv[])
       } else {
          dct_create_table_fft(size);
          dct_based_on_fft(pReal, pImag, (const float *) x2, (const float *) y2);
+      }
+
+      for (k = 0; k < size; k++) {
+         pReal2[k] = (double) pReal[k];
+         pImag2[k] = (double) pImag[k];
       }
 
       fwritef(pReal2, sizeof(*pReal2), size, stdout);

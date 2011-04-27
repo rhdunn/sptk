@@ -32,8 +32,8 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-bin_PROGRAMS = pca$(EXEEXT) pcas$(EXEEXT)
-subdir = bin/pca
+bin_PROGRAMS = idct$(EXEEXT)
+subdir = bin/idct
 DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
@@ -44,12 +44,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_pca_OBJECTS = pca.$(OBJEXT)
-pca_OBJECTS = $(am_pca_OBJECTS)
-pca_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
-am_pcas_OBJECTS = pcas.$(OBJEXT)
-pcas_OBJECTS = $(am_pcas_OBJECTS)
-pcas_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+am_idct_OBJECTS = idct.$(OBJEXT)
+idct_OBJECTS = $(am_idct_OBJECTS)
+idct_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -57,8 +54,8 @@ COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
 CCLD = $(CC)
 LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
-SOURCES = $(pca_SOURCES) $(pcas_SOURCES)
-DIST_SOURCES = $(pca_SOURCES) $(pcas_SOURCES)
+SOURCES = $(idct_SOURCES)
+DIST_SOURCES = $(idct_SOURCES)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -168,10 +165,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
-pca_SOURCES = pca.c 
-pca_LDADD = $(top_srcdir)/lib/libSPTK.a
-pcas_SOURCES = pcas.c 
-pcas_LDADD = $(top_srcdir)/lib/libSPTK.a
+idct_SOURCES = idct.c
+idct_LDADD = $(top_srcdir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:
@@ -185,9 +180,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  bin/pca/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu  bin/idct/Makefile'; \
 	cd $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu  bin/pca/Makefile
+	  $(AUTOMAKE) --gnu  bin/idct/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
@@ -228,12 +223,9 @@ uninstall-binPROGRAMS:
 
 clean-binPROGRAMS:
 	-test -z "$(bin_PROGRAMS)" || rm -f $(bin_PROGRAMS)
-pca$(EXEEXT): $(pca_OBJECTS) $(pca_DEPENDENCIES) 
-	@rm -f pca$(EXEEXT)
-	$(LINK) $(pca_OBJECTS) $(pca_LDADD) $(LIBS)
-pcas$(EXEEXT): $(pcas_OBJECTS) $(pcas_DEPENDENCIES) 
-	@rm -f pcas$(EXEEXT)
-	$(LINK) $(pcas_OBJECTS) $(pcas_LDADD) $(LIBS)
+idct$(EXEEXT): $(idct_OBJECTS) $(idct_DEPENDENCIES) 
+	@rm -f idct$(EXEEXT)
+	$(LINK) $(idct_OBJECTS) $(idct_LDADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -241,8 +233,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pca.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pcas.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/idct.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2010  Nagoya Institute of Technology          */
+/*                1996-2011  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -65,7 +65,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: ifft2.c,v 1.20 2010/12/10 10:44:22 mataki Exp $";
+static char *rcs_id = "$Id: ifft2.c,v 1.22 2011/04/27 13:46:40 mataki Exp $";
 
 /*  Standard C Libraries  */
 #include <stdio.h>
@@ -127,7 +127,7 @@ int main(int argc, char *argv[])
 {
    FILE *fp;
    char *s, *infile = NULL, c;
-   int dft(FILE * fp);
+   int dft(FILE *);
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];

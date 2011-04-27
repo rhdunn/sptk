@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2010  Nagoya Institute of Technology          */
+/*                1996-2011  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -76,7 +76,7 @@
 *                                                                        *
 *************************************************************************/
 
-static char *rcs_id = "$Id: x2x.c,v 1.32 2010/12/10 10:44:24 mataki Exp $";
+static char *rcs_id = "$Id: x2x.c,v 1.35 2011/04/27 13:46:44 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -138,17 +138,29 @@ void usage(int status)
            "       +type1  : input data type                             [f]\n");
    fprintf(stderr,
            "       +type2  : output data type                            [type1]\n");
-   fprintf(stderr, "                 c  (char)           C  (unsigned char)\n");
    fprintf(stderr,
-           "                 s  (short)          S  (unsigned short)\n");
-   fprintf(stderr, "                 i  (int)            I  (unsigned int)\n");
+           "                 c  (char, %dbyte)         C  (unsigned char, %dbyte)\n",
+           sizeof(char), sizeof(unsigned char));
    fprintf(stderr,
-           "                 i3 (int, 3byte)     I3 (unsigned int, 3byte)\n");
-   fprintf(stderr, "                 l  (long)           L  (unsigned long)\n");
+           "                 s  (short, %dbyte)        S  (unsigned short, %dbyte)\n",
+           sizeof(short), sizeof(unsigned short));
    fprintf(stderr,
-           "                 le (long long)      LE (unsigned long long)\n");
-   fprintf(stderr, "                 f  (float)          d  (double)\n");
-   fprintf(stderr, "                 de (long double)    a  (ascii)\n");
+           "                 i  (int, %dbyte)          I  (unsigned int, %dbyte)\n",
+           sizeof(int), sizeof(unsigned int));
+   fprintf(stderr,
+           "                 i3 (int, 3byte)          I3 (unsigned int, 3byte)\n");
+   fprintf(stderr,
+           "                 l  (long, %dbyte)         L  (unsigned long, %dbyte)\n",
+           sizeof(long), sizeof(unsigned long));
+   fprintf(stderr,
+           "                 le (long long, %dbyte)    LE (unsigned long long, %dbyte)\n",
+           sizeof(long long), sizeof(unsigned long long));
+   fprintf(stderr,
+           "                 f  (float, %dbyte)        d  (double, %dbyte)\n",
+           sizeof(float), sizeof(double));
+   fprintf(stderr,
+           "                 de (long double, %dbyte) a  (ascii)\n",
+           sizeof(long double));
    fprintf(stderr,
            "       +aN     : specify the column number N                 [%d]\n",
            COL);
@@ -189,7 +201,7 @@ double r = 0.0;
 
 int main(int argc, char **argv)
 {
-   char c1 = 'f', c2 = 'f', *form = FORM_LDBL;
+   char c1 = 'f', c2 = 'f', *form;
    long double x;
    size_t size1 = 0, size2 = 0;
    int i = 1, col = COL;
