@@ -20,14 +20,14 @@ LIBS	=  /NOLOGO /SUBSYSTEM:CONSOLE /MACHINE:X86 $(SPTKLIB) $(SYSLIB)
 all: acep.exe acorr.exe agcep.exe amcep.exe \
 	average.exe b2mc.exe bcp.exe bcut.exe c2acr.exe \
 	c2ir.exe c2sp.exe cat2.exe cdist.exe clip.exe da.exe dct.exe\
-	decimate.exe delay.exe delta.exe df2.exe dfs.exe dmp.exe ds.exe echo2.exe \
+	decimate.exe delay.exe delta.exe df2.exe dfs.exe dmp.exe ds.exe dtw.exe echo2.exe \
 	excite.exe extract.exe fd.exe fdrw.exe fft.exe fft2.exe fftcep.exe fftr.exe fftr2.exe \
 	fig.exe frame.exe freqt.exe gc2gc.exe gcep.exe glsadf.exe gmm.exe gmmp.exe gnorm.exe \
 	grpdelay.exe histogram.exe idct.exe ifft.exe ifft2.exe \
 	ignorm.exe impulse.exe imsvq.exe interpolate.exe ivq.exe \
 	lbg.exe levdur.exe linear_intpl.exe lmadf.exe lpc.exe lpc2c.exe lpc2lsp.exe \
 	lpc2par.exe lsp2lpc.exe lspcheck.exe lspdf.exe ltcdf.exe mc2b.exe mcep.exe \
-	merge.exe mgc2mgc.exe mgc2sp.exe mgcep.exe mglsadf.exe minmax.exe mlpg.exe \
+	merge.exe mfcc.exe mgc2mgc.exe mgc2sp.exe mgcep.exe mglsadf.exe minmax.exe mlpg.exe \
 	mlsadf.exe msvq.exe nan.exe norm0.exe nrand.exe pca.exe pcas.exe par2lpc.exe phase.exe pitch.exe \
 	poledf.exe psgr.exe \
 	ramp.exe rawtowav.exe reverse.exe rmse.exe root_pol.exe sin.exe smcep.exe snr.exe \
@@ -125,6 +125,10 @@ dmp.exe : dmp\dmp.obj
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
 ds.exe : ds\ds.obj
+	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
+	$(CL) /OUT:$@ $(LIBS) $(@B).obj
+
+dtw.exe : dtw\dtw.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
@@ -308,6 +312,10 @@ mcep.exe : mcep\mcep.obj
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 
 merge.exe : merge\merge.obj
+	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
+	$(CL) /OUT:$@ $(LIBS) $(@B).obj
+
+mfcc.exe : mfcc\mfcc.obj
 	$(CC) $(CFLAGS) /c $(@B)\$(@B).c
 	$(CL) /OUT:$@ $(LIBS) $(@B).obj
 

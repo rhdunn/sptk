@@ -42,33 +42,34 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-/****************************************************************************************
-*                                                                                       *
-*    Delta Calculation                                                                  *
-*                                                                                       *
-*                                      2008.6 H.Zen                                     *
-*       usage:                                                                          *
-*               delta [ options ] [ infile ] > stdout                                   *
-*       options:                                                                        *
-*               -m M              : order of vector                              [24]   *
-*               -l L              : length of vector                             [m+1]  *
-*               -d fn             : filename of delta coefficients               [N/A]  *
-*               -t t              : number of input vectors                      [EOF]  *
-*               -d coef [coef...] : delta coefficients                           [N/A]  *
-*               -r n w1 [w2]      : number and width of regression coefficients  [N/A]  *
-*       infile:                                                                         *
-*              static feature sequence                                                  *
-*                      x_1(1), ..., x_1(L), x_2(1), ..., x_2(L), x_3(1), ...            *
-*       stdout:                                                                         *
-*              static and dynamic feature sequence                                      *
-*                      x_1(1), ..., x_1(L), \Delta x_1(1), ..., \Delta x_1(L), ...      *
-*                                                                                       *
-****************************************************************************************/
+/*********************************************************************************************
+*                                                                                            *
+*    Delta Calculation                                                                       *
+*                                                                                            *
+*                                      2008.6 H.Zen                                          *
+*       usage:                                                                               *
+*               delta [ options ] [ infile ] > stdout                                        *
+*       options:                                                                             *
+*               -m M                   : order of vector                              [24]   *
+*               -l L                   : length of vector                             [m+1]  *
+*               -d fn                  : filename of delta coefficients               [N/A]  *
+*               -d coef [coef...]      : delta coefficients                           [N/A]  *
+*               -r n w1 [w2]           : number and width of regression coefficients  [N/A]  *
+*               -R n Wf1 Wb1 [Wf2 Wb2] : number and width of regression coefficients  [N/A]  *
+*               -M magic               : magic number                                 [N/A]  *
+*       infile:                                                                              *
+*              static feature sequence                                                       *
+*                      x_1(1), ..., x_1(L), x_2(1), ..., x_2(L), x_3(1), ...                 *
+*       stdout:                                                                              *
+*              static and dynamic feature sequence                                           *
+*                      x_1(1), ..., x_1(L), \Delta x_1(1), ..., \Delta x_1(L), ...           *
+*                                                                                            *
+**********************************************************************************************/
 
-static char *rcs_id = "$Id: delta.c,v 1.7 2011/04/27 13:46:38 mataki Exp $";
+static char *rcs_id = "$Id: delta.c,v 1.12 2011/12/19 06:00:34 mataki Exp $";
 
 
-/*  Standard C Libralies  */
+/*  Standard C Libraries  */
 #include <stdio.h>
 
 #ifdef HAVE_STRING_H
@@ -93,12 +94,16 @@ static char *rcs_id = "$Id: delta.c,v 1.7 2011/04/27 13:46:38 mataki Exp $";
 /*  Default Values  */
 #define  LENG  25
 #define  T     -1
+#define MAGIC_FLAG FA
 
 char *BOOL[] = { "FALSE", "TRUE" };
 
 /*  Command Name  */
 char *cmnd;
 
+/* magic number */
+Boolean MAGIC = MAGIC_FLAG;
+double magic;
 
 /*  Other Definitions  */
 #ifdef DOUBLE
@@ -107,6 +112,10 @@ typedef double real;
 typedef float real;
 #endif
 
+typedef struct _float_list {
+   float *f;
+   struct _float_list *next;
+} float_list;
 
 void usage(int status)
 {
@@ -117,16 +126,27 @@ void usage(int status)
    fprintf(stderr, "       %s [ options ] [ infile ] > stdout\n", cmnd);
    fprintf(stderr, "  options:\n");
    fprintf(stderr,
-           "       -m M              : order of vector                              [%d]\n",
+           "       -m M                   : order of vector                              [%d]\n",
            LENG - 1);
    fprintf(stderr,
-           "       -l L              : length of vector                             [m+1]\n");
+           "       -l L                   : length of vector                             [m+1]\n");
    fprintf(stderr,
-           "       -t T              : number of input vectors                      [EOF]\n");
+           "       -t T                   : number of input vectors                      [EOF]\n");
    fprintf(stderr,
-           "       -d coef [coef...] : delta coefficients                           [N/A]\n");
+           "       -d coef [coef...]      : delta coefficients                           [N/A]\n");
    fprintf(stderr,
-           "       -r n t1 [t2]      : number and width of regression coefficients  [N/A]\n");
+           "       -r n t1 [t2]           : number and width of regression coefficients  [N/A]\n");
+   fprintf(stderr,
+           "       -R n Wf1 Wb1 [Wf2 Wb2] : number and width of regression coefficients  [N/A]\n");
+   fprintf(stderr,
+           "                                Combining -M option, magic number is skipped\n");
+   fprintf(stderr,
+           "                                during the delta calculation.\n");
+
+   fprintf(stderr,
+           "       -M magic               : magic number                                 [N/A]\n");
+   fprintf(stderr,
+           "                                valid only when -R option is specified.\n");
    fprintf(stderr, "       -h     : print this message\n");
    fprintf(stderr, "  infile:\n");
    fprintf(stderr,
@@ -142,16 +162,165 @@ void usage(int status)
    exit(status);
 }
 
+/* LU decomposition */
+static void LU(int n, double **A)
+{
+   int i, j, k;
+   double q;
+
+   for (k = 0; k < n - 1; k++) {
+      for (i = k + 1; i < n; i++) {
+         q = A[i][k] / A[k][k];
+         for (j = k + 1; j < n; j++) {
+            A[i][j] -= q * A[k][j];
+         }
+         A[i][k] = q;
+      }
+   }
+}
+
+/* solve linear equation Ax = b via LU decomposition */
+static void SOLVE(int n, double **A, double *b)
+{
+   int i, j;
+
+   for (i = 0; i < n; i++) {
+      for (j = 0; j < i; j++) {
+         b[i] -= A[i][j] * b[j];
+      }
+   }
+
+   for (i = n - 1; i >= 0; i--) {
+      for (j = i + 1; j < n; j++) {
+         b[i] -= A[i][j] * b[j];
+      }
+      b[i] /= A[i][i];
+   }
+}
+
+/* calculate regression quadratic polynomial coefficients */
+void GetCoefficient(double *input, double *output, int dw_num,
+                    int *position, int TOTAL, int total, int length,
+                    int *win_size_forward, int *win_size_backward)
+{
+   int i, j, l, t, d, index, width;
+   double T0, T1, T2, T3, T4, b[3];
+   double **Matrix = (double **) malloc(sizeof(double *) * 3);
+   double *tmpMat = dgetmem(3 * 3);
+   Boolean boundary_begin = FA, boundary_end = FA;
+
+   for (i = 0, j = 0; i < 3; i++, j += 3) {
+      Matrix[i] = tmpMat + j;
+   }
+
+   for (d = 0; d < dw_num - 1; d++) {
+      if (MAGIC == TR) {
+         for (t = 0; t < TOTAL; t++) {
+            for (l = 0; l < length; l++) {
+               if (d == 0) {
+                  output[dw_num * length * t + length + l] = magic;
+               } else if (d == 1) {
+                  output[dw_num * length * t + length * 2 + l] = magic;
+               }
+            }
+         }
+      }
+      for (t = 0; t < total; t++) {
+         T0 = T1 = T2 = T3 = T4 = 0.0;
+         boundary_begin = boundary_end = FA;
+         for (i = -win_size_backward[d]; i <= win_size_forward[d]; i++) {
+            index = t + i;
+            if (index < 0) {
+               boundary_begin = TR;
+               width = (int) (-1.0E30); /* point at infinity */
+            } else if (index >= total) {
+               boundary_end = TR;
+               width = (int) (1.0E30);  /* point at infinity */
+            } else {
+               width = position[index] - position[t];
+            }
+            T0++;
+            T1 += width;
+            T2 += pow(width, 2);
+            T3 += pow(width, 3);
+            T4 += pow(width, 4);
+         }
+         Matrix[0][0] = T0;
+         Matrix[0][1] = T1;
+         Matrix[0][2] = T2;
+         Matrix[1][0] = T1;
+         Matrix[1][1] = T2;
+         Matrix[1][2] = T3;
+         Matrix[2][0] = T2;
+         Matrix[2][1] = T3;
+         Matrix[2][2] = T4;
+         LU(3, Matrix);         /* LU decomposition */
+         for (l = 0; l < length; l++) {
+            b[0] = 0.0;
+            b[1] = 0.0;
+            b[2] = 0.0;
+            for (i = -win_size_backward[d]; i <= win_size_forward[d]; i++) {
+               int tmp;
+               if (t + i < 0) {
+                  tmp = position[0];
+                  width = position[0] - position[t];
+               } else if (t + i > total) {
+                  tmp = position[total - 1];
+                  width = position[total - 1] - position[t];
+               } else {
+                  tmp = position[t + i];
+                  width = position[t + i] - position[t];
+               }
+               b[0] += input[length * (tmp) + l];
+               b[1] += width * input[length * (tmp) + l];
+               b[2] += pow(width, 2) * input[length * (tmp) + l];
+            }
+            SOLVE(3, Matrix, b);        /* solve linear equation */
+            if (d == 0) {
+               /* output static */
+               output[dw_num * length * position[t] + l] =
+                   input[length * position[t] + l];
+               /* output delta */
+               if (boundary_begin == TR && win_size_backward[d] == 1) {
+                  output[dw_num * length * position[t] + length + l]
+                      = (input[length * position[t + 1] + l]
+                         - input[length * position[t] + l])
+                      / (position[t + 1] - position[t]);
+               } else if (boundary_end == TR && win_size_forward[d] == 1) {
+                  output[dw_num * length * position[t] + length + l]
+                      = (input[length * position[t] + l]
+                         - input[length * position[t - 1] + l])
+                      / (position[t] - position[t - 1]);
+               } else {
+                  output[dw_num * length * position[t] + length + l] = b[1];
+               }
+            } else if (d == 1) {
+               /* output delta-delta */
+               if (boundary_begin == TR && win_size_backward[d] == 1) {
+                  output[dw_num * length * position[t] + length * 2 + l] = 0.0;
+               } else if (boundary_end == TR && win_size_forward[d] == 1) {
+                  output[dw_num * length * position[t] + length * 2 + l] = 0.0;
+               } else {
+                  output[dw_num * length * position[t] + length * 2 + l] =
+                      2 * b[2];
+               }
+            }
+         }
+      }
+   }
+}
 
 int main(int argc, char *argv[])
 {
    FILE *fp = stdin, *fpc;
    char *coef = NULL;
-   double *x = NULL, *dx = NULL, **dw_coef = NULL;
+   double *x = NULL, *dx = NULL, **dw_coef = NULL, *y = NULL;
    int i, j, l, d, t, tj, ispipe, fsize, leng = LENG, total = T;
-   int dw_num = 1, **dw_width = NULL, dw_calccoef = -1, dw_coeflen =
-       1, dw_maxw[2] = { 0, 0 }, dw_leng = 1;
+   int dw_num = 1, **dw_width = NULL, dw_calccoef = -1, dw_coeflen = 1,
+       dw_leng = 1;
    char **dw_fn = (char **) calloc(sizeof(char *), argc);
+   int non_magic_num, win_size_forward[2], win_size_backward[2];
+   float_list *top, *cur, *prev, *tmpf;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -162,7 +331,7 @@ int main(int argc, char *argv[])
       if (**++argv == '-') {
          switch (*(*argv + 1)) {
          case 'd':
-            if (dw_calccoef == 1) {
+            if (dw_calccoef == 1 || dw_calccoef == 2) {
                fprintf(stderr,
                        "%s : Options '-r' and '-d' should not be defined simultaneously!\n",
                        cmnd);
@@ -191,7 +360,7 @@ int main(int argc, char *argv[])
             --argc;
             break;
          case 'r':
-            if (dw_calccoef == 0) {
+            if (dw_calccoef == 0 || dw_calccoef == 2) {
                fprintf(stderr,
                        "%s : Options '-r' and '-d' should not be defined simultaneously!\n",
                        cmnd);
@@ -235,8 +404,43 @@ int main(int argc, char *argv[])
             leng = atoi(*++argv);
             --argc;
             break;
-         case 't':
-            total = atoi(*++argv);
+         case 'R':
+            if (dw_calccoef == 0 || dw_calccoef == 1) {
+               fprintf(stderr,
+                       "%s : Options '-r', '-d' and '-R' should not be defined simultaneously!\n",
+                       cmnd);
+               return (1);
+            }
+            dw_calccoef = 2;
+            dw_num = atoi(*++argv) + 1;
+            --argc;
+            if ((dw_num != 2) && (dw_num != 3)) {
+               fprintf(stderr,
+                       "%s : Number of delta parameter should be 1 or 2!\n",
+                       cmnd);
+               return (1);
+            }
+            if (argc <= 1) {
+               fprintf(stderr,
+                       "%s : Window size for delta-delta parameter required!\n",
+                       cmnd);
+               return (1);
+            }
+
+            sscanf(*++argv, "%d", &win_size_forward[0]);
+            --argc;
+            sscanf(*++argv, "%d", &win_size_backward[0]);
+            --argc;
+            if (dw_num > 2) {
+               sscanf(*++argv, "%d", &win_size_forward[1]);
+               --argc;
+               sscanf(*++argv, "%d", &win_size_backward[1]);
+               --argc;
+            }
+            break;
+         case 'M':
+            sscanf(*++argv, "%lf", &magic);
+            MAGIC = TR;
             --argc;
             break;
          case 'h':
@@ -248,21 +452,6 @@ int main(int argc, char *argv[])
       } else
          fp = getfp(*argv, "rb");
    }
-
-   /* -- Count number of input vectors -- */
-   if (total == -1) {
-      ispipe = fseek(fp, 0L, 2);
-      total = (int) (ftell(fp) / (double) leng / (double) sizeof(float));
-      rewind(fp);
-
-      if (ispipe == -1) {       /* input vectors is from standard input via pipe */
-         fprintf(stderr,
-                 "\n %s (Error) -t option must be specified for the standard input via pipe.\n",
-                 cmnd);
-         usage(1);
-      }
-   }
-
 
    /* parse window files */
    /* memory allocation */
@@ -339,46 +528,89 @@ int main(int argc, char *argv[])
               a0++, a1 += j * j, a2 += j * j * j * j, j++);
          for (j = -dw_leng; j <= dw_leng; j++)
             dw_coef[2][j] =
-                ((double) (a0 * j * j - a1)) / ((double) (a2 * a0 - a1 * a1)) /
-                2;
+                2 * ((double) (a0 * j * j - a1)) /
+                ((double) (a2 * a0 - a1 * a1));
       }
    }
 
-   /* max window width */
-   dw_maxw[0] = dw_maxw[1] = 0;
-   for (i = 0; i < dw_num; i++) {
-      if (dw_maxw[0] > dw_width[i][0])
-         dw_maxw[0] = dw_width[i][0];
-      if (dw_maxw[1] < dw_width[i][1])
-         dw_maxw[1] = dw_width[i][1];
+   /* -- Count number of input vectors and read -- */
+   x = dgetmem(leng);
+   top = prev = (float_list *) malloc(sizeof(float_list));
+   top->f = (float *) malloc(sizeof(float) * leng);
+   total = 0;
+   prev->next = NULL;
+   while (freadf(x, sizeof(*x), leng, fp) == leng) {
+      cur = (float_list *) malloc(sizeof(float_list));
+      cur->f = (float *) malloc(sizeof(float) * leng);
+      for (i = 0; i < leng; i++) {
+         cur->f[i] = (float) x[i];
+      }
+      total++;
+      prev->next = cur;
+      cur->next = NULL;
+      prev = cur;
    }
-
-   /* allocate memory for input/output vectors */
+   free(x);
    x = dgetmem(leng * total);
    dx = dgetmem(dw_num * leng * total);
    fillz(dx, sizeof(*x), dw_num * leng * total);
-
-   /* read input vectors */
-   freadf(x, sizeof(*x), total * leng, fp);
-
-   /* calculate delta and delta-delta */
-   for (t = 0; t < total; t++) {
-      for (d = 0; d < dw_num; d++) {
-         for (j = dw_width[d][0]; j <= dw_width[d][1]; j++) {
-            tj = t + j;
-            if (tj < 0)
-               tj = 0;
-            if (!(tj < total))
-               tj = total - 1;
-            for (l = 0; l < leng; l++)
-               dx[dw_num * leng * t + leng * d + l] +=
-                   dw_coef[d][j] * x[leng * tj + l];
-         }
+   for (i = 0, tmpf = top->next; tmpf != NULL; i++, tmpf = tmpf->next) {
+      for (j = 0; j < leng; j++) {
+         x[i * leng + j] = tmpf->f[j];
       }
    }
 
-   /* output static, delta, delta-delta */
-   fwritef(dx, sizeof(*dx), dw_num * total * leng, stdout);
+   if (dw_calccoef == 0 || dw_calccoef == 1) {
+      /* calculate delta and delta-delta */
+      for (t = 0; t < total; t++) {
+         for (d = 0; d < dw_num; d++) {
+            for (j = dw_width[d][0]; j <= dw_width[d][1]; j++) {
+               tj = t + j;
+               if (tj < 0)
+                  tj = 0;
+               if (!(tj < total))
+                  tj = total - 1;
+               for (l = 0; l < leng; l++)
+                  dx[dw_num * leng * t + leng * d + l] +=
+                      dw_coef[d][j] * x[leng * tj + l];
+            }
+         }
+      }
+
+      /* output static, delta, delta-delta */
+      fwritef(dx, sizeof(*dx), dw_num * total * leng, stdout);
+
+   } else if (dw_calccoef == 2) {
+      int *position = (int *) malloc(sizeof(int) * total);
+
+      /* skip magic number */
+      if (MAGIC == TR) {
+         for (t = 0, non_magic_num = 0; t < total; t++) {
+            for (l = 0; l < leng; l++) {
+               if (x[leng * t + l] == magic) {
+                  break;
+               }
+            }
+            if (l == leng) {
+               /* remember position of non-magic number */
+               position[non_magic_num] = t;
+               non_magic_num++;
+            }
+         }
+      } else {
+         for (t = 0; t < total; t++) {
+            position[t] = t;
+         }
+         non_magic_num = total;
+      }
+
+      /* calculate delta and delta-delta */
+      GetCoefficient(x, dx, dw_num, position, total, non_magic_num, leng,
+                     win_size_forward, win_size_backward);
+
+      /* output static, delta, delta-delta */
+      fwritef(dx, sizeof(*dx), dw_num * total * leng, stdout);
+   }
 
    return (0);
 }

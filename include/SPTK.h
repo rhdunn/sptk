@@ -43,7 +43,7 @@
 /* ----------------------------------------------------------------- */
 
 /***********************************************************
-   $Id: SPTK.h,v 1.34 2011/04/27 13:46:44 mataki Exp $ 
+   $Id: SPTK.h,v 1.37 2011/12/19 06:00:35 mataki Exp $ 
    
    Speech Signal Processing Toolkit
    SPTK.h
@@ -232,6 +232,10 @@ void mc2b(double *mc, double *b, int m, const double a);
 int mcep(double *xw, const int flng, double *mc, const int m, const double a,
          const int itr1, const int itr2, const double dd, const double e,
          const double f, const int itype);
+void mfcc(double *in, double *mc, const double sampleFreq, const double alpha,
+          const double eps, const int wlng, const int flng, const int m,
+          const int n, const int ceplift, const Boolean dftmode,
+          const Boolean usehamming);
 void frqtr(double *c1, int m1, double *c2, int m2, const double a);
 void mgc2mgc(double *c1, const int m1, const double a1, const double g1,
              double *c2, const int m2, const double a2, const double g2);
@@ -265,9 +269,6 @@ unsigned long srnd(const unsigned int seed);
 void par2lpc(double *k, double *a, const int m);
 void phase(double *p, const int mp, double *z, const int mz, double *ph,
            const int flng, const int unlap);
-double pitch(double *xw, const int l, const double thresh, const int low,
-             const int high, const double eps, const int m, const int itr1,
-             const int itr2, const double end);
 double poledf(double x, double *a, int m, double *d);
 double poledft(double x, double *a, int m, double *d);
 void reverse(double *x, const int l);

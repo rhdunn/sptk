@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 ##
-## $Id: Makefile.am,v 1.11 2011/04/26 12:05:40 mataki Exp $
+## $Id: Makefile.am,v 1.15 2011/12/20 02:45:12 mataki Exp $
 
 SUBDIRS = acep \
 	acorr \
@@ -25,6 +25,7 @@ SUBDIRS = acep \
 	dfs \
 	dmp \
 	ds \
+	dtw \
 	echo2 \
 	excite \
 	extract \
@@ -67,6 +68,7 @@ SUBDIRS = acep \
 	mc2b \
 	mcep \
 	merge \
+	mfcc \
 	mgc2mgc \
 	mgc2sp \
 	mgcep \
@@ -109,3 +111,5 @@ SUBDIRS = acep \
 	xgr \
 	zcross \
 	zerodf
+
+EXTRA_DIST = pitch/snack/COPYING pitch/swipe/COPYING

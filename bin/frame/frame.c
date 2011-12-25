@@ -70,7 +70,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: frame.c,v 1.21 2011/04/27 13:46:39 mataki Exp $";
+static char *rcs_id = "$Id: frame.c,v 1.24 2011/12/19 06:00:34 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -131,11 +131,10 @@ void usage(int status)
 
 int main(int argc, char **argv)
 {
-   int l = LENG, fprd = FPERIOD, ns, i;
-   size_t size = sizeof(float);
+   int l = LENG, fprd = FPERIOD, ns, i, rnum, ts, cs;
    FILE *fp = stdin;
    Boolean noctr = NOCTR;
-   char *x, *xx, *p1, *p2, *p;
+   double *x, *xx, *p1, *p2, *p;
    char *s, c;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
@@ -166,42 +165,57 @@ int main(int argc, char **argv)
       } else
          fp = getfp(*argv, "rb");
 
-   x = (char *) dgetmem(size * l);
-
+   x = dgetmem(l);
    if (!noctr) {
       i = (int) ((l + 1) / 2);
-      if (freadx(&x[(int) (l / 2) * size], size, i, fp) != i)
-         return 0;
-   } else {
-      if (freadx(x, size, l, fp) != l)
-         return 0;
-   }
-
-   fwritex(x, size, l, stdout);
+      rnum = freadf(&x[(int) (l / 2)], sizeof(*x), i, fp);
+   } else
+      rnum = freadf(x, sizeof(*x), l, fp);
+   if (rnum == 0)
+      return 0;
+   cs = rnum;
+   fwritef(x, sizeof(*x), l, stdout);
 
    if ((ns = (l - fprd)) > 0) {
-      p = &x[fprd * size];
+      p = &x[fprd];
       for (;;) {
          p1 = x;
          p2 = p;
-         i = ns * size;
-         while (i--)
+         i = ns;
+         while (i--) {
             *p1++ = *p2++;
-
-         if (freadx(p1, size, fprd, fp) != fprd)
+         }
+         rnum = freadf(p1, sizeof(*p1), fprd, fp);
+         if (rnum < fprd) {
+            ts = fprd - rnum;
+            cs -= ts;
+            while (rnum--)
+               p1++;
+            while (ts--)
+               *p1++ = 0.0;
+         }
+         if (cs <= 0)
             break;
-         fwritex(x, size, l, stdout);
+         fwritef(x, sizeof(*x), l, stdout);
       }
    } else {
       i = -ns;
-      xx = (char *) dgetmem(i * size);
+      xx = dgetmem(i);
       for (;;) {
-         if (freadx(xx, size, i, fp) != i)
+         if (freadf(xx, sizeof(*xx), i, fp) != i)
             break;
-
-         if (freadx(x, size, l, fp) != l)
-            break;
-         fwritex(x, size, l, stdout);
+         rnum = freadf(x, sizeof(*x), l, fp);
+         if (rnum < l) {
+            if (rnum == 0)
+               break;
+            ts = l - rnum;
+            p1 = x;
+            while (rnum--)
+               p1++;
+            while (ts--)
+               *p1++ = 0.0;
+         }
+         fwritef(x, sizeof(*x), l, stdout);
       }
    }
 

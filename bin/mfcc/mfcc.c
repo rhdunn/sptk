@@ -44,43 +44,44 @@
 
 /*************************************************************************
 *                                                                        *
-*    Frequency and Generalized Cepstral Transformation                   *
+*    MFCC Analysis                                                       *
 *                                                                        *
-*                                        1996.1  K.Koishida              *
+*                                       2011.9 T.Sawada                  *
 *                                                                        *
 *       usage:                                                           *
-*               mgc2mgc [ options ] [ infile ] > stdout                  *
+*               mfcc [ options ] [ infile ] > stdout                     *
 *       options:                                                         *
-*               -m  m    : order of generalized cepstrum (input)  [25]   *
-*               -a  a    : alpha of generalized cepstrum (input)  [0]    *
-*               -g  g    : gamma of generalized cepstrum (input)  [0]    *
-*               -c  c    : gamma of generalized cepstrum (input)         *
-*                          gamma = -1 / (int) c                          *
-*               -n       : regard input as normalized                    *
-*                          mel-generalized cepstrum               [FALSE]*
-*               -u       : regard input as multiplied by gamma    [FALSE]*
-*               -M  M    : order of generalized cepstrum (output) [25]   *
-*               -A  A    : alpha of generalized cepstrum (output) [0]    *
-*               -G  G    : gamma of generalized cepstrum (output) [1]    *
-*               -C  C    : gamma of generalized cepstrum (output)        *
-*                          gamma = -1 / (int) C                          *
-*               -N  N    : regard output as normalized                   *
-*                          mel-generalized cepstrum               [FALSE]*
-*               -U  : regard output as multiplied by gamma        [FALSE]*
+*               -a  a    :  pre-emphasis coefficient             [0.97]  *
+*               -c  c    :  liftering coefficient                [0]     *
+*               -e  e    :  flooring value for culculating log(x)[1.0]   *
+*                           in filterbank analysis                       *
+*                           if x < e then x = e                          *
+*               -l  l    :  frame length of input                [256]   *
+*               -L  L    :  frame length of window               [256]   * 
+*               -m  m    :  order of cepstrum                    [13]    *
+*               -n  n    :  order of channel for mel-filter bank [26]    *
+*               -F  F    :  sampling frequency (kHz)             [16.0]  *
+*               -d       :  without using fft algorithm          [FALSE] *
+*               -w       :  use hamming window                   [FALSE] *
+*               -E       :  use power                            [FALSE] *
+*               -0       :  use 0'th static coefficient          [FALSE] *
 *       infile:                                                          *
-*               mel-generalized cepstrum                                 *
-*                       , c(0), c(1), ..., c(m),                         *
+*               data sequence                                            *
+*                   , x(0), x(1), ..., x(l-1),                           *
 *       stdout:                                                          *
-*               mel-generalized cepstrum                                 *
-*                       , c'(0)(=c(0)), c'(1), ..., c'(M),               *
-*       notice:                                                          *    
-*               value of c and C must be c>=1, C>=1                      *
+*               mel-frequency cepstral coefficients                      *
+*                   , mc(0), mc(1), ..., mc(m-1),                        *
+*               if -E or -0 option is given, Energy E and 0'th static    *
+*               coefficient C0 is output as follows,                     *
+*                   , mc(0), mc(1), ..., mc(m-1), E (C0)                 *
+*               if Both -E and -0 option is given, C0 is output before   *
+*               E                                                        *
 *       require:                                                         *
-*               mgc2mgc(), gnorm(), ignorm()                             *
+*               mfcc()                                                   *
 *                                                                        *
 *************************************************************************/
 
-static char *rcs_id = "$Id: mgc2mgc.c,v 1.27 2011/08/10 06:12:06 mataki Exp $";
+static char *rcs_id = "$Id: mfcc.c,v 1.4 2011/12/08 08:43:03 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -104,16 +105,18 @@ static char *rcs_id = "$Id: mgc2mgc.c,v 1.27 2011/08/10 06:12:06 mataki Exp $";
 #endif
 
 /*  Default Values  */
-#define ORDER1 25
-#define ORDER2 25
-#define ALPHA1 0.0
-#define ALPHA2 0.0
-#define GAMMA1 0.0
-#define GAMMA2 1.0
-#define NORMFLG1 FA
-#define NORMFLG2 FA
-#define MULGFLG1 FA
-#define MULGFLG2 FA
+#define ORDER 12
+#define WLNG 256
+#define EPS 1.0
+#define CHANNEL 20
+#define USEHAMMING FA
+#define DFTMODE FA
+#define CZERO FA
+#define ENERGY  FA
+#define SAMPLEFREQ 16.0
+#define ALPHA 0.97
+#define LIFT 22
+#define WTYPE 0
 
 char *BOOL[] = { "FALSE", "TRUE" };
 
@@ -124,56 +127,61 @@ char *cmnd;
 void usage(int status)
 {
    fprintf(stderr, "\n");
-   fprintf(stderr, " %s - frequency and generalized cepstral transformation\n",
-           cmnd);
+   fprintf(stderr, " %s - MFCC analysis\n", cmnd);
    fprintf(stderr, "\n");
    fprintf(stderr, "  usage:\n");
    fprintf(stderr, "       %s [ options ] [ infile ] > stdout\n", cmnd);
    fprintf(stderr, "  options:\n");
    fprintf(stderr,
-           "       -m m  : order of mel-generalized cepstrum (input)            [%d]\n",
-           ORDER1);
+           "       -a a  : pre-emphasis coefficient              [%g]\n",
+           ALPHA);
    fprintf(stderr,
-           "       -a a  : alpha of mel-generalized cepstrum (input)            [%g]\n",
-           ALPHA1);
+           "       -c c  : liftering coefficient                 [%d]\n", LIFT);
    fprintf(stderr,
-           "       -g g  : gamma of mel-generalized cepstrum (input)            [%g]\n",
-           GAMMA1);
+           "       -e e  : flooring value for calculating log(x) [%g]\n", EPS);
+   fprintf(stderr, "               in filterbank analysis\n");
+   fprintf(stderr, "               if x < e, then x = e\n");
    fprintf(stderr,
-           "       -c c  : gamma of mel-generalized cepstrum = -1 / (int) c (input) \n");
+           "       -f f  : sampling frequency (kHz)              [%.1f]\n",
+           SAMPLEFREQ);
    fprintf(stderr,
-           "       -n    : regard input as normalized mel-generalized cepstrum  [%s]\n",
-           BOOL[NORMFLG1]);
+           "       -l l  : frame length of input                 [%d]\n", WLNG);
    fprintf(stderr,
-           "       -u    : regard input as multiplied by gamma                  [%s]\n",
-           BOOL[MULGFLG1]);
+           "       -L L  : frame length for fft                  [2^n]\n");
+   fprintf(stderr, "               default value 2^n satisfies l <= 2^n\n");
    fprintf(stderr,
-           "       -M M  : order of mel-generalized cepstrum (output)           [%d]\n",
-           ORDER2);
+           "       -m m  : order of cepstrum                     [%d]\n",
+           ORDER);
    fprintf(stderr,
-           "       -A A  : alpha of mel-generalized cepstrum (output)           [%g]\n",
-           ALPHA2);
+           "       -n n  : order of channel for mel-filter bank  [%d]\n",
+           CHANNEL);
    fprintf(stderr,
-           "       -G G  : gamma of mel-generalized cepstrum (output)           [%g]\n",
-           GAMMA2);
+           "       -w w  : type of window                        [%d]\n",
+           WTYPE);
+   fprintf(stderr, "                  0 (hamming)\n");
+   fprintf(stderr, "                  1 (do not use a window function)\n");
    fprintf(stderr,
-           "       -C C  : gamma of mel-generalized cepstrum = -1 / (int) C (output)\n");
+           "       -d    : without using fft algorithm (use dft) [%s]\n",
+           BOOL[DFTMODE]);
    fprintf(stderr,
-           "       -N    : regard output as normalized mel-generalized cepstrum [%s]\n",
-           BOOL[NORMFLG2]);
+           "       -E    : output energy                         [%s]\n",
+           BOOL[ENERGY]);
    fprintf(stderr,
-           "       -U    : regard output as multiplied by gamma                 [%s]\n",
-           BOOL[MULGFLG2]);
+           "       -0    : output 0'th static coefficient        [%s]\n",
+           BOOL[CZERO]);
+   fprintf(stderr, "\n");
+   fprintf(stderr, "       if -E or -0 option is given, the value is output\n");
+   fprintf(stderr,
+           "       after the MFCC. Also, if both -E and -0 option are\n");
+   fprintf(stderr,
+           "       given, 0'th static coefficient C0 is output before energy E.\n");
+   fprintf(stderr, "\n");
    fprintf(stderr, "       -h    : print this message\n");
    fprintf(stderr, "  infile:\n");
-   fprintf(stderr,
-           "       mel-generalized cepstrum (%s)                   [stdin]\n",
-           FORMAT);
+   fprintf(stderr, "       sequence (%s)   [stdin]\n", FORMAT);
    fprintf(stderr, "  stdout:\n");
-   fprintf(stderr, "       transformed mel-generalized cepstrum (%s)\n",
-           FORMAT);
-   fprintf(stderr, "  notice:\n");
-   fprintf(stderr, "      value of c and C must be c>=1, C>=1 \n");
+   fprintf(stderr, "       mfcc (%s)\n", FORMAT);
+   fprintf(stderr, "  note:\n");
 #ifdef PACKAGE_VERSION
    fprintf(stderr, "\n");
    fprintf(stderr, " SPTK: version %s\n", PACKAGE_VERSION);
@@ -185,11 +193,11 @@ void usage(int status)
 
 int main(int argc, char **argv)
 {
-   int m1 = ORDER1, m2 = ORDER2, i;
-   double a1 = ALPHA1, a2 = ALPHA2, g1 = GAMMA1, g2 = GAMMA2, *c1, *c2;
-   Boolean norm1 = NORMFLG1, norm2 = NORMFLG2, mulg1 = MULGFLG1, mulg2 =
-       MULGFLG2;
+   int m = ORDER, l = WLNG, L = -1, n = CHANNEL, lift = LIFT, wtype =
+       WTYPE, num = 0;
+   double eps = EPS, fs = SAMPLEFREQ, alpha = ALPHA, *x, *mc;
    FILE *fp = stdin;
+   Boolean dftmode = DFTMODE, czero = CZERO, usehamming = USEHAMMING;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -198,55 +206,51 @@ int main(int argc, char **argv)
    while (--argc)
       if (**++argv == '-') {
          switch (*(*argv + 1)) {
-         case 'm':
-            m1 = atoi(*++argv);
-            --argc;
-            break;
-         case 'M':
-            m2 = atoi(*++argv);
-            --argc;
-            break;
          case 'a':
-            a1 = atof(*++argv);
-            --argc;
-            break;
-         case 'A':
-            a2 = atof(*++argv);
-            --argc;
-            break;
-         case 'g':
-            g1 = atof(*++argv);
+            alpha = atof(*++argv);
             --argc;
             break;
          case 'c':
-            g1 = atoi(*++argv);
-            --argc;
-            if (g1 < 1)
-               fprintf(stderr, "%s : value of c must be c>=1!\n", cmnd);
-            g1 = -1.0 / g1;
-            break;
-         case 'G':
-            g2 = atof(*++argv);
+            lift = atoi(*++argv);
             --argc;
             break;
-         case 'C':
-            g2 = atoi(*++argv);
+         case 'e':
+            eps = atof(*++argv);
             --argc;
-            if (g2 < 1)
-               fprintf(stderr, "%s : value of C must be C>=1!\n", cmnd);
-            g2 = -1.0 / g2;
+            break;
+         case 'f':
+            fs = atof(*++argv);
+            --argc;
+            break;
+         case 'l':
+            l = atoi(*++argv);
+            --argc;
+            break;
+         case 'L':
+            L = atoi(*++argv);
+            --argc;
+            break;
+         case 'm':
+            m = atoi(*++argv);
+            --argc;
             break;
          case 'n':
-            norm1 = 1 - norm1;
+            n = atoi(*++argv);
+            --argc;
             break;
-         case 'N':
-            norm2 = 1 - norm2;
+         case 'w':
+            wtype = atoi(*++argv);
+            --argc;
             break;
-         case 'u':
-            mulg1 = 1 - mulg1;
+         case 'd':
+            dftmode = 1 - dftmode;
             break;
-         case 'U':
-            mulg2 = 1 - mulg2;
+         case 'E':
+            num++;
+            break;
+         case '0':
+            czero = 1 - czero;
+            num++;
             break;
          case 'h':
             usage(0);
@@ -257,39 +261,23 @@ int main(int argc, char **argv)
       } else
          fp = getfp(*argv, "rb");
 
-   c1 = dgetmem(m1 + m2 + 2);
-   c2 = c1 + m1 + 1;
+   fs *= 1000;                  /* kHz -> Hz */
 
-   if (mulg1 && g1 == 0) {
-      fprintf(stderr,
-              "%s : gamma for input mgc coefficients should not equal to 0 if you specify -u option!\n",
-              cmnd);
-      usage(1);
-   }
-
-   while (freadf(c1, sizeof(*c1), m1 + 1, fp) == m1 + 1) {
-
-      if (norm1)
-         ignorm(c1, c1, m1, g1);
-      else if (mulg1) {
-         c1[0] = (c1[0] - 1.0) / g1;
-         for (i = m1; i >= 1; i--)
-            c1[i] /= g1;
+   if (L < 0)
+      for (L = 2; L <= l; L *= 2) {
       }
+   if (wtype == 0)
+      usehamming = 1 - usehamming;
 
-      mgc2mgc(c1, m1, a1, g1, c2, m2, a2, g2);
+   x = dgetmem(l + m + 2);
+   mc = x + l;
 
-      if (norm2)
-         gnorm(c2, c2, m2, g2);
-      else if (mulg2)
-         c1[0] = c1[0] * g2 + 1.0;
-
-      if (mulg2)
-         for (i = m2; i >= 1; i--)
-            c2[i] *= g2;
-
-      fwritef(c2, sizeof(*c2), m2 + 1, stdout);
+   while (freadf(x, sizeof(*x), l, fp) == l) {
+      mfcc(x, mc, fs, alpha, eps, l, L, m + 1, n, lift, dftmode, usehamming);
+      if (!czero)
+         mc[m] = mc[m + 1];
+      fwritef(mc, sizeof(*mc), m + num, stdout);
    }
 
-   return (0);
+   return 0;
 }

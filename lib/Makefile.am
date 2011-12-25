@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 ##
-## $Id: Makefile.am,v 1.7 2010/09/01 05:45:20 mataki Exp $
+## $Id: Makefile.am,v 1.9 2011/12/07 12:28:33 uratec Exp $
 INCLUDES=-I$(top_srcdir)/include
 lib_LIBRARIES = libSPTK.a
 libSPTK_a_SOURCES = agexp.c \
@@ -62,6 +62,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/ltcdf/_ltcdf.c \
 		$(top_srcdir)/bin/mc2b/_mc2b.c \
 		$(top_srcdir)/bin/mcep/_mcep.c \
+		$(top_srcdir)/bin/mfcc/_mfcc.c \
 		$(top_srcdir)/bin/mgc2mgc/_mgc2mgc.c \
 		$(top_srcdir)/bin/mgc2sp/_mgc2sp.c \
 		$(top_srcdir)/bin/mgcep/_mgcep.c \
@@ -73,7 +74,6 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/nrand/_nrand.c \
 		$(top_srcdir)/bin/par2lpc/_par2lpc.c \
 		$(top_srcdir)/bin/phase/_phase.c \
-		$(top_srcdir)/bin/pitch/_pitch.c \
 		$(top_srcdir)/bin/poledf/_poledf.c \
 		$(top_srcdir)/bin/reverse/_reverse.c \
 		$(top_srcdir)/bin/rmse/_rmse.c \

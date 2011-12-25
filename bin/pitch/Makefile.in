@@ -44,7 +44,8 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_pitch_OBJECTS = _pitch.$(OBJEXT) pitch.$(OBJEXT)
+am_pitch_OBJECTS = pitch.$(OBJEXT) jkGetF0.$(OBJEXT) sigproc.$(OBJEXT) \
+	swipe.$(OBJEXT) vector.$(OBJEXT)
 pitch_OBJECTS = $(am_pitch_OBJECTS)
 pitch_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -165,7 +166,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
-pitch_SOURCES = _pitch.c pitch.c 
+pitch_SOURCES = pitch.c $(srcdir)/snack/jkGetF0.c $(srcdir)/snack/sigproc.c $(srcdir)/snack/jkGetF0.h \
+	$(srcdir)/swipe/swipe.c $(srcdir)/swipe/vector.c $(srcdir)/swipe/vector.h
+
 pitch_LDADD = $(top_srcdir)/lib/libSPTK.a
 all: all-am
 
@@ -233,8 +236,11 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_pitch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/jkGetF0.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/pitch.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sigproc.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/swipe.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/vector.Po@am__quote@
 
 .c.o:
 @am__fastdepCC_TRUE@	$(COMPILE) -MT $@ -MD -MP -MF $(DEPDIR)/$*.Tpo -c -o $@ $<
@@ -249,6 +255,62 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$<' object='$@' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(COMPILE) -c `$(CYGPATH_W) '$<'`
+
+jkGetF0.o: $(srcdir)/snack/jkGetF0.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT jkGetF0.o -MD -MP -MF $(DEPDIR)/jkGetF0.Tpo -c -o jkGetF0.o `test -f '$(srcdir)/snack/jkGetF0.c' || echo '$(srcdir)/'`$(srcdir)/snack/jkGetF0.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/jkGetF0.Tpo $(DEPDIR)/jkGetF0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/snack/jkGetF0.c' object='jkGetF0.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o jkGetF0.o `test -f '$(srcdir)/snack/jkGetF0.c' || echo '$(srcdir)/'`$(srcdir)/snack/jkGetF0.c
+
+jkGetF0.obj: $(srcdir)/snack/jkGetF0.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT jkGetF0.obj -MD -MP -MF $(DEPDIR)/jkGetF0.Tpo -c -o jkGetF0.obj `if test -f '$(srcdir)/snack/jkGetF0.c'; then $(CYGPATH_W) '$(srcdir)/snack/jkGetF0.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/snack/jkGetF0.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/jkGetF0.Tpo $(DEPDIR)/jkGetF0.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/snack/jkGetF0.c' object='jkGetF0.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o jkGetF0.obj `if test -f '$(srcdir)/snack/jkGetF0.c'; then $(CYGPATH_W) '$(srcdir)/snack/jkGetF0.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/snack/jkGetF0.c'; fi`
+
+sigproc.o: $(srcdir)/snack/sigproc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sigproc.o -MD -MP -MF $(DEPDIR)/sigproc.Tpo -c -o sigproc.o `test -f '$(srcdir)/snack/sigproc.c' || echo '$(srcdir)/'`$(srcdir)/snack/sigproc.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sigproc.Tpo $(DEPDIR)/sigproc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/snack/sigproc.c' object='sigproc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sigproc.o `test -f '$(srcdir)/snack/sigproc.c' || echo '$(srcdir)/'`$(srcdir)/snack/sigproc.c
+
+sigproc.obj: $(srcdir)/snack/sigproc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT sigproc.obj -MD -MP -MF $(DEPDIR)/sigproc.Tpo -c -o sigproc.obj `if test -f '$(srcdir)/snack/sigproc.c'; then $(CYGPATH_W) '$(srcdir)/snack/sigproc.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/snack/sigproc.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/sigproc.Tpo $(DEPDIR)/sigproc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/snack/sigproc.c' object='sigproc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o sigproc.obj `if test -f '$(srcdir)/snack/sigproc.c'; then $(CYGPATH_W) '$(srcdir)/snack/sigproc.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/snack/sigproc.c'; fi`
+
+swipe.o: $(srcdir)/swipe/swipe.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT swipe.o -MD -MP -MF $(DEPDIR)/swipe.Tpo -c -o swipe.o `test -f '$(srcdir)/swipe/swipe.c' || echo '$(srcdir)/'`$(srcdir)/swipe/swipe.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/swipe.Tpo $(DEPDIR)/swipe.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/swipe/swipe.c' object='swipe.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o swipe.o `test -f '$(srcdir)/swipe/swipe.c' || echo '$(srcdir)/'`$(srcdir)/swipe/swipe.c
+
+swipe.obj: $(srcdir)/swipe/swipe.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT swipe.obj -MD -MP -MF $(DEPDIR)/swipe.Tpo -c -o swipe.obj `if test -f '$(srcdir)/swipe/swipe.c'; then $(CYGPATH_W) '$(srcdir)/swipe/swipe.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/swipe/swipe.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/swipe.Tpo $(DEPDIR)/swipe.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/swipe/swipe.c' object='swipe.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o swipe.obj `if test -f '$(srcdir)/swipe/swipe.c'; then $(CYGPATH_W) '$(srcdir)/swipe/swipe.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/swipe/swipe.c'; fi`
+
+vector.o: $(srcdir)/swipe/vector.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT vector.o -MD -MP -MF $(DEPDIR)/vector.Tpo -c -o vector.o `test -f '$(srcdir)/swipe/vector.c' || echo '$(srcdir)/'`$(srcdir)/swipe/vector.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/vector.Tpo $(DEPDIR)/vector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/swipe/vector.c' object='vector.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o vector.o `test -f '$(srcdir)/swipe/vector.c' || echo '$(srcdir)/'`$(srcdir)/swipe/vector.c
+
+vector.obj: $(srcdir)/swipe/vector.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT vector.obj -MD -MP -MF $(DEPDIR)/vector.Tpo -c -o vector.obj `if test -f '$(srcdir)/swipe/vector.c'; then $(CYGPATH_W) '$(srcdir)/swipe/vector.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/swipe/vector.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/vector.Tpo $(DEPDIR)/vector.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(srcdir)/swipe/vector.c' object='vector.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o vector.obj `if test -f '$(srcdir)/swipe/vector.c'; then $(CYGPATH_W) '$(srcdir)/swipe/vector.c'; else $(CYGPATH_W) '$(srcdir)/$(srcdir)/swipe/vector.c'; fi`
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \

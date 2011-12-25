@@ -48,40 +48,43 @@
 *                                                                       *
 *                                      1998.7  M.Tamura                 *
 *                                      2000.3  T.Tanaka                 *
+*                                      2011.10 A.Tamamori               *
+*                                      2011.11 T.Sawada                 *
 *                                                                       *
 *       usage:                                                          *
 *               pitch [ options ] [ infile ] > stdout                   *
 *       options:                                                        *
-*               -s  s     :  sampling frequency            [10]         *
-*               -l  l     :  frame length                  [400]        *
-*               -t  t     :  voiced/unvoiced threshhold    [6.0]        *
+*               -a  a     :  algorithm used for pitch      [0]          *
+*                            estimation                                 *
+*                              0 (snack)                                *
+*                              1 (swipe)                                *
+*               -s  s     :  sampling frequency (Hz)       [16]         *
+*               -p  p     :  frame shift                   [80]         *
+*               -t  t     :  voiced/unvoiced threshold     [0.3]        *
+*                            (used only for swipe algorithm)            *
 *               -L  L     :  minimum fundamental frequency [60]         *
 *                            to search for (Hz)                         *
 *               -H  H     :  maximum fundamental frequency [240]        *
 *                            to search for (Hz)                         *
-*               -e  e     :  small value for calculate log [0]          *
-*                            spectral envelope                          *
-*               (level 2  :  for uels cepstral analysis)                *
-*               -i  i     :  minimum number of iteration   [2]          *
-*               -j  j     :  maximum number of iteration   [30]         *
-*               -d  d     :  end condition                 [0.1]        *
+*               -o  o     :  output format                 [0]          *
+*                              0 (pitch)                                *
+*                              1 (f0)                                   *
+*                              2 (log(f0))                              *
 *       infile:                                                         *
 *               data sequence                                           *
-*                       , x(0), x(1), ..., x(n-1),                      *
+*                       x(0), x(1), ..., x(n-1), ...                    *
 *       stdout:                                                         *
-*               pitch                                                   *
-*               p(t)                                                    *
-*       require:                                                        *
-*               pitch()                                                 *
+*               pitch, f0, or log(f0)                                   *
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: pitch.c,v 1.29 2011/04/27 13:46:43 mataki Exp $";
+static char *rcs_id = "$Id: pitch.c,v 1.39 2011/12/19 12:47:27 mataki Exp $";
 
 
 /*  Standard C Libraries  */
 #include <stdio.h>
 #include <stdlib.h>
+#include <math.h>
 
 #ifdef HAVE_STRING_H
 #  include <string.h>
@@ -100,22 +103,61 @@ static char *rcs_id = "$Id: pitch.c,v 1.29 2011/04/27 13:46:43 mataki Exp $";
 #endif
 
 /*  Default Values  */
-#define FREQ   10
-#define ILNG   400
-#define THRESH 6.0
-#define LOW    60
-#define HIGH   240
-#define EPS    0.0
-
-
-/*  Default Values for uels */
-#define MINITR 2
-#define MAXITR 30
-#define END    0.1
+#define LOW    60.0
+#define HIGH   240.0
+#define FRAME_SHIFT 80
+#define SAMPLE_FREQ 16.0
+#define ATYPE 0
+#define OTYPE 0
+#define STR_LEN 255
+#define THRESH 0.3
+#define NOISEMASK 50.0
+#define SEED 1
+#define RND_MAX 32767
+#define FSP 10.0
+#define ALPHA 0.00275
+#define BETA_1 9600.0
+#define BETA_2 168.0
+#define BETA_3 96000.0
 
 /*  Command Name  */
 char *cmnd;
 
+typedef struct _float_list {
+   float f;
+   struct _float_list *next;
+} float_list;
+
+static double rnd(unsigned long *next)
+{
+   double r;
+
+   *next = *next * 1103515245L + 12345;
+   r = (*next / 65536L) % 32768L;
+
+   return (r / RND_MAX);
+}
+
+double nrandom(unsigned long *next)
+{
+   static int sw = 0;
+   static double r1, r2, se;
+
+   if (sw == 0) {
+      sw = 1;
+      do {
+         r1 = 2 * rnd(next) - 1;
+         r2 = 2 * rnd(next) - 1;
+         se = r1 * r1 + r2 * r2;
+      }
+      while (se > 1 || se == 0);
+      se = sqrt(-2 * log(se) / se);
+      return (r1 * se);
+   } else {
+      sw = 0;
+      return (r2 * se);
+   }
+}
 
 void usage(int status)
 {
@@ -125,34 +167,34 @@ void usage(int status)
    fprintf(stderr, "  usage:\n");
    fprintf(stderr, "       %s [ options ] [ infile ] > stdout\n", cmnd);
    fprintf(stderr, "  options:\n");
-   fprintf(stderr, "       -s s  : sampling frequency (kHz)        [%d]\n",
-           FREQ);
-   fprintf(stderr, "       -l l  : frame length                    [%d]\n",
-           ILNG);
-   fprintf(stderr, "       -t t  : voiced/unvoiced threshold       [%.1f]\n",
+   fprintf(stderr, "       -a a  : algorithm used for pitch        [%d]\n",
+           ATYPE);
+   fprintf(stderr, "               estimation\n");
+   fprintf(stderr, "                 0 (snack)\n");
+   fprintf(stderr, "                 1 (swipe)\n");
+   fprintf(stderr, "       -s s  : sampling frequency (kHz)        [%g]\n",
+           SAMPLE_FREQ);
+   fprintf(stderr, "       -p p  : frame shift                     [%d]\n",
+           FRAME_SHIFT);
+   fprintf(stderr, "       -t t  : voiced/unvoiced threshold       [%g]\n",
            THRESH);
-   fprintf(stderr, "       -L L  : minimum fundamental             [%d]\n",
+   fprintf(stderr, "               (used only for swipe algorithm)\n");
+   fprintf(stderr, "       -L L  : minimum fundamental             [%g]\n",
            LOW);
    fprintf(stderr, "               frequency to search for (Hz)\n");
-   fprintf(stderr, "       -H H  : maximum fundamental             [%d]\n",
+   fprintf(stderr, "       -H H  : maximum fundamental             [%g]\n",
            HIGH);
    fprintf(stderr, "               frequency to search for (Hz)\n");
-   fprintf(stderr, "       -e e  : small value for calculate       [%g]\n",
-           EPS);
-   fprintf(stderr, "               log-spectral envelope\n");
-   fprintf(stderr, "     (level 2 : for uels cepstral analysis)\n");
-   fprintf(stderr, "       -i i  : minimum number of iteration     [%d]\n",
-           MINITR);
-   fprintf(stderr, "       -j j  : maximum number of iteration     [%d]\n",
-           MAXITR);
-   fprintf(stderr, "       -d d  : end condition                   [%g]\n",
-           END);
+   fprintf(stderr, "       -o o  : output format                   [%d]\n",
+           OTYPE);
+   fprintf(stderr, "                 0 (pitch)\n");
+   fprintf(stderr, "                 1 (f0)\n");
+   fprintf(stderr, "                 2 (log(f0))\n");
    fprintf(stderr, "       -h    : print this message\n");
    fprintf(stderr, "  infile:\n");
-   fprintf(stderr, "       windowed sequence (%s)             [stdin]\n",
-           FORMAT);
+   fprintf(stderr, "       waveform (%s)             \n", FORMAT);
    fprintf(stderr, "  stdout:\n");
-   fprintf(stderr, "       pitch (%s)\n", FORMAT);
+   fprintf(stderr, "       pitch, f0 or log(f0) (%s)\n", FORMAT);
 #ifdef PACKAGE_VERSION
    fprintf(stderr, "\n");
    fprintf(stderr, " SPTK: version %s\n", PACKAGE_VERSION);
@@ -165,10 +207,17 @@ void usage(int status)
 
 int main(int argc, char **argv)
 {
-   int freq = FREQ, n = ILNG, l, L = LOW, H = HIGH, m, itr1 = MINITR, itr2 =
-       MAXITR, low, high;
-   double *x, eps = EPS, p, thresh = THRESH, end = END;
+   int i, j, length, frame_shift = FRAME_SHIFT,
+       atype = ATYPE, otype = OTYPE, alpha, beta, fnum;
+   unsigned long next = SEED;
+   double *x, thresh = THRESH, timestep, p, fsp, sample_freq = SAMPLE_FREQ, L =
+       LOW, H = HIGH;
    FILE *fp = stdin;
+   float_list *top, *cur, *prev;
+   char *message = (char *) malloc(sizeof(char) * STR_LEN);
+   char *cGet_f0(float_list * flist, float sample_freq,
+                 int length, int frame_shift,
+                 int minF0, int maxF0, int fnum, int otype);
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -177,12 +226,16 @@ int main(int argc, char **argv)
    while (--argc)
       if (**++argv == '-') {
          switch (*(*argv + 1)) {
-         case 's':
-            freq = atoi(*++argv);
+         case 'a':
+            atype = atoi(*++argv);
             --argc;
             break;
-         case 'l':
-            n = atoi(*++argv);
+         case 's':
+            sample_freq = atof(*++argv);
+            --argc;
+            break;
+         case 'p':
+            frame_shift = atoi(*++argv);
             --argc;
             break;
          case 't':
@@ -190,49 +243,73 @@ int main(int argc, char **argv)
             --argc;
             break;
          case 'L':
-            L = atoi(*++argv);
+            L = atof(*++argv);
             --argc;
             break;
          case 'H':
-            H = atoi(*++argv);
+            H = atof(*++argv);
             --argc;
             break;
-         case 'e':
-            eps = atof(*++argv);
+         case 'o':
+            otype = atoi(*++argv);
             --argc;
             break;
-         case 'i':
-            itr1 = atoi(*++argv);
-            --argc;
-         case 'j':
-            itr2 = atoi(*++argv);
-            --argc;
-         case 'd':
-            end = atof(*++argv);
-            --argc;
          case 'h':
             usage(0);
          default:
             fprintf(stderr, "%s : Invalid option '%c'!\n", cmnd, *(*argv + 1));
             usage(1);
          }
-      } else
+      } else {
          fp = getfp(*argv, "rb");
+      }
+   sample_freq *= 1000.0;
 
-   low = freq * 1000 / H;
-   high = freq * 1000 / L;
-   m = (freq * 25) / 10;
-   l = 1;
-   while (l < n)
-      l += l;
-
-   x = dgetmem(l);
-
-   while (freadf(x, sizeof(*x), n, fp) == n) {
-      fillz(x + n, l - n, sizeof(double));
-      p = pitch(x, l, thresh, low, high, eps, m, itr1, itr2, end);
-      fwritef(&p, sizeof(p), 1, stdout);
+   x = dgetmem(1);
+   top = prev = (float_list *) malloc(sizeof(float_list));
+   length = 0;
+   prev->next = NULL;
+   while (freadf(x, sizeof(*x), 1, fp) == 1) {
+      p = (double) nrandom(&next);
+      cur = (float_list *) malloc(sizeof(float_list));
+      if (atype == 0)
+         cur->f = (float) x[0] + (float) (p * NOISEMASK);
+      else
+         cur->f = (float) x[0];
+      length++;
+      prev->next = cur;
+      cur->next = NULL;
+      prev = cur;
+   }
+   if (atype == 0) {
+      fnum = (int) (ceil((double) length / (double) frame_shift));
+      fsp = sample_freq * (FSP / (double) frame_shift);
+      alpha = (int) (ALPHA * fsp + 0.5);
+      beta = (int) ((BETA_1 / L - BETA_2) * fsp / BETA_3 + 0.5);
+      if (beta < 0)
+         beta = 0;
+      for (i = 0; i < (alpha + beta + 3) * frame_shift; i++) {
+         p = (double) nrandom(&next);
+         cur = (float_list *) malloc(sizeof(float_list));
+         cur->f = (float) (p * NOISEMASK);
+         length++;
+         prev->next = cur;
+         cur->next = NULL;
+         prev = cur;
+      }
    }
 
+   if (atype == 0) {
+      message =
+          cGet_f0(top->next, (float) sample_freq, length, frame_shift, (int) L,
+                  (int) H, fnum, otype);
+      if (message != NULL) {
+         fprintf(stderr, "%s : %s\n", cmnd, message);
+         usage(1);
+      }
+   } else {
+      timestep = (double) frame_shift / sample_freq;
+      swipe(top->next, length, L, H, thresh, timestep, sample_freq, otype);
+   }
    return (0);
 }

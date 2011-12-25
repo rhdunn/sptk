@@ -71,11 +71,11 @@ nodist_libSPTK_a_OBJECTS = _acep.$(OBJEXT) _acorr.$(OBJEXT) \
 	_lpc.$(OBJEXT) _lpc2c.$(OBJEXT) _lpc2lsp.$(OBJEXT) \
 	_lpc2par.$(OBJEXT) _lsp2lpc.$(OBJEXT) _lspcheck.$(OBJEXT) \
 	_lspdf.$(OBJEXT) _ltcdf.$(OBJEXT) _mc2b.$(OBJEXT) \
-	_mcep.$(OBJEXT) _mgc2mgc.$(OBJEXT) _mgc2sp.$(OBJEXT) \
-	_mgcep.$(OBJEXT) _mglsadf.$(OBJEXT) _mlpg.$(OBJEXT) \
-	_mlsadf.$(OBJEXT) _msvq.$(OBJEXT) _norm0.$(OBJEXT) \
-	_nrand.$(OBJEXT) _par2lpc.$(OBJEXT) _phase.$(OBJEXT) \
-	_pitch.$(OBJEXT) _poledf.$(OBJEXT) _reverse.$(OBJEXT) \
+	_mcep.$(OBJEXT) _mfcc.$(OBJEXT) _mgc2mgc.$(OBJEXT) \
+	_mgc2sp.$(OBJEXT) _mgcep.$(OBJEXT) _mglsadf.$(OBJEXT) \
+	_mlpg.$(OBJEXT) _mlsadf.$(OBJEXT) _msvq.$(OBJEXT) \
+	_norm0.$(OBJEXT) _nrand.$(OBJEXT) _par2lpc.$(OBJEXT) \
+	_phase.$(OBJEXT) _poledf.$(OBJEXT) _reverse.$(OBJEXT) \
 	_rmse.$(OBJEXT) _root_pol.$(OBJEXT) _smcep.$(OBJEXT) \
 	_uels.$(OBJEXT) _ulaw.$(OBJEXT) _vq.$(OBJEXT) \
 	_window.$(OBJEXT) _zcross.$(OBJEXT) _zerodf.$(OBJEXT)
@@ -259,6 +259,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/ltcdf/_ltcdf.c \
 		$(top_srcdir)/bin/mc2b/_mc2b.c \
 		$(top_srcdir)/bin/mcep/_mcep.c \
+		$(top_srcdir)/bin/mfcc/_mfcc.c \
 		$(top_srcdir)/bin/mgc2mgc/_mgc2mgc.c \
 		$(top_srcdir)/bin/mgc2sp/_mgc2sp.c \
 		$(top_srcdir)/bin/mgcep/_mgcep.c \
@@ -270,7 +271,6 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/nrand/_nrand.c \
 		$(top_srcdir)/bin/par2lpc/_par2lpc.c \
 		$(top_srcdir)/bin/phase/_phase.c \
-		$(top_srcdir)/bin/pitch/_pitch.c \
 		$(top_srcdir)/bin/poledf/_poledf.c \
 		$(top_srcdir)/bin/reverse/_reverse.c \
 		$(top_srcdir)/bin/rmse/_rmse.c \
@@ -399,6 +399,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_ltcdf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mc2b.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mcep.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mfcc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mgc2mgc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mgc2sp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_mgcep.Po@am__quote@
@@ -410,7 +411,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_nrand.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_par2lpc.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_phase.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_pitch.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_poledf.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_reverse.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_rmse.Po@am__quote@
@@ -1053,6 +1053,20 @@ _mcep.obj: $(top_srcdir)/bin/mcep/_mcep.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mcep.obj `if test -f '$(top_srcdir)/bin/mcep/_mcep.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/mcep/_mcep.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/mcep/_mcep.c'; fi`
 
+_mfcc.o: $(top_srcdir)/bin/mfcc/_mfcc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mfcc.o -MD -MP -MF $(DEPDIR)/_mfcc.Tpo -c -o _mfcc.o `test -f '$(top_srcdir)/bin/mfcc/_mfcc.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/mfcc/_mfcc.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_mfcc.Tpo $(DEPDIR)/_mfcc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/mfcc/_mfcc.c' object='_mfcc.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mfcc.o `test -f '$(top_srcdir)/bin/mfcc/_mfcc.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/mfcc/_mfcc.c
+
+_mfcc.obj: $(top_srcdir)/bin/mfcc/_mfcc.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mfcc.obj -MD -MP -MF $(DEPDIR)/_mfcc.Tpo -c -o _mfcc.obj `if test -f '$(top_srcdir)/bin/mfcc/_mfcc.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/mfcc/_mfcc.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/mfcc/_mfcc.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_mfcc.Tpo $(DEPDIR)/_mfcc.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/mfcc/_mfcc.c' object='_mfcc.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _mfcc.obj `if test -f '$(top_srcdir)/bin/mfcc/_mfcc.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/mfcc/_mfcc.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/mfcc/_mfcc.c'; fi`
+
 _mgc2mgc.o: $(top_srcdir)/bin/mgc2mgc/_mgc2mgc.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _mgc2mgc.o -MD -MP -MF $(DEPDIR)/_mgc2mgc.Tpo -c -o _mgc2mgc.o `test -f '$(top_srcdir)/bin/mgc2mgc/_mgc2mgc.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/mgc2mgc/_mgc2mgc.c
 @am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_mgc2mgc.Tpo $(DEPDIR)/_mgc2mgc.Po
@@ -1206,20 +1220,6 @@ _phase.obj: $(top_srcdir)/bin/phase/_phase.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/phase/_phase.c' object='_phase.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _phase.obj `if test -f '$(top_srcdir)/bin/phase/_phase.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/phase/_phase.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/phase/_phase.c'; fi`
-
-_pitch.o: $(top_srcdir)/bin/pitch/_pitch.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _pitch.o -MD -MP -MF $(DEPDIR)/_pitch.Tpo -c -o _pitch.o `test -f '$(top_srcdir)/bin/pitch/_pitch.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/pitch/_pitch.c
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_pitch.Tpo $(DEPDIR)/_pitch.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/pitch/_pitch.c' object='_pitch.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _pitch.o `test -f '$(top_srcdir)/bin/pitch/_pitch.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/pitch/_pitch.c
-
-_pitch.obj: $(top_srcdir)/bin/pitch/_pitch.c
-@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _pitch.obj -MD -MP -MF $(DEPDIR)/_pitch.Tpo -c -o _pitch.obj `if test -f '$(top_srcdir)/bin/pitch/_pitch.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/pitch/_pitch.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/pitch/_pitch.c'; fi`
-@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_pitch.Tpo $(DEPDIR)/_pitch.Po
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/pitch/_pitch.c' object='_pitch.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _pitch.obj `if test -f '$(top_srcdir)/bin/pitch/_pitch.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/pitch/_pitch.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/pitch/_pitch.c'; fi`
 
 _poledf.o: $(top_srcdir)/bin/poledf/_poledf.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _poledf.o -MD -MP -MF $(DEPDIR)/_poledf.Tpo -c -o _poledf.o `test -f '$(top_srcdir)/bin/poledf/_poledf.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/poledf/_poledf.c

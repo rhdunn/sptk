@@ -182,6 +182,7 @@ SUBDIRS = acep \
 	dfs \
 	dmp \
 	ds \
+	dtw \
 	echo2 \
 	excite \
 	extract \
@@ -224,6 +225,7 @@ SUBDIRS = acep \
 	mc2b \
 	mcep \
 	merge \
+	mfcc \
 	mgc2mgc \
 	mgc2sp \
 	mgcep \
@@ -267,6 +269,7 @@ SUBDIRS = acep \
 	zcross \
 	zerodf
 
+EXTRA_DIST = pitch/snack/COPYING pitch/swipe/COPYING
 all: all-recursive
 
 .SUFFIXES:
