@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _lspcheck.c,v 1.13 2011/12/12 04:47:10 sawada11 Exp $
+    $Id: _lspcheck.c,v 1.16 2012/12/21 10:04:42 mataki Exp $
 
     Check order of LSP
 
@@ -53,8 +53,8 @@
        double   *lsp  : LSP
        int      ord   : order of LSP
 
-       return   value : 0  -> normal
-                        -1 -> ill condition
+       return   value : 0   -> normal
+                        -1  -> ill condition
 
 *****************************************************************/
 #include<stdio.h>
@@ -66,109 +66,64 @@
 #  include <SPTK.h>
 #endif
 
-#define MIN (1.0E-15)
 #define TH 100
 
 int lspcheck(double *lsp, const int ord)
 {
    int i;
 
-   if ((lsp[0] <= 0.0) || (lsp[0] >= 0.5))
-      return (-1);
-
    for (i = 1; i < ord; i++) {
       if (lsp[i] <= lsp[i - 1])
          return (-1);
-      if ((lsp[i] <= 0.0) || (lsp[i] >= 0.5))
-         return (-1);
    }
+   if ((lsp[0] <= 0.0) || (lsp[ord - 1] >= 0.5))
+      return (-1);
 
    return (0);
 }
 
 /****************************************************************
 
-    $Id: _lspcheck.c,v 1.13 2011/12/12 04:47:10 sawada11 Exp $
+    $Id: _lspcheck.c,v 1.16 2012/12/21 10:04:42 mataki Exp $
 
     Rearrangement of LSP
 
-       void lsparrange(lsp, ord, alpha, itype, sampling)
+       void lsparrange(lsp, ord, min)
 
        double    *lsp : LSP
        int        ord : order of LSP
-       double   alpha : minimal distance between two consecutive LSPs
-       int      itype : input type
-       int   sampling : sampling frequency
+       double     min : minimal distance between two consecutive LSPs
 
 *****************************************************************/
 
-void lsparrange(double *lsp, const int ord, double alpha, int itype,
-                double sampling)
+void lsparrange(double *lsp, int ord, double min)
 {
-   int i, count = 0, flag;
+   int i, count, flag;
    double tmp;
-   double min = alpha * PI / ord;
-
-
-   if (itype == 0)
-      min /= PI2;
-   else if (itype == 2 || itype == 3)
-      min /= sampling;
-   if (itype == 3)
-      min /= 1000;
-
-
-
-   /* check out of range */
-   for (i = 0; i < ord; i++) {
-      if (lsp[i] < 0.0)
-         lsp[i] = -lsp[i];
-      if (lsp[i] > 0.5)
-         lsp[i] = 1.0 - lsp[i];
-   }
-
-   /* check unmonotonic */
-   for (;;) {
-      flag = 0;
-      for (i = 1; i < ord; i++)
-         if (lsp[i] < lsp[i - 1]) {
-            tmp = lsp[i];
-            lsp[i] = lsp[i - 1];
-            lsp[i - 1] = tmp;
-            flag = 1;
-         }
-      if (!flag)
-         break;
-   }
-
 
    /* check distance between two consecutive LSPs */
-   for (;;) {
-      if (count++ >= TH)
-         break;
+   for (count = 0; count < TH; count++) {
       flag = 0;
       for (i = 1; i < ord; i++) {
          tmp = lsp[i] - lsp[i - 1];
-         if (min - tmp > MIN) {
+         if (min > tmp) {
             lsp[i - 1] -= (min - tmp) / 2;
             lsp[i] += (min - tmp) / 2;
             flag = 1;
          }
       }
-      if (lsp[0] < (min / 2.0)) {
-         tmp = (lsp[ord - 1] - (min / 2.0)) / (lsp[ord - 1] - lsp[0]);
-         for (i = 0; i < ord - 1; i++)
-            lsp[i] = lsp[i] * tmp + lsp[ord - 1] * (1 - tmp);
+      if (lsp[0] < 0.0) {
+         lsp[0] = min;
          flag = 1;
       }
-      if (lsp[ord - 1] + (min / 2.0) > 0.5) {
-         tmp = (0.5 - (min / 2.0) - lsp[0]) / (lsp[ord - 1] - lsp[0]);
-         for (i = 1; i < ord; i++)
-            lsp[i] = lsp[i] * tmp + lsp[0] * (1 - tmp);
+      if (lsp[ord - 1] > 0.5) {
+         lsp[ord - 1] = 0.5 - min;
          flag = 1;
       }
+
       if (!flag)
          break;
    }
+
    return;
 }

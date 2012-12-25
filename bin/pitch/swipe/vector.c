@@ -31,7 +31,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -65,7 +65,11 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-static char *rcs_id = "$Id: vector.c,v 1.2 2011/11/28 10:01:35 mataki Exp $";
+/****************************************************************
+
+    $Id: vector.c,v 1.7 2012/12/22 12:25:38 mataki Exp $
+
+*****************************************************************/
 
 #include <math.h>
 #include <stdio.h>
@@ -77,6 +81,14 @@ static char *rcs_id = "$Id: vector.c,v 1.2 2011/11/28 10:01:35 mataki Exp $";
 
 #ifndef NAN
     #define NAN     sqrt(-1.)
+#endif
+
+// polynomial fitting
+#if 0
+#else
+static void  LU(int, double **);
+static void  SOLVE(int, double **, double *);
+static void  dgels(int, vector, vector);
 #endif
 
 // create a vector of size xSz
@@ -355,10 +367,16 @@ void printm(matrix yr_matrix) {
 
 intmatrix makeim(int xSz, int ySz) {
     intmatrix nw_matrix;
+#if 0
+#else
+    int i;
+#endif
     nw_matrix.x = xSz;
     nw_matrix.y = ySz;
     nw_matrix.m = malloc(sizeof(int) * xSz);
+#if 0
     int i;
+#endif
     for (i = 0; i < nw_matrix.x; i++) {
         nw_matrix.m[i] = malloc(sizeof(int) * ySz);
     }
@@ -538,7 +556,11 @@ static void SOLVE(int n, double **A, double *b)
 
 static void dgels(int n, vector Ap, vector bp)
 {
+#if 0
   int i, j;
+#else 
+  int i;
+#endif
   double x1 = 0.0, x2 = 0.0, x3 = 0.0, x4 = 0.0, x1y1 = 0.0, x2y1 = 0.0, y1 = 0.0;
   matrix a = makem(n, n);
   for(i = 0; i < n; i++) {
@@ -572,8 +594,12 @@ static void dgels(int n, vector Ap, vector bp)
 // polynomial fitting with CLAPACK: solves poly(A, m) * X = B
 vector polyfit(vector A, vector B, int order) { 
     int i;                                      
+#if 0
     int j;
     int info;
+#else
+    vector Bp;
+#endif
     order++; // I find it intuitive this way...
 #if 0
     double* Ap = malloc(sizeof(double) * order * A.x); 
@@ -583,7 +609,11 @@ vector polyfit(vector A, vector B, int order) {
         }
     }
 #endif
+#if 0
     vector Bp = makev(order >= B.x ? order : B.x); 
+#else
+    Bp = makev(order >= B.x ? order : B.x); 
+#endif
     for (i = 0; i < B.x; i++) Bp.v[i] = B.v[i];
 #if 0
     i = 1; // nrhs, j is info

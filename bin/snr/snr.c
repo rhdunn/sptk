@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -66,7 +66,7 @@
 *               SNR,  SNRseg                                            *
 ************************************************************************/
 
-static char *rcs_id = "$Id: snr.c,v 1.24 2011/04/27 13:46:43 mataki Exp $";
+static char *rcs_id = "$Id: snr.c,v 1.27 2012/12/21 11:27:37 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -139,8 +139,7 @@ void usage(int status)
 
 int main(int argc, char **argv)
 {
-   int l = LENG, f1w = 1, f2w = 0, otype =
-       OTYPE, count, countold, countseg, xn, yn, size, i;
+   int l = LENG, otype = OTYPE, count, countold, countseg, xn, yn, size, i;
    FILE *fp2 = stdin, *fp1 = NULL;
    double *x, *y, snr, snrseg, pw1, pw2, pw1snr, pw2snr, sub;
    char *s, c;

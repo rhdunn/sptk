@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -95,7 +95,7 @@
 *                                                                              *
 *******************************************************************************/
 
-static char *rcs_id = "$Id: sopr.c,v 1.34 2011/12/19 06:00:35 mataki Exp $";
+static char *rcs_id = "$Id: sopr.c,v 1.38 2012/12/21 11:27:37 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -217,9 +217,9 @@ static double mem[MEMSIZE];
 
 int main(int argc, char *argv[])
 {
-   int i, count = 0, magic_count = 0, MAGIC_COUNT = 0;
+   int magic_count = 0, MAGIC_COUNT = 0;
    FILE *fp;
-   char *s, *m, c;
+   char *s, c;
    char *infile = NULL;
    int sopr(FILE *);
 
@@ -235,7 +235,7 @@ int main(int argc, char *argv[])
          c = *++s;
          if (islower(c) && *++s == '\0') {
             s = *++argv;
-            if (s == NULL) {
+            if ((s == NULL) && (c != 'h')) {
                fprintf(stderr,
                        "%s : numerical argument is also needed !\n", cmnd);
                usage(1);

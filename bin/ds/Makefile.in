@@ -48,7 +48,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_ds_OBJECTS = ds-ds.$(OBJEXT)
 ds_OBJECTS = $(am_ds_OBJECTS)
-ds_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+ds_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -175,9 +175,9 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
-lpcoefdir = $(DESTDIR)$(libdir)
+lpcoefdir = $(datarootdir)/SPTK
 ds_SOURCES = ds.c 
-ds_LDADD = $(top_srcdir)/lib/libSPTK.a
+ds_LDADD = $(top_builddir)/lib/libSPTK.a
 ds_CPPFLAGS = -DLIB=\"$(lpcoefdir)\"
 dist_lpcoef_DATA = lpfcoef.2to1 \
 	lpfcoef.3to2 \

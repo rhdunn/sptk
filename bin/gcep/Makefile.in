@@ -46,7 +46,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_gcep_OBJECTS = _gcep.$(OBJEXT) gcep.$(OBJEXT)
 gcep_OBJECTS = $(am_gcep_OBJECTS)
-gcep_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+gcep_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -166,7 +166,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 gcep_SOURCES = _gcep.c gcep.c 
-gcep_LDADD = $(top_srcdir)/lib/libSPTK.a
+gcep_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

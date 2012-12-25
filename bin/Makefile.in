@@ -204,6 +204,7 @@ SUBDIRS = acep \
 	histogram \
 	idct \
 	ifft \
+	ifftr \
 	ifft2 \
 	ignorm \
 	impulse \
@@ -232,6 +233,7 @@ SUBDIRS = acep \
 	mglsadf \
 	minmax \
 	mlpg \
+	mlsacheck \
 	mlsadf \
 	msvq \
 	nan \
@@ -255,7 +257,9 @@ SUBDIRS = acep \
 	spec \
 	step \
 	swab \
+	symmetrize \
 	train \
+	transpose \
 	uels \
 	ulaw \
 	us \

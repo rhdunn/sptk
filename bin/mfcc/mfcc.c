@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -60,7 +60,7 @@
 *               -L  L    :  frame length of window               [256]   * 
 *               -m  m    :  order of cepstrum                    [13]    *
 *               -n  n    :  order of channel for mel-filter bank [26]    *
-*               -F  F    :  sampling frequency (kHz)             [16.0]  *
+*               -s  s    :  sampling frequency (kHz)             [16.0]  *
 *               -d       :  without using fft algorithm          [FALSE] *
 *               -w       :  use hamming window                   [FALSE] *
 *               -E       :  use power                            [FALSE] *
@@ -74,14 +74,14 @@
 *               if -E or -0 option is given, Energy E and 0'th static    *
 *               coefficient C0 is output as follows,                     *
 *                   , mc(0), mc(1), ..., mc(m-1), E (C0)                 *
-*               if Both -E and -0 option is given, C0 is output before   *
-*               E                                                        *
+*               if Both -E and -0 option is given, C0 is output before E *
+*                                                                        *
 *       require:                                                         *
 *               mfcc()                                                   *
 *                                                                        *
 *************************************************************************/
 
-static char *rcs_id = "$Id: mfcc.c,v 1.4 2011/12/08 08:43:03 mataki Exp $";
+static char *rcs_id = "$Id: mfcc.c,v 1.9 2012/12/23 11:15:49 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -142,13 +142,13 @@ void usage(int status)
    fprintf(stderr, "               in filterbank analysis\n");
    fprintf(stderr, "               if x < e, then x = e\n");
    fprintf(stderr,
-           "       -f f  : sampling frequency (kHz)              [%.1f]\n",
+           "       -s s  : sampling frequency (kHz)              [%.1f]\n",
            SAMPLEFREQ);
    fprintf(stderr,
            "       -l l  : frame length of input                 [%d]\n", WLNG);
    fprintf(stderr,
            "       -L L  : frame length for fft                  [2^n]\n");
-   fprintf(stderr, "               default value 2^n satisfies l <= 2^n\n");
+   fprintf(stderr, "               default value 2^n satisfies l < 2^n\n");
    fprintf(stderr,
            "       -m m  : order of cepstrum                     [%d]\n",
            ORDER);
@@ -222,6 +222,10 @@ int main(int argc, char **argv)
             fs = atof(*++argv);
             --argc;
             break;
+         case 's':
+            fs = atof(*++argv);
+            --argc;
+            break;
          case 'l':
             l = atoi(*++argv);
             --argc;
@@ -273,6 +277,7 @@ int main(int argc, char **argv)
    mc = x + l;
 
    while (freadf(x, sizeof(*x), l, fp) == l) {
+
       mfcc(x, mc, fs, alpha, eps, l, L, m + 1, n, lift, dftmode, usehamming);
       if (!czero)
          mc[m] = mc[m + 1];

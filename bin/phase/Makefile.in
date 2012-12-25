@@ -46,7 +46,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_phase_OBJECTS = _phase.$(OBJEXT) phase.$(OBJEXT)
 phase_OBJECTS = $(am_phase_OBJECTS)
-phase_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+phase_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -166,7 +166,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 phase_SOURCES = _phase.c phase.c 
-phase_LDADD = $(top_srcdir)/lib/libSPTK.a
+phase_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

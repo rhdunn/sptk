@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -43,7 +43,7 @@
 /* ----------------------------------------------------------------- */
 
 /***********************************************************
-   $Id: SPTK.h,v 1.37 2011/12/19 06:00:35 mataki Exp $ 
+   $Id: SPTK.h,v 1.44 2012/12/21 11:27:39 mataki Exp $ 
    
    Speech Signal Processing Toolkit
    SPTK.h
@@ -127,6 +127,7 @@ char *getmem(const size_t leng, const size_t size);
 double gexp(const double r, const double x);
 double glog(const double r, const double x);
 int ifftr(double *x, double *y, const int l);
+double invert(double **mat, double **inv, const int n);
 void multim(double x[], const int xx, const int xy, double y[], const int yx,
             const int yy, double a[]);
 void addm(double x[], double y[], const int xx, const int yy, double a[]);
@@ -157,6 +158,15 @@ void ic2ir(double *h, const int leng, double *c, const int nc);
 void c2sp(double *c, const int m, double *x, double *y, const int l);
 void clip(double *x, const int l, const double min, const double max,
           double *y);
+int dft(double *pReal, double *pImag, const int nDFTLength);
+void dct(double *in, double *out, const int size, const int m,
+         const Boolean dftmode, const Boolean compmode);
+int dct_create_table_fft(const int nSize);
+int dct_create_table(const int nSize);
+int dct_based_on_fft(double *pReal, double *pImag, const double *pInReal,
+                     const double *pInImag);
+int dct_based_on_dft(double *pReal, double *pImag, const double *pInReal,
+                     const double *pInImag);
 double df2(const double x, const double sf, const double f0p, const double wbp,
            const double f0z, const double wbz, const int fp, const int fz,
            double *buf, int *bufp);
@@ -172,8 +182,8 @@ void freqt(double *c1, const int m1, double *c2, const int m2, const double a);
 void gc2gc(double *c1, const int m1, const double g1, double *c2, const int m2,
            const double g2);
 int gcep(double *xw, const int flng, double *gc, const int m, const double g,
-         const int itr1, const int itr2, const double d, const double e,
-         const double f, const int itype);
+         const int itr1, const int itr2, const double d, const int etype,
+         const double e, const double f, const int itype);
 double glsadf(double x, double *c, const int m, const int n, double *d);
 double glsadf1(double x, double *c, const int m, const int n, double *d);
 double glsadft(double x, double *c, const int m, const int n, double *d);
@@ -217,7 +227,7 @@ double lmadf(double x, double *c, const int m, const int pd, double *d);
 double lmadft(double x, double *c, const int m, const int pd, double *d);
 double lmadf1(double x, double *c, const int m, double *d, const int m1,
               const int m2, const int pd);
-double lmadf1t(double x, double *b, const int m, const int pd, double *d);
+double lmadf1t(double x, double *b, const int pd, double *d);
 int lpc(double *x, const int flng, double *a, const int m, const double f);
 void lpc2c(double *a, int m1, double *c, const int m2);
 int lpc2lsp(double *lpc, double *lsp, const int order, const int numsp,
@@ -230,8 +240,8 @@ double lspdf_odd(double x, double *f, const int m, double *d);
 double ltcdf(double x, double *k, int m, double *d);
 void mc2b(double *mc, double *b, int m, const double a);
 int mcep(double *xw, const int flng, double *mc, const int m, const double a,
-         const int itr1, const int itr2, const double dd, const double e,
-         const double f, const int itype);
+         const int itr1, const int itr2, const double dd, const int etype,
+         const double e, const double f, const int itype);
 void mfcc(double *in, double *mc, const double sampleFreq, const double alpha,
           const double eps, const int wlng, const int flng, const int m,
           const int n, const int ceplift, const Boolean dftmode,
@@ -243,7 +253,8 @@ void mgc2sp(double *mgc, const int m, const double a, const double g, double *x,
             double *y, const int flng);
 int mgcep(double *xw, int flng, double *b, const int m, const double a,
           const double g, const int n, const int itr1, const int itr2,
-          const double dd, const double e, const double f, const int itype);
+          const double dd, const int etype, const double e, const double f,
+          const int itype);
 double newton(double *x, const int flng, double *c, const int m, const double a,
               const double g, const int n, const int j, const double f);
 double mglsadf(double x, double *b, const int m, const double a, const int n,
@@ -279,9 +290,11 @@ void root_pol(double *a, const int odr, complex * x, const int a_zero,
 complex *cplx_getmem(const int leng);
 int smcep(double *xw, const int flng, double *mc, const int m, const int fftsz,
           const double a, const double t, const int itr1, const int itr2,
-          const double dd, const double e, const double f, const int itype);
+          const double dd, const int etype, const double e, const double f,
+          const int itype);
 int uels(double *xw, const int flng, double *c, const int m, const int itr1,
-         const int itr2, const double dd, const double e, const int itype);
+         const int itr2, const double dd, const int etype, const double e,
+         const int itype);
 double ulaw_c(const double x, const double max, const double mu);
 double ulaw_d(const double x, const double max, const double mu);
 int vq(double *x, double *cb, const int l, const int cbsize);

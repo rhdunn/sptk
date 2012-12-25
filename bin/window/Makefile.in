@@ -44,9 +44,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_window_OBJECTS = _window.$(OBJEXT) window.$(OBJEXT)
+am_window_OBJECTS = window.$(OBJEXT) _window.$(OBJEXT)
 window_OBJECTS = $(am_window_OBJECTS)
-window_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+window_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -165,8 +165,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
-window_SOURCES = _window.c window.c 
-window_LDADD = $(top_srcdir)/lib/libSPTK.a
+window_SOURCES = window.c _window.c
+window_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

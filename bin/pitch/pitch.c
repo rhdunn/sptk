@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -56,12 +56,14 @@
 *       options:                                                        *
 *               -a  a     :  algorithm used for pitch      [0]          *
 *                            estimation                                 *
-*                              0 (snack)                                *
-*                              1 (swipe)                                *
+*                              0 (RAPT)                                 *
+*                              1 (SWIPE')                               *
 *               -s  s     :  sampling frequency (Hz)       [16]         *
 *               -p  p     :  frame shift                   [80]         *
+*               -T  T     :  voiced/unvoiced threshold     [0.0]        *
+*                            (used only for RAPT algorithm)             *
 *               -t  t     :  voiced/unvoiced threshold     [0.3]        *
-*                            (used only for swipe algorithm)            *
+*                            (used only for SWIPE' algorithm)           *
 *               -L  L     :  minimum fundamental frequency [60]         *
 *                            to search for (Hz)                         *
 *               -H  H     :  maximum fundamental frequency [240]        *
@@ -78,7 +80,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: pitch.c,v 1.39 2011/12/19 12:47:27 mataki Exp $";
+static char *rcs_id = "$Id: pitch.c,v 1.44 2012/08/22 16:18:54 uratec Exp $";
 
 
 /*  Standard C Libraries  */
@@ -110,7 +112,8 @@ static char *rcs_id = "$Id: pitch.c,v 1.39 2011/12/19 12:47:27 mataki Exp $";
 #define ATYPE 0
 #define OTYPE 0
 #define STR_LEN 255
-#define THRESH 0.3
+#define THRESH_RAPT 0.0
+#define THRESH_SWIPE 0.3
 #define NOISEMASK 50.0
 #define SEED 1
 #define RND_MAX 32767
@@ -128,37 +131,6 @@ typedef struct _float_list {
    struct _float_list *next;
 } float_list;
 
-static double rnd(unsigned long *next)
-{
-   double r;
-
-   *next = *next * 1103515245L + 12345;
-   r = (*next / 65536L) % 32768L;
-
-   return (r / RND_MAX);
-}
-
-double nrandom(unsigned long *next)
-{
-   static int sw = 0;
-   static double r1, r2, se;
-
-   if (sw == 0) {
-      sw = 1;
-      do {
-         r1 = 2 * rnd(next) - 1;
-         r2 = 2 * rnd(next) - 1;
-         se = r1 * r1 + r2 * r2;
-      }
-      while (se > 1 || se == 0);
-      se = sqrt(-2 * log(se) / se);
-      return (r1 * se);
-   } else {
-      sw = 0;
-      return (r2 * se);
-   }
-}
-
 void usage(int status)
 {
    fprintf(stderr, "\n");
@@ -170,15 +142,18 @@ void usage(int status)
    fprintf(stderr, "       -a a  : algorithm used for pitch        [%d]\n",
            ATYPE);
    fprintf(stderr, "               estimation\n");
-   fprintf(stderr, "                 0 (snack)\n");
-   fprintf(stderr, "                 1 (swipe)\n");
-   fprintf(stderr, "       -s s  : sampling frequency (kHz)        [%g]\n",
+   fprintf(stderr, "                 0 (RAPT)\n");
+   fprintf(stderr, "                 1 (SWIPE')\n");
+   fprintf(stderr, "       -s s  : sampling frequency (kHz)        [%.1f]\n",
            SAMPLE_FREQ);
    fprintf(stderr, "       -p p  : frame shift                     [%d]\n",
            FRAME_SHIFT);
+   fprintf(stderr, "       -T T  : voiced/unvoiced threshold       [%.1f]\n",
+           THRESH_RAPT);
+   fprintf(stderr, "               (used only for RAPT algorithm)\n");
    fprintf(stderr, "       -t t  : voiced/unvoiced threshold       [%g]\n",
-           THRESH);
-   fprintf(stderr, "               (used only for swipe algorithm)\n");
+           THRESH_SWIPE);
+   fprintf(stderr, "               (used only for SWIPE' algorithm)\n");
    fprintf(stderr, "       -L L  : minimum fundamental             [%g]\n",
            LOW);
    fprintf(stderr, "               frequency to search for (Hz)\n");
@@ -207,17 +182,17 @@ void usage(int status)
 
 int main(int argc, char **argv)
 {
-   int i, j, length, frame_shift = FRAME_SHIFT,
-       atype = ATYPE, otype = OTYPE, alpha, beta, fnum;
-   unsigned long next = SEED;
-   double *x, thresh = THRESH, timestep, p, fsp, sample_freq = SAMPLE_FREQ, L =
-       LOW, H = HIGH;
+   int length, frame_shift = FRAME_SHIFT, atype = ATYPE, otype = OTYPE;
+   double *x, thresh_rapt = THRESH_RAPT, thresh_swipe =
+       THRESH_SWIPE, sample_freq = SAMPLE_FREQ, L = LOW, H = HIGH;
    FILE *fp = stdin;
    float_list *top, *cur, *prev;
-   char *message = (char *) malloc(sizeof(char) * STR_LEN);
-   char *cGet_f0(float_list * flist, float sample_freq,
-                 int length, int frame_shift,
-                 int minF0, int maxF0, int fnum, int otype);
+   void rapt(float_list * flist, int length, double sample_freq,
+             int frame_shift, double min, double max, double threshold,
+             int otype);
+   void swipe(float_list * input, int length, double sample_freq,
+              int frame_shift, double min, double max, double threshold,
+              int otype);
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -238,8 +213,12 @@ int main(int argc, char **argv)
             frame_shift = atoi(*++argv);
             --argc;
             break;
+         case 'T':
+            thresh_rapt = atof(*++argv);
+            --argc;
+            break;
          case 't':
-            thresh = atof(*++argv);
+            thresh_swipe = atof(*++argv);
             --argc;
             break;
          case 'L':
@@ -270,46 +249,21 @@ int main(int argc, char **argv)
    length = 0;
    prev->next = NULL;
    while (freadf(x, sizeof(*x), 1, fp) == 1) {
-      p = (double) nrandom(&next);
       cur = (float_list *) malloc(sizeof(float_list));
-      if (atype == 0)
-         cur->f = (float) x[0] + (float) (p * NOISEMASK);
-      else
-         cur->f = (float) x[0];
+      cur->f = (float) x[0];
       length++;
       prev->next = cur;
       cur->next = NULL;
       prev = cur;
    }
-   if (atype == 0) {
-      fnum = (int) (ceil((double) length / (double) frame_shift));
-      fsp = sample_freq * (FSP / (double) frame_shift);
-      alpha = (int) (ALPHA * fsp + 0.5);
-      beta = (int) ((BETA_1 / L - BETA_2) * fsp / BETA_3 + 0.5);
-      if (beta < 0)
-         beta = 0;
-      for (i = 0; i < (alpha + beta + 3) * frame_shift; i++) {
-         p = (double) nrandom(&next);
-         cur = (float_list *) malloc(sizeof(float_list));
-         cur->f = (float) (p * NOISEMASK);
-         length++;
-         prev->next = cur;
-         cur->next = NULL;
-         prev = cur;
-      }
-   }
 
    if (atype == 0) {
-      message =
-          cGet_f0(top->next, (float) sample_freq, length, frame_shift, (int) L,
-                  (int) H, fnum, otype);
-      if (message != NULL) {
-         fprintf(stderr, "%s : %s\n", cmnd, message);
-         usage(1);
-      }
+      rapt(top->next, length, sample_freq, frame_shift, L, H, thresh_rapt,
+           otype);
    } else {
-      timestep = (double) frame_shift / sample_freq;
-      swipe(top->next, length, L, H, thresh, timestep, sample_freq, otype);
+      swipe(top->next, length, sample_freq, frame_shift, L, H, thresh_swipe,
+            otype);
    }
+
    return (0);
 }

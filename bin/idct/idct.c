@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -61,7 +61,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: idct.c,v 1.3 2011/06/05 14:35:05 mataki Exp $";
+static char *rcs_id = "$Id: idct.c,v 1.7 2012/12/21 11:27:33 mataki Exp $";
 
 /*  Standard C Libraries  */
 #include <stdio.h>
@@ -136,36 +136,9 @@ int usage(void)
    exit(1);
 }
 
-int dft(double *pReal, double *pImag, const int nDFTLength)
-{
-   int k, n;
-   double *pTempReal, *pTempImag, TempReal, TempImag;
-
-   pTempReal = dgetmem(nDFTLength);
-   pTempImag = dgetmem(nDFTLength);
-
-   memcpy(pTempReal, pReal, sizeof(double) * nDFTLength);
-   memcpy(pTempImag, pImag, sizeof(double) * nDFTLength);
-
-   for (k = 0; k < nDFTLength; k++) {
-      TempReal = 0;
-      TempImag = 0;
-      for (n = 0; n < nDFTLength; n++) {
-         TempReal += pTempReal[n] * cos(2.0 * PI * n * k / (double) nDFTLength)
-             + pTempImag[n] * sin(2.0 * PI * n * k / (double) nDFTLength);
-         TempImag += -pTempReal[n] * sin(2.0 * PI * n * k / (double) nDFTLength)
-             + pTempImag[n] * cos(2.0 * PI * n * k / (double) nDFTLength);
-      }
-      pReal[k] = TempReal;
-      pImag[k] = TempImag;
-   }
-   free(pTempReal);
-   free(pTempImag);
-}
-
 int idct_create_table(const int nSize)
 {
-   int k, n;
+   int k;
 
    if (nSize == dct_table_size) {
       /* no need to resize workspace */
@@ -203,6 +176,8 @@ int idct_create_table(const int nSize)
       pWeightReal[0] *= sqrt(2.0);
       pWeightImag[0] *= sqrt(2.0);
    }
+
+   return (0);
 }
 
 int idct(double *pReal, double *pImag,
@@ -240,12 +215,14 @@ int idct(double *pReal, double *pImag,
       pReal[k] = pLocalReal[k];
       pImag[k] = pLocalImag[k];
    }
+
+   return (0);
 }
 
 int main(int argc, char *argv[])
 {
    char *s, *infile = NULL, c;
-   int i, j, k, n, iter, size2;
+   int i, j, iter, size2;
    double *x, *y, *pReal, *pImag;
    FILE *fp;
    Boolean comp = COMPLEX;

@@ -46,7 +46,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_mlsadf_OBJECTS = _mlsadf.$(OBJEXT) mlsadf.$(OBJEXT)
 mlsadf_OBJECTS = $(am_mlsadf_OBJECTS)
-mlsadf_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+mlsadf_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -166,7 +166,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 mlsadf_SOURCES = _mlsadf.c mlsadf.c 
-mlsadf_LDADD = $(top_srcdir)/lib/libSPTK.a
+mlsadf_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

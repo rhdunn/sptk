@@ -54,29 +54,30 @@ libSPTK_a_AR = $(AR) $(ARFLAGS)
 libSPTK_a_LIBADD =
 am_libSPTK_a_OBJECTS = agexp.$(OBJEXT) cholesky.$(OBJEXT) \
 	fileio.$(OBJEXT) fillz.$(OBJEXT) getfp.$(OBJEXT) \
-	getmem.$(OBJEXT) gexp.$(OBJEXT) glog.$(OBJEXT) ifftr.$(OBJEXT) \
-	matrix.$(OBJEXT) movem.$(OBJEXT) mseq.$(OBJEXT) theq.$(OBJEXT) \
-	toeplitz.$(OBJEXT)
+	getmem.$(OBJEXT) gexp.$(OBJEXT) glog.$(OBJEXT) \
+	invert.$(OBJEXT) matrix.$(OBJEXT) movem.$(OBJEXT) \
+	mseq.$(OBJEXT) theq.$(OBJEXT) toeplitz.$(OBJEXT)
 nodist_libSPTK_a_OBJECTS = _acep.$(OBJEXT) _acorr.$(OBJEXT) \
 	_agcep.$(OBJEXT) _amcep.$(OBJEXT) _average.$(OBJEXT) \
 	_b2mc.$(OBJEXT) _c2acr.$(OBJEXT) _c2ir.$(OBJEXT) \
-	_c2sp.$(OBJEXT) _clip.$(OBJEXT) _df2.$(OBJEXT) _dfs.$(OBJEXT) \
-	_fft.$(OBJEXT) _fft2.$(OBJEXT) _fftcep.$(OBJEXT) \
-	_fftr.$(OBJEXT) _fftr2.$(OBJEXT) _freqt.$(OBJEXT) \
-	_gc2gc.$(OBJEXT) _gcep.$(OBJEXT) _glsadf.$(OBJEXT) \
-	_gmm.$(OBJEXT) _gnorm.$(OBJEXT) _grpdelay.$(OBJEXT) \
-	_histogram.$(OBJEXT) _ifft.$(OBJEXT) _ifft2.$(OBJEXT) \
-	_ignorm.$(OBJEXT) _imsvq.$(OBJEXT) _ivq.$(OBJEXT) \
-	_lbg.$(OBJEXT) _levdur.$(OBJEXT) _lmadf.$(OBJEXT) \
-	_lpc.$(OBJEXT) _lpc2c.$(OBJEXT) _lpc2lsp.$(OBJEXT) \
-	_lpc2par.$(OBJEXT) _lsp2lpc.$(OBJEXT) _lspcheck.$(OBJEXT) \
-	_lspdf.$(OBJEXT) _ltcdf.$(OBJEXT) _mc2b.$(OBJEXT) \
-	_mcep.$(OBJEXT) _mfcc.$(OBJEXT) _mgc2mgc.$(OBJEXT) \
-	_mgc2sp.$(OBJEXT) _mgcep.$(OBJEXT) _mglsadf.$(OBJEXT) \
-	_mlpg.$(OBJEXT) _mlsadf.$(OBJEXT) _msvq.$(OBJEXT) \
-	_norm0.$(OBJEXT) _nrand.$(OBJEXT) _par2lpc.$(OBJEXT) \
-	_phase.$(OBJEXT) _poledf.$(OBJEXT) _reverse.$(OBJEXT) \
-	_rmse.$(OBJEXT) _root_pol.$(OBJEXT) _smcep.$(OBJEXT) \
+	_c2sp.$(OBJEXT) _clip.$(OBJEXT) _dct.$(OBJEXT) _df2.$(OBJEXT) \
+	_dfs.$(OBJEXT) _fft.$(OBJEXT) _fft2.$(OBJEXT) \
+	_fftcep.$(OBJEXT) _fftr.$(OBJEXT) _fftr2.$(OBJEXT) \
+	_freqt.$(OBJEXT) _gc2gc.$(OBJEXT) _gcep.$(OBJEXT) \
+	_glsadf.$(OBJEXT) _gmm.$(OBJEXT) _gnorm.$(OBJEXT) \
+	_grpdelay.$(OBJEXT) _histogram.$(OBJEXT) _ifft.$(OBJEXT) \
+	_ifftr.$(OBJEXT) _ifft2.$(OBJEXT) _ignorm.$(OBJEXT) \
+	_imsvq.$(OBJEXT) _ivq.$(OBJEXT) _lbg.$(OBJEXT) \
+	_levdur.$(OBJEXT) _lmadf.$(OBJEXT) _lpc.$(OBJEXT) \
+	_lpc2c.$(OBJEXT) _lpc2lsp.$(OBJEXT) _lpc2par.$(OBJEXT) \
+	_lsp2lpc.$(OBJEXT) _lspcheck.$(OBJEXT) _lspdf.$(OBJEXT) \
+	_ltcdf.$(OBJEXT) _mc2b.$(OBJEXT) _mcep.$(OBJEXT) \
+	_mfcc.$(OBJEXT) _mgc2mgc.$(OBJEXT) _mgc2sp.$(OBJEXT) \
+	_mgcep.$(OBJEXT) _mglsadf.$(OBJEXT) _mlpg.$(OBJEXT) \
+	_mlsadf.$(OBJEXT) _msvq.$(OBJEXT) _norm0.$(OBJEXT) \
+	_nrand.$(OBJEXT) _par2lpc.$(OBJEXT) _phase.$(OBJEXT) \
+	_poledf.$(OBJEXT) _reverse.$(OBJEXT) _rmse.$(OBJEXT) \
+	_root_pol.$(OBJEXT) _smcep.$(OBJEXT) _transpose.$(OBJEXT) \
 	_uels.$(OBJEXT) _ulaw.$(OBJEXT) _vq.$(OBJEXT) \
 	_window.$(OBJEXT) _zcross.$(OBJEXT) _zerodf.$(OBJEXT)
 libSPTK_a_OBJECTS = $(am_libSPTK_a_OBJECTS) \
@@ -208,7 +209,7 @@ libSPTK_a_SOURCES = agexp.c \
 	      getmem.c \
 	      gexp.c \
 	      glog.c \
-	      ifftr.c \
+	      invert.c \
 	      matrix.c \
 	      movem.c \
 	      mseq.c \
@@ -226,6 +227,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/c2ir/_c2ir.c \
 		$(top_srcdir)/bin/c2sp/_c2sp.c \
 		$(top_srcdir)/bin/clip/_clip.c \
+		$(top_srcdir)/bin/dct/_dct.c \
 		$(top_srcdir)/bin/df2/_df2.c \
 		$(top_srcdir)/bin/dfs/_dfs.c \
 		$(top_srcdir)/bin/fft/_fft.c \
@@ -242,6 +244,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/grpdelay/_grpdelay.c \
 		$(top_srcdir)/bin/histogram/_histogram.c \
 		$(top_srcdir)/bin/ifft/_ifft.c \
+		$(top_srcdir)/bin/ifftr/_ifftr.c \
 		$(top_srcdir)/bin/ifft2/_ifft2.c \
 		$(top_srcdir)/bin/ignorm/_ignorm.c \
 		$(top_srcdir)/bin/imsvq/_imsvq.c \
@@ -276,6 +279,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/rmse/_rmse.c \
 		$(top_srcdir)/bin/root_pol/_root_pol.c \
 		$(top_srcdir)/bin/smcep/_smcep.c \
+		$(top_srcdir)/bin/transpose/_transpose.c \
 		$(top_srcdir)/bin/uels/_uels.c \
 		$(top_srcdir)/bin/ulaw/_ulaw.c \
 		$(top_srcdir)/bin/vq/_vq.c \
@@ -366,6 +370,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_c2ir.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_c2sp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_clip.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_dct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_df2.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_dfs.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_fft.Po@am__quote@
@@ -383,6 +388,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_histogram.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_ifft.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_ifft2.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_ifftr.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_ignorm.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_imsvq.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_ivq.Po@am__quote@
@@ -416,6 +422,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_rmse.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_root_pol.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_smcep.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_transpose.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_uels.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_ulaw.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_vq.Po@am__quote@
@@ -430,7 +437,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/getmem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/gexp.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/glog.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ifftr.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/invert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/matrix.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/movem.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mseq.Po@am__quote@
@@ -590,6 +597,20 @@ _clip.obj: $(top_srcdir)/bin/clip/_clip.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/clip/_clip.c' object='_clip.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _clip.obj `if test -f '$(top_srcdir)/bin/clip/_clip.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/clip/_clip.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/clip/_clip.c'; fi`
+
+_dct.o: $(top_srcdir)/bin/dct/_dct.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _dct.o -MD -MP -MF $(DEPDIR)/_dct.Tpo -c -o _dct.o `test -f '$(top_srcdir)/bin/dct/_dct.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/dct/_dct.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_dct.Tpo $(DEPDIR)/_dct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/dct/_dct.c' object='_dct.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _dct.o `test -f '$(top_srcdir)/bin/dct/_dct.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/dct/_dct.c
+
+_dct.obj: $(top_srcdir)/bin/dct/_dct.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _dct.obj -MD -MP -MF $(DEPDIR)/_dct.Tpo -c -o _dct.obj `if test -f '$(top_srcdir)/bin/dct/_dct.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/dct/_dct.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/dct/_dct.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_dct.Tpo $(DEPDIR)/_dct.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/dct/_dct.c' object='_dct.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _dct.obj `if test -f '$(top_srcdir)/bin/dct/_dct.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/dct/_dct.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/dct/_dct.c'; fi`
 
 _df2.o: $(top_srcdir)/bin/df2/_df2.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _df2.o -MD -MP -MF $(DEPDIR)/_df2.Tpo -c -o _df2.o `test -f '$(top_srcdir)/bin/df2/_df2.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/df2/_df2.c
@@ -814,6 +835,20 @@ _ifft.obj: $(top_srcdir)/bin/ifft/_ifft.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/ifft/_ifft.c' object='_ifft.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _ifft.obj `if test -f '$(top_srcdir)/bin/ifft/_ifft.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/ifft/_ifft.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/ifft/_ifft.c'; fi`
+
+_ifftr.o: $(top_srcdir)/bin/ifftr/_ifftr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _ifftr.o -MD -MP -MF $(DEPDIR)/_ifftr.Tpo -c -o _ifftr.o `test -f '$(top_srcdir)/bin/ifftr/_ifftr.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/ifftr/_ifftr.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_ifftr.Tpo $(DEPDIR)/_ifftr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/ifftr/_ifftr.c' object='_ifftr.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _ifftr.o `test -f '$(top_srcdir)/bin/ifftr/_ifftr.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/ifftr/_ifftr.c
+
+_ifftr.obj: $(top_srcdir)/bin/ifftr/_ifftr.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _ifftr.obj -MD -MP -MF $(DEPDIR)/_ifftr.Tpo -c -o _ifftr.obj `if test -f '$(top_srcdir)/bin/ifftr/_ifftr.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/ifftr/_ifftr.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/ifftr/_ifftr.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_ifftr.Tpo $(DEPDIR)/_ifftr.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/ifftr/_ifftr.c' object='_ifftr.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _ifftr.obj `if test -f '$(top_srcdir)/bin/ifftr/_ifftr.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/ifftr/_ifftr.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/ifftr/_ifftr.c'; fi`
 
 _ifft2.o: $(top_srcdir)/bin/ifft2/_ifft2.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _ifft2.o -MD -MP -MF $(DEPDIR)/_ifft2.Tpo -c -o _ifft2.o `test -f '$(top_srcdir)/bin/ifft2/_ifft2.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/ifft2/_ifft2.c
@@ -1290,6 +1325,20 @@ _smcep.obj: $(top_srcdir)/bin/smcep/_smcep.c
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/smcep/_smcep.c' object='_smcep.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _smcep.obj `if test -f '$(top_srcdir)/bin/smcep/_smcep.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/smcep/_smcep.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/smcep/_smcep.c'; fi`
+
+_transpose.o: $(top_srcdir)/bin/transpose/_transpose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _transpose.o -MD -MP -MF $(DEPDIR)/_transpose.Tpo -c -o _transpose.o `test -f '$(top_srcdir)/bin/transpose/_transpose.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/transpose/_transpose.c
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_transpose.Tpo $(DEPDIR)/_transpose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/transpose/_transpose.c' object='_transpose.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _transpose.o `test -f '$(top_srcdir)/bin/transpose/_transpose.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/transpose/_transpose.c
+
+_transpose.obj: $(top_srcdir)/bin/transpose/_transpose.c
+@am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _transpose.obj -MD -MP -MF $(DEPDIR)/_transpose.Tpo -c -o _transpose.obj `if test -f '$(top_srcdir)/bin/transpose/_transpose.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/transpose/_transpose.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/transpose/_transpose.c'; fi`
+@am__fastdepCC_TRUE@	mv -f $(DEPDIR)/_transpose.Tpo $(DEPDIR)/_transpose.Po
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	source='$(top_srcdir)/bin/transpose/_transpose.c' object='_transpose.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCC_FALSE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -c -o _transpose.obj `if test -f '$(top_srcdir)/bin/transpose/_transpose.c'; then $(CYGPATH_W) '$(top_srcdir)/bin/transpose/_transpose.c'; else $(CYGPATH_W) '$(srcdir)/$(top_srcdir)/bin/transpose/_transpose.c'; fi`
 
 _uels.o: $(top_srcdir)/bin/uels/_uels.c
 @am__fastdepCC_TRUE@	$(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS) -MT _uels.o -MD -MP -MF $(DEPDIR)/_uels.Tpo -c -o _uels.o `test -f '$(top_srcdir)/bin/uels/_uels.c' || echo '$(srcdir)/'`$(top_srcdir)/bin/uels/_uels.c

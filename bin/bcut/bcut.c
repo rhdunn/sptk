@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -75,7 +75,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: bcut.c,v 1.22 2011/04/27 13:46:38 mataki Exp $";
+static char *rcs_id = "$Id: bcut.c,v 1.29 2012/12/23 12:51:13 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -125,27 +125,29 @@ void usage(int status)
    fprintf(stderr, "       -n n  : block order  [l-1]\n");
    fprintf(stderr, "       +type : data type    [f]\n");
    fprintf(stderr,
-           "                c  (char, %dbyte)         C  (unsigned char, %dbyte)\n",
-           sizeof(char), sizeof(unsigned char));
+           "                c  (char, %lubyte)         C  (unsigned char, %lubyte)\n",
+           (unsigned long) sizeof(char), (unsigned long) sizeof(unsigned char));
    fprintf(stderr,
-           "                s  (short, %dbyte)        S  (unsigned short, %dbyte)\n",
-           sizeof(short), sizeof(unsigned short));
+           "                s  (short, %lubyte)        S  (unsigned short, %lubyte)\n",
+           (unsigned long) sizeof(short),
+           (unsigned long) sizeof(unsigned short));
    fprintf(stderr,
            "                i3 (int, 3byte)          I3 (unsigned int, 3byte)\n");
    fprintf(stderr,
-           "                i  (int, %dbyte)          I  (unsigned int, %dbyte)\n",
-           sizeof(int), sizeof(unsigned int));
+           "                i  (int, %lubyte)          I  (unsigned int, %lubyte)\n",
+           (unsigned long) sizeof(int), (unsigned long) sizeof(unsigned int));
    fprintf(stderr,
-           "                l  (long, %dbyte)         L  (unsigned long, %dbyte)\n",
-           sizeof(long), sizeof(unsigned long));
+           "                l  (long, %lubyte)         L  (unsigned long, %lubyte)\n",
+           (unsigned long) sizeof(long), (unsigned long) sizeof(unsigned long));
    fprintf(stderr,
-           "                le (long long, %dbyte)    LE (unsigned long long, %dbyte)\n",
-           sizeof(long long), sizeof(unsigned long long));
+           "                le (long long, %lubyte)    LE (unsigned long long, %lubyte)\n",
+           (unsigned long) sizeof(long long),
+           (unsigned long) sizeof(unsigned long long));
    fprintf(stderr,
-           "                f  (float, %dbyte)        d  (double, %dbyte)\n",
-           sizeof(float), sizeof(double));
-   fprintf(stderr,
-           "                de (long double, %dbyte)\n", sizeof(long double));
+           "                f  (float, %lubyte)        d  (double, %lubyte)\n",
+           (unsigned long) sizeof(float), (unsigned long) sizeof(double));
+   fprintf(stderr, "                de (long double, %lubyte)\n",
+           (unsigned long) sizeof(long double));
    fprintf(stderr, "       -h    : print this message\n");
    fprintf(stderr, "  infile:\n");
    fprintf(stderr, "       data sequence        [stdin]\n");
@@ -171,12 +173,8 @@ int main(int argc, char **argv)
    FILE *fp = stdin;
    char *s, c;
    Boolean int3flg = SIGNED_INT3, uint3flg = UNSIGNED_INT3;
-   long int y = 0;
-   long long xl = 0;
-   unsigned long long xul = 0;
-   long double xd = 0.0;
+   long int y = 0, z = 0;
    long double x;
-   char *tmp;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -285,7 +283,8 @@ int main(int argc, char **argv)
       if (freadx(&x, size, 1, fp) != 1)
          break;
       if (int3flg == TR || uint3flg == TR) {
-         y = *(int *) &x & 0x00FFFFFF;
+         memcpy(&z, &x, size);
+         y = z & 0x00FFFFFF;
          if (int3flg == TR && y >> 23 == 1)
             y = y | 0xFF000000;
          fwritex(&y, size, 1, stdout);

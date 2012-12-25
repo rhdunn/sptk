@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -58,7 +58,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: ifft.c,v 1.23 2011/04/27 13:46:40 mataki Exp $";
+static char *rcs_id = "$Id: ifft.c,v 1.26 2012/12/21 11:27:34 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -117,7 +117,8 @@ int main(int argc, char *argv[])
 {
    FILE *fp;
    char *s, *infile = NULL, c;
-   int dft(FILE *);
+   int size2;
+   double *x, *y;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -150,23 +151,13 @@ int main(int argc, char *argv[])
          infile = s;
    }
 
+   fp = stdin;
+
    if (infile) {
       fp = getfp(infile, "rb");
-      dft(fp);
-      fclose(fp);
-   } else
-      dft(stdin);
-
-   return 0;
-}
-
-int dft(FILE * fp)
-{
-   double *x, *y;
-   int size2;
+   }
 
    x = dgetmem(size2 = size + size);
-
    y = x + size;
 
    while (!feof(fp)) {
@@ -179,6 +170,10 @@ int dft(FILE * fp)
          fwritef(x, sizeof(*x), size, stdout);
       if (out != 'R')
          fwritef(y, sizeof(*y), size, stdout);
+   }
+
+   if (infile) {
+      fclose(fp);
    }
 
    return (0);

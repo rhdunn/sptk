@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -72,7 +72,7 @@
 *                                                                                       *
 ****************************************************************************************/
 
-static char *rcs_id = "$Id: mlpg.c,v 1.31 2011/04/27 13:46:42 mataki Exp $";
+static char *rcs_id = "$Id: mlpg.c,v 1.33 2012/12/21 11:27:36 mataki Exp $";
 
 
 /* Standard C Libraries */
@@ -164,8 +164,8 @@ typedef struct _PStream {
 } PStream;
 
 /*  Required Functions  */
-void InitPStream(PStream * pst);
-void InitDWin(PStream * pst);
+void init_pstream(PStream * pst);
+void init_dwin(PStream * pst);
 double *dcalloc(int x, int xoff);
 double **ddcalloc(int x, int y, int xoff, int yoff);
 double ***dddcalloc(int x, int y, int z, int xoff, int yoff, int zoff);
@@ -173,7 +173,7 @@ double *mlpg(PStream * pst);
 int doupdate(PStream * pst, int d);
 void calc_pi(PStream * pst, int d);
 void calc_k(PStream * pst, int d);
-void update_P(PStream * pst, int d);
+void update_P(PStream * pst);
 void update_c(PStream * pst, int d);
 
 
@@ -235,7 +235,7 @@ int main(int argc, char **argv)
    int coeflen;
    PStream pst;
    int i, j;
-   void InitPStream(PStream *);
+   void init_pstream(PStream *);
    double *mlpg(PStream *);
 
    pst.order = ORDER;
@@ -345,7 +345,7 @@ int main(int argc, char **argv)
          pdffp = getfp(*argv, "rb");
    }
 
-   InitPStream(&pst);
+   init_pstream(&pst);
 
    delay = pst.range + pst.dw.maxw[WRIGHT];
    nframe = 0;
@@ -378,16 +378,16 @@ int main(int argc, char **argv)
    return (0);
 }
 
-void InitPStream(PStream * pst)
+void init_pstream(PStream * pst)
 {
-   void InitDWin(PStream *);
+   void init_dwin(PStream *);
    double *dcalloc(int, int);
    double **ddcalloc(int, int, int, int);
    double ***dddcalloc(int, int, int, int, int, int);
    int half, full;
    int i, m;
 
-   InitDWin(pst);
+   init_dwin(pst);
 
    half = pst->range * 2;
    full = pst->range * 4 + 1;
@@ -429,12 +429,12 @@ void InitPStream(PStream * pst)
 }
 
 
-void InitDWin(PStream * pst)
+void init_dwin(PStream * pst)
 {
    double *dcalloc(int, int);
    int i, j;
    int fsize, leng;
-   double x, a0, a1, a2;
+   double a0, a1, a2;
    FILE *fp;
 
    /* memory allocation */
@@ -581,7 +581,7 @@ double *mlpg(PStream * pst)
    int doupdate(PStream *, int);
    void calc_pi(PStream *, int);
    void calc_k(PStream *, int);
-   void update_P(PStream *, int);
+   void update_P(PStream *);
    void update_c(PStream *, int);
    int tcur, tmin, tmax;
    int d, m, u;
@@ -611,7 +611,7 @@ double *mlpg(PStream * pst)
       if (doupdate(pst, d)) {
          calc_pi(pst, d);
          calc_k(pst, d);
-         update_P(pst, d);
+         update_P(pst);
          update_c(pst, d);
       }
    }
@@ -671,7 +671,7 @@ void calc_k(PStream * pst, int d)
 }
 
 
-void update_P(PStream * pst, int d)
+void update_P(PStream * pst)
 {
    int m, u, v;
 

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -62,7 +62,7 @@ struct page_media {
 #define SCALE 10
 
 #define MIN_OFFSET 12
-#define MAX_OFFSET 17
+#define MAX_OFFSET 22
 #define CHAR_HEIGHT 10
 
 #define norm(x) (int)(x)

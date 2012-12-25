@@ -46,10 +46,10 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_gmm_OBJECTS = _gmm.$(OBJEXT) gmm.$(OBJEXT)
 gmm_OBJECTS = $(am_gmm_OBJECTS)
-gmm_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+gmm_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 am_gmmp_OBJECTS = _gmm.$(OBJEXT) gmmp.$(OBJEXT)
 gmmp_OBJECTS = $(am_gmmp_OBJECTS)
-gmmp_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+gmmp_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -169,9 +169,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 gmm_SOURCES = _gmm.c gmm.c gmm.h
-gmm_LDADD = $(top_srcdir)/lib/libSPTK.a
+gmm_LDADD = $(top_builddir)/lib/libSPTK.a
 gmmp_SOURCES = _gmm.c gmmp.c gmm.h
-gmmp_LDADD = $(top_srcdir)/lib/libSPTK.a
+gmmp_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 
 /********************************************************
-* $Id: plot.c,v 1.18 2011/04/27 13:46:43 mataki Exp $  *
+* $Id: plot.c,v 1.20 2012/12/21 11:27:36 mataki Exp $  *
 *       Interpret X-Y Plotter Commands                  *
 ********************************************************/
 
@@ -277,7 +277,7 @@ static void _line(FILE * fp)
    _flush();
 }
 
-static void intstyle(int type)
+/*static void intstyle(int type)
 {
    int is_frame = 1, style = 2;
 
@@ -298,9 +298,9 @@ static void intstyle(int type)
       if ((style = type + 10) == 0)
          style = 1;
    }
-}
+   }*/
 
-static void polyg(FILE * fp, int type)
+/*static void polyg(FILE * fp, int type)
 {
    int n;
    int d, angle;
@@ -316,7 +316,7 @@ static void polyg(FILE * fp, int type)
    polylines(xb + 1, yb + 1, n);
 
    return;
-}
+   }*/
 
 static void hatching(FILE * fp, int type)
 {

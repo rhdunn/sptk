@@ -46,7 +46,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_poledf_OBJECTS = _poledf.$(OBJEXT) poledf.$(OBJEXT)
 poledf_OBJECTS = $(am_poledf_OBJECTS)
-poledf_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+poledf_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -166,7 +166,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 poledf_SOURCES = _poledf.c poledf.c 
-poledf_LDADD = $(top_srcdir)/lib/libSPTK.a
+poledf_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

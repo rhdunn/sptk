@@ -46,11 +46,11 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_fdrw_OBJECTS = fdrw.$(OBJEXT) plot.$(OBJEXT) plsub.$(OBJEXT)
 fdrw_OBJECTS = $(am_fdrw_OBJECTS)
-fdrw_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+fdrw_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 am_fig_OBJECTS = fig.$(OBJEXT) fig0.$(OBJEXT) fig1.$(OBJEXT) \
 	plot.$(OBJEXT) plsub.$(OBJEXT)
 fig_OBJECTS = $(am_fig_OBJECTS)
-fig_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+fig_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -171,8 +171,8 @@ top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 fig_SOURCES = fig.c fig.h fig0.c fig1.c plot.c plot.h plsub.c 
 fdrw_SOURCES = fdrw.c plot.c plot.h plsub.c 
-fig_LDADD = $(top_srcdir)/lib/libSPTK.a
-fdrw_LDADD = $(top_srcdir)/lib/libSPTK.a
+fig_LDADD = $(top_builddir)/lib/libSPTK.a
+fdrw_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

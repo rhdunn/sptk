@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -54,10 +54,9 @@
 *        options:                                                             *
 *                -l l      :  length of vector                  [26]          *
 *                -n n      :  order of vector                   [25]          *
-*                -t t      :  number of training vector         [N/A]         *
 *                -s s      :  initial codebook size             [1]           *
 *                -e e      :  final codebook size               [256]         *
-*                -f f      :  initial codebook filename         [NULL]        *
+*                -F F      :  initial codebook filename         [NULL]        *
 *                -i i      :  maximum number of iteration       [1000]        *
 *                -m m      :  minimum num. of training          [NULL]        *
 *                             vectors for each cell             [1]           *
@@ -96,7 +95,7 @@
 *                                                                             *
 ******************************************************************************/
 
-static char *rcs_id = "$Id: lbg.c,v 1.26 2011/04/27 13:46:40 mataki Exp $";
+static char *rcs_id = "$Id: lbg.c,v 1.28 2012/08/20 12:36:31 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -137,6 +136,10 @@ static char *rcs_id = "$Id: lbg.c,v 1.26 2011/04/27 13:46:40 mataki Exp $";
 /*  Command Name  */
 char *cmnd;
 
+typedef struct _float_list {
+   float *f;
+   struct _float_list *next;
+} float_list;
 
 void usage(int status)
 {
@@ -153,15 +156,13 @@ void usage(int status)
            "       -n n      : order of vector                                      [%d]\n",
            LENG - 1);
    fprintf(stderr,
-           "       -t t      : number of training vector                            [N/A]\n");
-   fprintf(stderr,
            "       -s s      : initial codebook size                                [%d]\n",
            ICBSIZE);
    fprintf(stderr,
            "       -e e      : final codebook size                                  [%d]\n",
            ECBSIZE);
    fprintf(stderr,
-           "       -f f      : initial codebook filename                            [NULL]\n");
+           "       -F F      : initial codebook filename                            [NULL]\n");
    fprintf(stderr,
            "       -i i      : maximum number of iteration for centroid update      [%d]\n",
            ITER);
@@ -208,11 +209,12 @@ void usage(int status)
 int main(int argc, char **argv)
 {
    int l = LENG, icbsize = ICBSIZE, ecbsize = ECBSIZE, iter = ITER, tnum =
-       TNUMBER, seed = SEED, ispipe, xsize, csize, i, j, *tindex, mintnum =
+       TNUMBER, seed = SEED, csize, i, j, *tindex, mintnum =
        MINTRAIN, centup = CENTUP;
    FILE *fp = stdin, *fpi = NULL, *fpcb = NULL;
    double delta = DELTA, minerr = END, *x, *cb, *icb;
    double *p;
+   float_list *top, *cur, *prev, *tmpf, *tmpff;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -227,10 +229,6 @@ int main(int argc, char **argv)
             break;
          case 'n':
             l = atoi(*++argv) + 1;
-            --argc;
-            break;
-         case 't':
-            tnum = atoi(*++argv);
             --argc;
             break;
          case 's':
@@ -249,7 +247,7 @@ int main(int argc, char **argv)
             delta = atof(*++argv);
             --argc;
             break;
-         case 'f':
+         case 'F':
             fpcb = getfp(*++argv, "rb");
             --argc;
             break;
@@ -278,34 +276,38 @@ int main(int argc, char **argv)
       } else
          fpi = getfp(*argv, "wb");
 
-   if (tnum == -1) {
-      ispipe = fseek(fp, 0L, 2);
-
-#ifdef DOUBLE
-      tnum = ftell(fp) / l / sizeof(double);
-#else
-      tnum = ftell(fp) / l / sizeof(float);
-#endif                          /* DOUBLE */
-
-      rewind(fp);
-      if (ispipe == -1) {
-         fprintf(stderr,
-                 "%s : -t option must be specified, when input via pipe!\n",
-                 cmnd);
-         usage(1);
+   /* -- Count number of input vectors and read -- */
+   x = dgetmem(l);
+   top = prev = (float_list *) malloc(sizeof(float_list));
+   top->f = fgetmem(l);
+   tnum = 0;
+   prev->next = NULL;
+   while (freadf(x, sizeof(*x), l, fp) == l) {
+      cur = (float_list *) malloc(sizeof(float_list));
+      cur->f = fgetmem(l);
+      for (i = 0; i < l; i++) {
+         cur->f[i] = (float) x[i];
       }
+      tnum++;
+      prev->next = cur;
+      cur->next = NULL;
+      prev = cur;
    }
+   free(x);
+   x = dgetmem(tnum * l);
+   for (i = 0, tmpf = top->next; tmpf != NULL; i++, tmpf = tmpff) {
+      for (j = 0; j < l; j++) {
+         x[i * l + j] = tmpf->f[j];
+      }
+      tmpff = tmpf->next;
+      free(tmpf->f);
+      free(tmpf);
+   }
+   free(top);
 
-   xsize = tnum * l;
    csize = ecbsize * l;
-
-   x = dgetmem(xsize);
    cb = dgetmem(csize);
 
-   if (freadf(x, sizeof(*x), xsize, fp) != xsize) {
-      fprintf(stderr, "%s : Size error of training data!\n", cmnd);
-      return (1);
-   }
    if (icbsize == 1) {
       icb = dgetmem(l);
       fillz(icb, sizeof(*icb), l);

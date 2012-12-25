@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -73,7 +73,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: swab.c,v 1.23 2011/04/27 13:46:43 mataki Exp $";
+static char *rcs_id = "$Id: swab.c,v 1.28 2012/12/21 11:27:37 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -124,24 +124,26 @@ void usage(int status)
    fprintf(stderr, "       -e e   : end offset number            [0]\n");
    fprintf(stderr, "       +type  : input and output data format [s]\n");
    fprintf(stderr,
-           "                s  (short, %dbyte)        S  (unsigned short, %dbyte)\n",
-           sizeof(short), sizeof(unsigned short));
+           "                s  (short, %lubyte)        S  (unsigned short, %lubyte)\n",
+           (unsigned long) sizeof(short),
+           (unsigned long) sizeof(unsigned short));
    fprintf(stderr,
            "                i3 (int, 3byte)          I3 (unsigned int, 3byte)\n");
    fprintf(stderr,
-           "                i  (int, %dbyte)          I  (unsigned int, %dbyte)\n",
-           sizeof(int), sizeof(unsigned int));
+           "                i  (int, %lubyte)          I  (unsigned int, %lubyte)\n",
+           (unsigned long) sizeof(int), (unsigned long) sizeof(unsigned int));
    fprintf(stderr,
-           "                l  (long, %dbyte)         L  (unsigned long, %dbyte)\n",
-           sizeof(long), sizeof(unsigned long));
+           "                l  (long, %lubyte)         L  (unsigned long, %lubyte)\n",
+           (unsigned long) sizeof(long), (unsigned long) sizeof(unsigned long));
    fprintf(stderr,
-           "                le (long long, %dbyte)    LE (unsigned long long, %dbyte)\n",
-           sizeof(long long), sizeof(unsigned long long));
+           "                le (long long, %lubyte)    LE (unsigned long long, %lubyte)\n",
+           (unsigned long) sizeof(long long),
+           (unsigned long) sizeof(unsigned long long));
    fprintf(stderr,
-           "                f  (float, %dbyte)        d  (double, %dbyte)\n",
-           sizeof(float), sizeof(double));
-   fprintf(stderr,
-           "                de (long double, %dbyte)\n", sizeof(long double));
+           "                f  (float, %lubyte)        d  (double, %lubyte)\n",
+           (unsigned long) sizeof(float), (unsigned long) sizeof(double));
+   fprintf(stderr, "                de (long double, %lubyte)\n",
+           (unsigned long) sizeof(long double));
    fprintf(stderr, "       -h     : print this message\n");
    fprintf(stderr, "  infile:\n");
    fprintf(stderr, "       data sequence                [stdin]\n");
@@ -165,7 +167,6 @@ int main(int argc, char *argv[])
    int c;
    size_t iosize = sizeof(short);
    void conv(FILE * fp, size_t iosize);
-   Boolean int3flg = SIGNED_INT3, uint3flg = UNSIGNED_INT3;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -265,7 +266,7 @@ void conv(FILE * fp, size_t iosize)
       freadx(ibuf, iosize, 1, fp);
       if (feof(fp))
          break;
-      for (i = 0; i < iosize; ++i)
+      for (i = 0; i < (int) iosize; ++i)
          obuf[i] = ibuf[iosize - 1 - i];
       fwritex(obuf, iosize, 1, stdout);
    }

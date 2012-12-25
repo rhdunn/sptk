@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -80,7 +80,7 @@
 *                                                                        *
 *************************************************************************/
 
-static char *rcs_id = "$Id: mgc2mgc.c,v 1.27 2011/08/10 06:12:06 mataki Exp $";
+static char *rcs_id = "$Id: mgc2mgc.c,v 1.29 2012/12/21 11:27:35 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -271,11 +271,12 @@ int main(int argc, char **argv)
 
       if (norm1)
          ignorm(c1, c1, m1, g1);
-      else if (mulg1) {
+      else if (mulg1)
          c1[0] = (c1[0] - 1.0) / g1;
+
+      if (mulg1)
          for (i = m1; i >= 1; i--)
             c1[i] /= g1;
-      }
 
       mgc2mgc(c1, m1, a1, g1, c2, m2, a2, g2);
 

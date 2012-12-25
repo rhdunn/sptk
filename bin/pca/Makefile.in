@@ -46,10 +46,10 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_pca_OBJECTS = pca.$(OBJEXT)
 pca_OBJECTS = $(am_pca_OBJECTS)
-pca_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+pca_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 am_pcas_OBJECTS = pcas.$(OBJEXT)
 pcas_OBJECTS = $(am_pcas_OBJECTS)
-pcas_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+pcas_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -169,9 +169,9 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 pca_SOURCES = pca.c 
-pca_LDADD = $(top_srcdir)/lib/libSPTK.a
+pca_LDADD = $(top_builddir)/lib/libSPTK.a
 pcas_SOURCES = pcas.c 
-pcas_LDADD = $(top_srcdir)/lib/libSPTK.a
+pcas_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

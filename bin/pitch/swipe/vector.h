@@ -31,7 +31,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -140,12 +140,5 @@ intvector                          primes(int);
 vector                             spline(vector, vector);
 double                             splinv(vector, vector, vector, double, int);
 
-// polynomial fitting
-#if 0
-#else
-static void                        LU(int, double **);
-static void                        SOLVE(int, double **, double *);
-static void                        dgels(int, vector, vector);
-#endif
 vector                             polyfit(vector, vector, int);
 double                             polyval(vector, double);

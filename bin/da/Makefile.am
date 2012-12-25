@@ -1,19 +1,19 @@
 ## Process this file with automake to produce Makefile.in
 ##
-## $Id: Makefile.am,v 1.5 2008/11/13 03:25:17 s_sako Exp $
+## $Id: Makefile.am,v 1.7 2012/07/02 11:36:51 mataki Exp $
 if USEDA
 INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = dawrite
 bin_SCRIPTS = da.sh
 dawrite_SOURCES = da.h dawrite.c winplay.c winplay.h
-dawrite_LDADD = $(top_srcdir)/lib/libSPTK.a
+dawrite_LDADD = $(top_builddir)/lib/libSPTK.a
 endif
 
 EXTRA_DIST = da.in
 CLEANFILES = $(bin_PROGRAMS) $(bin_SCRIPTS)
 
 replace_path  = sed -e 's,@binpath@,$(DESTDIR)$(bindir),g' \
-	       -e 's,@libpath@,$(DESTDIR)$(libdir),g' \
+	       -e 's,@libpath@,$(datarootdir)/SPTK,g' \
 	       -e 's,@sptk_version@,$(PACKAGE_VERSION),g' \
 	       -e 's,@cshpath@,$(CSH),' \
 	       -e 's,@io_symbol@,$(IO_SYMBOL),g' \

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -62,7 +62,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: fft.c,v 1.24 2011/04/27 13:46:39 mataki Exp $";
+static char *rcs_id = "$Id: fft.c,v 1.27 2012/12/21 11:27:32 mataki Exp $";
 
 /* Standard C Libraries */
 #include <stdio.h>
@@ -125,8 +125,8 @@ int main(int argc, char *argv[])
 {
    FILE *fp;
    char *s, *infile = NULL, c;
-   int size = SIZE, nd = -1, out = ' ';
-   int dft(FILE * fp, const int size, const int nd, const int out);
+   int size = SIZE, size2, k, nd = -1, out = ' ';
+   double *x, *y;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -173,20 +173,12 @@ int main(int argc, char *argv[])
               cmnd, nd, size);
       return (1);
    }
+
+   fp = stdin;
+
    if (infile) {
       fp = getfp(infile, "rb");
-      dft(fp, size, nd, out);
-      fclose(fp);
-   } else
-      dft(stdin, size, nd, out);
-
-   return 0;
-}
-
-int dft(FILE * fp, const int size, const int nd, const int out)
-{
-   double *x, *y;
-   int k, size2;
+   }
 
    x = dgetmem(size2 = size + size);
    y = x + size;
@@ -208,6 +200,10 @@ int dft(FILE * fp, const int size, const int nd, const int out)
          fwritef(x, sizeof(*x), size, stdout);
       if (out == ' ' || out == 'I')
          fwritef(y, sizeof(*y), size, stdout);
+   }
+
+   if (infile) {
+      fclose(fp);
    }
 
    return (0);

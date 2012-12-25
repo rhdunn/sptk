@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -60,21 +60,23 @@
 *                             1 (normalized frequency <0...0.5>)        *
 *                             2 (frequency (kHz))                       *
 *                             3 (frequency (Hz))                        *
-*               -r r     :  rearrange LSP               [FALSE]         *
+*               -c       :  rearrange LSP               [N/A]           *
 *                           distance between two consecutive LSPs       *
 *                                                       [r]             *
 *                           extend the distance (if it is smaller       *
-*                           than [r]*pi/m)    s.t. (0 < [r] < 1)        *
+*                           than R*pi/m)    s.t. (0 <= R <= 1)          *
+*               -r R     :  threshold of rearrangement  [0.0]           *
 *       infile:                                                         *
 *               LSP                                                     *
 *                       , f(1), ..., f(m),                              *
 *       stdout:                                                         *
-*               frame number of irregular LSP of                        *
-*               rearranged LSP if -r option is specified                *
+*               LSP or rearranged LSP if -r option is specified         *
+*       stderr:                                                         *
+*               frame number of irregular LSP                           *
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: lspcheck.c,v 1.27 2011/12/20 15:27:29 uratec Exp $";
+static char *rcs_id = "$Id: lspcheck.c,v 1.33 2012/12/21 10:04:42 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -102,9 +104,9 @@ static char *rcs_id = "$Id: lspcheck.c,v 1.27 2011/12/20 15:27:29 uratec Exp $";
 #define ITYPE  0
 #define OTYPE  -1
 #define SAMPLING 10.0
-#define ARRANGE  FA
+#define ARRANGE  0
 #define GAIN  TR
-#define ALPHA 0.0001
+#define ALPHA 0.0
 
 char *BOOL[] = { "FALSE", "TRUE" };
 
@@ -129,19 +131,23 @@ void usage(int status)
    fprintf(stderr, "                 1 (normalized frequency <0...0.5>)\n");
    fprintf(stderr, "                 2 (frequency (kHz))\n");
    fprintf(stderr, "                 3 (frequency (Hz))\n");
-   fprintf(stderr, "       -r r  : rearrange LSP       [%s]\n", BOOL[ARRANGE]);
+   fprintf(stderr, "       -c    : rearrange LSP       [N/A]\n");
    fprintf(stderr,
            "               check the distance between two consecutive LSPs\n");
    fprintf(stderr,
-           "               and extend the distance (if it is smaller than [r]*pi/m)\n");
-   fprintf(stderr, "               s.t. (0 < [r] < 1)\n");
+           "               and extend the distance (if it is smaller than R*pi/m)\n");
+   fprintf(stderr, "       -r R  : threshold of rearrangement of LSP [%.1f]\n",
+           ALPHA);
+   fprintf(stderr, "               s.t. 0 <= R <= 1\n");
    fprintf(stderr, "       -h    : print this message\n");
    fprintf(stderr, "  infile:\n");
    fprintf(stderr, "       LSP (%s)                 [stdin]\n", FORMAT);
    fprintf(stderr, "  stdout:\n");
-   fprintf(stderr, "       frame number of irregular LSP or\n");
-   fprintf(stderr, "       rearranged LSP (%s) if -r option is specified\n",
-           FORMAT);
+   fprintf(stderr,
+           "       LSP (%s) or rearranged LSP (%s) if -r option is specified\n",
+           FORMAT, FORMAT);
+   fprintf(stderr, "  stderr:\n");
+   fprintf(stderr, "       irregular LSP and its frame number\n");
 #ifdef PACKAGE_VERSION
    fprintf(stderr, "\n");
    fprintf(stderr, " SPTK: version %s\n", PACKAGE_VERSION);
@@ -157,8 +163,8 @@ int main(int argc, char **argv)
    int m = ORDER, itype = ITYPE, otype = OTYPE, i, num;
    Boolean arrange = ARRANGE, gain = GAIN;
    FILE *fp = stdin;
-   double *lsp, *lsp1, alpha = ALPHA, sampling = SAMPLING;
-
+   double *lsp, alpha = ALPHA, sampling = SAMPLING, min;
+   void lsparrange(double *lsp, const int ord, double min);
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -185,15 +191,17 @@ int main(int argc, char **argv)
             break;
          case 'r':
             alpha = atof(*++argv);
-            if (alpha <= 0 || alpha >= 1) {
+            if (alpha < 0 || alpha > 1) {
                fprintf(stderr, "%s : Invalid option 'r'!\n", cmnd);
                usage(0);
             }
             --argc;
-            arrange = 1 - arrange;
             break;
          case 'k':
             gain = 1 - gain;
+            break;
+         case 'c':
+            arrange = 1 - arrange;
             break;
          case 'h':
             usage(0);
@@ -207,56 +215,69 @@ int main(int argc, char **argv)
    if (otype < 0)
       otype = itype;
 
-   lsp = dgetmem(m + m + gain);
-   lsp1 = lsp + m + gain;
-
-
+   lsp = dgetmem(m + gain);
    num = 0;
+   min = alpha * PI / m;
 
+   switch (itype) {
+   case 0:
+      min /= PI2;
+      break;
+   case 1:
+      break;
+   case 2:
+      min /= sampling;
+      break;
+   case 3:
+      min /= (sampling * 1000);
+      break;
+   }
 
-   while (freadf(lsp, sizeof(*lsp), m + gain, fp) == m + gain) {
-      if (itype == 0)
-         for (i = gain; i < m + gain; i++)
-            lsp1[i] = lsp[i] / PI2;
-      else if (itype == 1)
-         for (i = gain; i < m + gain; i++)
-            lsp1[i] = lsp[i];
-      else if (itype == 2 || itype == 3)
-         for (i = gain; i < m + gain; i++)
-            lsp1[i] = lsp[i] / sampling;
-
-      if (itype == 3)
-         for (i = gain; i < m + gain; i++)
-            lsp1[i] = lsp[i] / 1000;
-
-      if (lspcheck(lsp1 + gain, m) == -1) {
-         if (!arrange) {
-            fprintf(stderr, "[ unstable frame number : %d ]\n", num);
-            for (i = 0; i < m + gain; i++)
-               fprintf(stderr, "%f\n", lsp[i]);
-            fprintf(stderr, "\n");
-         }
+   while (freadf(lsp, sizeof(*lsp), m + gain, fp) == m + (int) gain) {
+      switch (itype) {
+      case 0:
+         for (i = gain; i < m + (int) gain; i++)
+            lsp[i] /= PI2;
+         break;
+      case 1:
+         break;
+      case 2:
+         for (i = gain; i < m + (int) gain; i++)
+            lsp[i] /= sampling;
+         break;
+      case 3:
+         for (i = gain; i < m + (int) gain; i++)
+            lsp[i] /= (sampling * 1000);
+         break;
       }
-      if (arrange)
-         lsparrange(lsp1 + gain, m, alpha, itype, sampling);
 
-      if (otype == 0)
-         for (i = gain; i < m + gain; i++)
-            lsp1[i] *= PI2;
-      else if (otype == 2 || otype == 3)
-         for (i = gain; i < m + gain; i++)
-            lsp1[i] *= sampling;
+      if (lspcheck(lsp + gain, m) == -1) {      /* unstable */
+         fprintf(stderr, "[No. %d] is unstable frame\n", num);
+      }
+      if (arrange) {
+         lsparrange(lsp + gain, m, min);
+      }
 
-      if (otype == 3)
-         for (i = gain; i < m + gain; i++)
-            lsp1[i] *= 1000;
+      switch (otype) {
+      case 0:
+         for (i = gain; i < m + (int) gain; i++)
+            lsp[i] *= PI2;
+         break;
+      case 1:
+         break;
+      case 2:
+         for (i = gain; i < m + (int) gain; i++)
+            lsp[i] *= sampling;
+         break;
+      case 3:
+         for (i = gain; i < m + (int) gain; i++)
+            lsp[i] *= (sampling * 1000);
+         break;
+      }
 
-      if (gain == 1)
-         lsp1[0] = lsp[0];
-
-      fwritef(lsp1, sizeof(*lsp1), m + gain, stdout);
+      fwritef(lsp, sizeof(*lsp), m + gain, stdout);
       num++;
    }
-   putchar('\n');
+
    return (0);
 }

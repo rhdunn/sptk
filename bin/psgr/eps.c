@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -43,7 +43,7 @@
 /* ----------------------------------------------------------------- */
 
 /********************************************************
-* $Id: eps.c,v 1.16 2011/12/07 09:22:11 mataki Exp $   *
+* $Id: eps.c,v 1.19 2012/12/21 11:27:36 mataki Exp $   *
 *            Setup Commands for EPSF                    *
 ********************************************************/
 
@@ -163,15 +163,13 @@ static void bbox(FILE * fp, int *xmin, int *ymin, int *xmax, int *ymax,
    char c;
    int n, x, y;
    int temp_xmin, temp_ymin, temp_xmax, temp_ymax;
-   int temp_plot_xmin, temp_plot_ymin, temp_plot_xmax, temp_plot_ymax;
+   int temp_plot_xmin, temp_plot_ymin = 0, temp_plot_xmax, temp_plot_ymax;
    int plot_xmin, plot_ymin, plot_xmax, plot_ymax;
    double unit_length;
    int rotate = 0;
    int ch = 30, cw = 30;
    float mag = 0.875;           /*  7/8  */
 
-   *xmin = *ymin = 9999;
-   *xmax = *ymax = 0;
    temp_xmin = temp_ymin = 9999;
    temp_xmax = temp_ymax = 0;
    plot_xmin = xleng;
@@ -292,7 +290,7 @@ static void bbox(FILE * fp, int *xmin, int *ymin, int *xmax, int *ymax,
 void epsf_setup(FILE * fp, float shrink, int xoffset, int yoffset,
                 struct bbmargin bbm, int ncopy)
 {
-   int xmin, ymin, xmax, ymax;
+   int xmin = 9999, ymin = 9999, xmax = 0, ymax = 0;
 
    if (!psmode)
       bbox(fp, &xmin, &ymin, &xmax, &ymax, shrink, xoffset, yoffset, bbm);

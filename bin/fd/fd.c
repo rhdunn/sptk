@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -69,7 +69,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: fd.c,v 1.23 2011/04/27 13:46:39 mataki Exp $";
+static char *rcs_id = "$Id: fd.c,v 1.27 2012/12/21 11:27:32 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -118,27 +118,29 @@ void usage(int status)
    fprintf(stderr, "       -ent  : number of data in each line [%d]\n", ENTRY);
    fprintf(stderr, "       +type : data type                   [c]\n");
    fprintf(stderr,
-           "                c  (char, %dbyte)         C  (unsigned char, %dbyte)\n",
-           sizeof(char), sizeof(unsigned char));
+           "                c  (char, %lubyte)         C  (unsigned char, %lubyte)\n",
+           (unsigned long) sizeof(char), (unsigned long) sizeof(unsigned char));
    fprintf(stderr,
-           "                s  (short, %dbyte)        S  (unsigned short, %dbyte)\n",
-           sizeof(short), sizeof(unsigned short));
+           "                s  (short, %lubyte)        S  (unsigned short, %lubyte)\n",
+           (unsigned long) sizeof(short),
+           (unsigned long) sizeof(unsigned short));
    fprintf(stderr,
            "                i3 (int, 3byte)          I3 (unsigned int, 3byte)\n");
    fprintf(stderr,
-           "                i  (int, %dbyte)          I  (unsigned int, %dbyte)\n",
-           sizeof(int), sizeof(unsigned int));
+           "                i  (int, %lubyte)          I  (unsigned int, %lubyte)\n",
+           (unsigned long) sizeof(int), (unsigned long) sizeof(unsigned int));
    fprintf(stderr,
-           "                l  (long, %dbyte)         L  (unsigned long, %dbyte)\n",
-           sizeof(long), sizeof(unsigned long));
+           "                l  (long, %lubyte)         L  (unsigned long, %lubyte)\n",
+           (unsigned long) sizeof(long), (unsigned long) sizeof(unsigned long));
    fprintf(stderr,
-           "                le (long long, %dbyte)    LE (unsigned long long, %dbyte)\n",
-           sizeof(long long), sizeof(unsigned long long));
+           "                le (long long, %lubyte)    LE (unsigned long long, %lubyte)\n",
+           (unsigned long) sizeof(long long),
+           (unsigned long) sizeof(unsigned long long));
    fprintf(stderr,
-           "                f  (float, %dbyte)        d  (double, %dbyte)\n",
-           sizeof(float), sizeof(double));
-   fprintf(stderr,
-           "                de (long double, %dbyte)\n", sizeof(long double));
+           "                f  (float, %lubyte)        d  (double, %lubyte)\n",
+           (unsigned long) sizeof(float), (unsigned long) sizeof(double));
+   fprintf(stderr, "                de (long double, %lubyte)\n",
+           (unsigned long) sizeof(long double));
    fprintf(stderr, "       %%form : print format(printf style) [N/A]\n");
    fprintf(stderr, "       -h    : print this message\n");
    fprintf(stderr, "  infile:\n");
@@ -196,6 +198,10 @@ int main(int argc, char **argv)
             usage(1);
          }
       } else if (*s == '+') {
+         if (*(s + 2) == '%') {
+            strcpy(format, s + 2);
+            ff = 1;
+         }
          c = type = *++s;
          switch (c) {
          case 'b':

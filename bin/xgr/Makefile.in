@@ -47,7 +47,7 @@ PROGRAMS = $(bin_PROGRAMS)
 am_xgr_OBJECTS = xgr-plot.$(OBJEXT) xgr-window.$(OBJEXT) \
 	xgr-xgr.$(OBJEXT)
 xgr_OBJECTS = $(am_xgr_OBJECTS)
-xgr_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+xgr_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 xgr_LINK = $(CCLD) $(xgr_CFLAGS) $(CFLAGS) $(xgr_LDFLAGS) $(LDFLAGS) \
 	-o $@
 DEFAULT_INCLUDES = -I.@am__isrc@
@@ -210,7 +210,7 @@ xgr_SOURCES = config.h \
 
 xgr_CFLAGS = $(X_CFLAGS)
 xgr_LDFLAGS = $(X_LIBS)
-xgr_LDADD = $(top_srcdir)/lib/libSPTK.a -lX11
+xgr_LDADD = $(top_builddir)/lib/libSPTK.a -lX11
 all: all-am
 
 .SUFFIXES:

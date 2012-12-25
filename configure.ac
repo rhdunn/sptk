@@ -1,11 +1,11 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT(SPTK, 3.5, http://sourceforge.net/projects/sp-tk/)
+AC_INIT(SPTK, 3.6, http://sourceforge.net/projects/sp-tk/)
 AC_CONFIG_AUX_DIR([config])
 AC_COPYRIGHT(Copyright 1984-2007 Tokyo Institute of Technology)
-AC_COPYRIGHT(Copyright 1996-2011 Nagoya Institute of Technology)
-AM_INIT_AUTOMAKE(SPTK, 3.5, nostdinc no-installinfo no-installman)
+AC_COPYRIGHT(Copyright 1996-2012 Nagoya Institute of Technology)
+AM_INIT_AUTOMAKE(SPTK, 3.6, nostdinc no-installinfo no-installman)
 AC_SUBST(PACKAGE_NAME)
 AC_SUBST(PACKAGE_VERSION)
 
@@ -194,6 +194,7 @@ AC_CONFIG_FILES([Makefile
                  bin/histogram/Makefile
                  bin/idct/Makefile
                  bin/ifft/Makefile
+                 bin/ifftr/Makefile
                  bin/ifft2/Makefile
                  bin/ignorm/Makefile
                  bin/impulse/Makefile
@@ -222,6 +223,7 @@ AC_CONFIG_FILES([Makefile
                  bin/mglsadf/Makefile
                  bin/minmax/Makefile
                  bin/mlpg/Makefile
+                 bin/mlsacheck/Makefile
                  bin/mlsadf/Makefile
                  bin/msvq/Makefile
                  bin/nan/Makefile
@@ -245,7 +247,9 @@ AC_CONFIG_FILES([Makefile
                  bin/spec/Makefile
                  bin/step/Makefile
                  bin/swab/Makefile
+                 bin/symmetrize/Makefile
                  bin/train/Makefile
+                 bin/transpose/Makefile
                  bin/uels/Makefile
                  bin/ulaw/Makefile
                  bin/us/Makefile

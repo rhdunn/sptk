@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -64,7 +64,7 @@
 *                           le (long long)     LE (unsigned long long)   *
 *                           f (float)          d  (double)               *
 *                           de (long double)   a  (ascii)                *
-*               +aN      :  specify the column number N       [1]        *
+*                           aN (ascii w/ column number N;N=1 by default) *
 *               -r       :  specify rounding off when a real number      *
 *                           is substituted for a integer      [FALSE]    *
 *               -o       :  clip by minimum and maximum of               *
@@ -76,7 +76,7 @@
 *                                                                        *
 *************************************************************************/
 
-static char *rcs_id = "$Id: x2x.c,v 1.37 2011/07/28 09:22:58 mataki Exp $";
+static char *rcs_id = "$Id: x2x.c,v 1.45 2012/12/21 11:27:38 mataki Exp $";
 
 
 /*  Standard C Libraries  */
@@ -110,6 +110,7 @@ static char *rcs_id = "$Id: x2x.c,v 1.37 2011/07/28 09:22:58 mataki Exp $";
 #define FORM_ULONG  "%u"
 #define FORM_LLONG  "%lld"
 #define FORM_ULLONG "%llu"
+#define FORM_FLOAT  "%g"
 #define FORM_LDBL   "%Lg"
 #define INT3_MAX   8388607
 #define INT3_MIN   (-8388608)
@@ -139,30 +140,31 @@ void usage(int status)
    fprintf(stderr,
            "       +type2  : output data type                            [type1]\n");
    fprintf(stderr,
-           "                 c  (char, %dbyte)         C  (unsigned char, %dbyte)\n",
-           sizeof(char), sizeof(unsigned char));
+           "                 c  (char, %lubyte)         C  (unsigned char, %lubyte)\n",
+           (unsigned long) sizeof(char), (unsigned long) sizeof(unsigned char));
    fprintf(stderr,
-           "                 s  (short, %dbyte)        S  (unsigned short, %dbyte)\n",
-           sizeof(short), sizeof(unsigned short));
+           "                 s  (short, %lubyte)        S  (unsigned short, %lubyte)\n",
+           (unsigned long) sizeof(short),
+           (unsigned long) sizeof(unsigned short));
    fprintf(stderr,
-           "                 i  (int, %dbyte)          I  (unsigned int, %dbyte)\n",
-           sizeof(int), sizeof(unsigned int));
+           "                 i  (int, %lubyte)          I  (unsigned int, %lubyte)\n",
+           (unsigned long) sizeof(int), (unsigned long) sizeof(unsigned int));
    fprintf(stderr,
            "                 i3 (int, 3byte)          I3 (unsigned int, 3byte)\n");
    fprintf(stderr,
-           "                 l  (long, %dbyte)         L  (unsigned long, %dbyte)\n",
-           sizeof(long), sizeof(unsigned long));
+           "                 l  (long, %lubyte)         L  (unsigned long, %lubyte)\n",
+           (unsigned long) sizeof(long), (unsigned long) sizeof(unsigned long));
    fprintf(stderr,
-           "                 le (long long, %dbyte)    LE (unsigned long long, %dbyte)\n",
-           sizeof(long long), sizeof(unsigned long long));
+           "                 le (long long, %lubyte)    LE (unsigned long long, %lubyte)\n",
+           (unsigned long) sizeof(long long),
+           (unsigned long) sizeof(unsigned long long));
    fprintf(stderr,
-           "                 f  (float, %dbyte)        d  (double, %dbyte)\n",
-           sizeof(float), sizeof(double));
+           "                 f  (float, %lubyte)        d  (double, %lubyte)\n",
+           (unsigned long) sizeof(float), (unsigned long) sizeof(double));
+   fprintf(stderr, "                 de (long double, %lubyte) a  (ascii)\n",
+           (unsigned long) sizeof(long double));
    fprintf(stderr,
-           "                 de (long double, %dbyte) a  (ascii)\n",
-           sizeof(long double));
-   fprintf(stderr,
-           "       +aN     : specify the column number N                 [%d]\n",
+           "                 aN (ascii with column number N, defalut is N=%d)\n",
            COL);
    fprintf(stderr,
            "       -r      : specify rounding off when a real number\n");
@@ -201,12 +203,12 @@ double r = 0.0;
 
 int main(int argc, char **argv)
 {
-   char c1 = 'f', c2 = 'f', *form;
+   char c1 = 'f', c2 = 'f', *form = NULL;
    long double x;
    size_t size1 = 0, size2 = 0;
    int i = 1, col = COL, n;
    FILE *fp = stdin;
-   Boolean round = ROUND, clip = CLIP;
+   Boolean round = ROUND, clip = CLIP, form_fix = 0;
    void x2x(void *x1, void *x2, char c1, char c2, int clip);
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
@@ -370,40 +372,74 @@ int main(int argc, char **argv)
                } else {
                   c2 = 'a';
                   size2 = -1;
-                  if (*(*argv + 1) != '\0') {
-                     if (sscanf(*argv + 1, "%d", &col) == 0)
-                        col = COL;
-                     while (*(*argv + 1) != '\0')
+                  if (*(*argv + 1) != '\0') {   /* ex. +fa... */
+                     if (isdigit(*(*argv + 1))) {       /* ex. +fa5... */
+                        char *ptr;
+                        char *subst = NULL;
+                        ptr = strchr(*argv + 2, '%');   /* search '%' */
+                        if (ptr == NULL) {      /* ex. +fa5 ('%' is not found) */
+                           if (sscanf(*argv + 1, "%d", &col) == 0) {
+                              col = COL;
+                           }
+                        } else {        /* ex. +fa5%.10f ('%' is found) */
+                           subst =
+                               getmem(strlen(*argv + 1) - strlen(ptr) + 1,
+                                      sizeof(char));
+                           form = getmem(strlen(ptr) + 1, sizeof(char));
+                           strncpy(subst, *argv + 1, strlen(*argv + 1) - strlen(ptr));  /* 5 (column num.) */
+                           strncpy(form, ptr, strlen(ptr));     /* %.10f */
+                           if (sscanf(subst, "%d", &col) == 0) {
+                              col = COL;
+                           }
+                           form_fix = 1;        /* format is fixed */
+                        }
+                        if (subst != NULL) {
+                           free(subst);
+                        }
+                     } else if (*(*argv + 1) == '%') {  /* ex. +fa%.10f (no column num.) */
+                        form_fix = 1;   /* format is fixed */
+                        form = getmem((strlen(*argv + 1) + 1), sizeof(char));
+                        strcpy(form, *argv + 1);        /* %.10f */
+                     }
+                     while (*(*argv + 1) != '\0') {
                         (*argv)++;
+                     }
                   }
-                  switch (c1) {
-                  case 'U':
-                     form = getmem((strlen(FORM_ULLONG) + 1), sizeof(char));
-                     strcpy(form, FORM_ULLONG);
-                     break;
-                  case 'u':
-                     form = getmem((strlen(FORM_LLONG) + 1), sizeof(char));
-                     strcpy(form, FORM_LLONG);
-                     break;
-                  case 'S':
-                  case 'I':
-                  case 'L':
-                  case 'C':
-                  case 'T':
-                     form = getmem((strlen(FORM_ULONG) + 1), sizeof(char));
-                     strcpy(form, FORM_ULONG);
-                     break;
-                  case 's':
-                  case 'i':
-                  case 'l':
-                  case 'c':
-                  case 't':
-                     form = getmem((strlen(FORM_LONG) + 1), sizeof(char));
-                     strcpy(form, FORM_LONG);
-                     break;
-                  default:
-                     form = getmem((strlen(FORM_LDBL) + 1), sizeof(char));
-                     strcpy(form, FORM_LDBL);
+                  if (form_fix != 1) {
+                     switch (c1) {
+                     case 'U':
+                        form = getmem((strlen(FORM_ULLONG) + 1), sizeof(char));
+                        strcpy(form, FORM_ULLONG);
+                        break;
+                     case 'u':
+                        form = getmem((strlen(FORM_LLONG) + 1), sizeof(char));
+                        strcpy(form, FORM_LLONG);
+                        break;
+                     case 'S':
+                     case 'I':
+                     case 'L':
+                     case 'C':
+                     case 'T':
+                        form = getmem((strlen(FORM_ULONG) + 1), sizeof(char));
+                        strcpy(form, FORM_ULONG);
+                        break;
+                     case 's':
+                     case 'i':
+                     case 'l':
+                     case 'c':
+                     case 't':
+                        form = getmem((strlen(FORM_LONG) + 1), sizeof(char));
+                        strcpy(form, FORM_LONG);
+                        break;
+                     case 'f':
+                     case 'd':
+                        form = getmem((strlen(FORM_FLOAT) + 1), sizeof(char));
+                        strcpy(form, FORM_FLOAT);
+                        break;
+                     default:
+                        form = getmem((strlen(FORM_LDBL) + 1), sizeof(char));
+                        strcpy(form, FORM_LDBL);
+                     }
                   }
                }
                break;
@@ -483,9 +519,13 @@ int main(int argc, char **argv)
             x2x(&x, &x, c1, 'v', clip);
             switch (c1) {
             case 'v':
+               printf(form, (long double) x);
+               break;
             case 'd':
+               printf(form, (double) x);
+               break;
             case 'f':
-               printf(form, x);
+               printf(form, (float) x);
                break;
             case 'U':
                printf(form, (unsigned long long) x);
@@ -587,7 +627,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'short'!\n",
                     cmnd);
          xl = ((xl < SHRT_MIN) ? SHRT_MIN : ((xl > SHRT_MAX) ? SHRT_MAX : xl));
-         xul = ((xul > SHRT_MAX) ? SHRT_MAX : xl);
+         xul = ((xul > SHRT_MAX) ? SHRT_MAX : xul);
          xd = ((xd < SHRT_MIN) ? SHRT_MIN : ((xd > SHRT_MAX) ? SHRT_MAX : xd));
          break;
       case 'i':
@@ -597,7 +637,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'int'!\n",
                     cmnd);
          xl = ((xl < INT_MIN) ? INT_MIN : ((xl > INT_MAX) ? INT_MAX : xl));
-         xul = ((xul > INT_MAX) ? INT_MAX : xl);
+         xul = ((xul > INT_MAX) ? INT_MAX : xul);
          xd = ((xd < INT_MIN) ? INT_MIN : ((xd > INT_MAX) ? INT_MAX : xd));
          break;
       case 'l':
@@ -607,7 +647,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'long'!\n",
                     cmnd);
          xl = ((xl < LONG_MIN) ? LONG_MIN : ((xl > LONG_MAX) ? LONG_MAX : xl));
-         xul = ((xul > LONG_MAX) ? LONG_MAX : xl);
+         xul = ((xul > LONG_MAX) ? LONG_MAX : xul);
          xd = ((xd < LONG_MIN) ? LONG_MIN : ((xd > LONG_MAX) ? LONG_MAX : xd));
          break;
       case 'u':
@@ -626,7 +666,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'unsigned short'!\n",
                     cmnd);
          xl = ((xl < 0) ? 0 : ((xl > USHRT_MAX) ? USHRT_MAX : xl));
-         xul = ((xul > USHRT_MAX) ? USHRT_MAX : xl);
+         xul = ((xul > USHRT_MAX) ? USHRT_MAX : xul);
          xd = ((xd < 0.0) ? 0.0 : ((xd > USHRT_MAX) ? USHRT_MAX : xd));
          break;
       case 'I':
@@ -636,7 +676,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'unsigned int'!\n",
                     cmnd);
          xl = ((xl < 0) ? 0 : ((xl > UINT_MAX) ? UINT_MAX : xl));
-         xul = ((xul > UINT_MAX) ? UINT_MAX : xl);
+         xul = ((xul > UINT_MAX) ? UINT_MAX : xul);
          xd = ((xd < 0.0) ? 0.0 : ((xd > UINT_MAX) ? UINT_MAX : xd));
          break;
       case 'L':
@@ -646,7 +686,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'unsigned long'!\n",
                     cmnd);
          xl = ((xl < 0) ? 0 : ((xl > ULONG_MAX) ? ULONG_MAX : xl));
-         xul = ((xul > ULONG_MAX) ? ULONG_MAX : xl);
+         xul = ((xul > ULONG_MAX) ? ULONG_MAX : xul);
          xd = ((xd < 0.0) ? 0.0 : ((xd > ULONG_MAX) ? ULONG_MAX : xd));
          break;
       case 'U':
@@ -690,7 +730,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'char'!\n",
                     cmnd);
          xl = ((xl < CHAR_MIN) ? CHAR_MIN : ((xl > CHAR_MAX) ? CHAR_MAX : xl));
-         xul = ((xul > CHAR_MAX) ? CHAR_MAX : xl);
+         xul = ((xul > CHAR_MAX) ? CHAR_MAX : xul);
          xd = ((xd < CHAR_MIN) ? CHAR_MIN : ((xd > CHAR_MAX) ? CHAR_MAX : xd));
          break;
       case 'C':
@@ -700,7 +740,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'unsigned char'!\n",
                     cmnd);
          xl = ((xl < 0) ? 0 : ((xl > UCHAR_MAX) ? UCHAR_MAX : xl));
-         xul = ((xul > UCHAR_MAX) ? UCHAR_MAX : xl);
+         xul = ((xul > UCHAR_MAX) ? UCHAR_MAX : xul);
          xd = ((xd < 0.0) ? 0.0 : ((xd > UCHAR_MAX) ? UCHAR_MAX : xd));
          break;
       case 't':
@@ -710,7 +750,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'int(3byte)'!\n",
                     cmnd);
          xl = ((xl < INT3_MIN) ? INT3_MIN : ((xl > INT3_MAX) ? INT3_MAX : xl));
-         xul = ((xul > INT3_MAX) ? INT3_MAX : xl);
+         xul = ((xul > INT3_MAX) ? INT3_MAX : xul);
          xd = ((xd < INT3_MIN) ? INT3_MIN : ((xd > INT3_MAX) ? INT3_MAX : xd));
          break;
       case 'T':
@@ -720,7 +760,7 @@ void x2x(void *x1, void *x2, char c1, char c2, int clip)
                     "%s : warning: input data is over the range of type 'unsigned int(3byte)'!\n",
                     cmnd);
          xl = ((xl < 0) ? 0 : ((xl > UINT3_MAX) ? UINT3_MAX : xl));
-         xul = ((xul > UINT3_MAX) ? UINT3_MAX : xl);
+         xul = ((xul > UINT3_MAX) ? UINT3_MAX : xul);
          xd = ((xd < 0.0) ? 0.0 : ((xd > UINT3_MAX) ? UINT3_MAX : xd));
          break;
       }

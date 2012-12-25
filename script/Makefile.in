@@ -151,8 +151,8 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-bin_SCRIPTS = bell.sh glogsp.sh grlogsp.sh gwave.sh mgc2mgclsp.sh mgclsp2mgc.sh raw2wav.sh wav2raw.sh
-EXTRA_DIST = bell.in glogsp.in grlogsp.in gwave.in mgc2mgclsp.in mgclsp2mgc.in raw2wav.in wav2raw.in
+bin_SCRIPTS = bell.sh gseries.sh glogsp.sh grlogsp.sh gwave.sh mgc2mgclsp.sh mgclsp2mgc.sh raw2wav.sh wav2raw.sh
+EXTRA_DIST = bell.in gseries.in glogsp.in grlogsp.in gwave.in mgc2mgclsp.in mgclsp2mgc.in raw2wav.in wav2raw.in
 CLEANFILES = $(bin_SCRIPTS)
 replace_path = sed -e 's,@binpath@,$(DESTDIR)$(bindir),g' \
 	            -e 's,@libpath@,$(DESTDIR)$(libdir),g' \

@@ -1,6 +1,7 @@
+
 ## Process this file with automake to produce Makefile.in
 ##
-## $Id: Makefile.am,v 1.9 2011/12/07 12:28:33 uratec Exp $
+## $Id: Makefile.am,v 1.15 2012/09/09 08:44:55 okdtmhr Exp $
 INCLUDES=-I$(top_srcdir)/include
 lib_LIBRARIES = libSPTK.a
 libSPTK_a_SOURCES = agexp.c \
@@ -11,7 +12,7 @@ libSPTK_a_SOURCES = agexp.c \
 	      getmem.c \
 	      gexp.c \
 	      glog.c \
-	      ifftr.c \
+	      invert.c \
 	      matrix.c \
 	      movem.c \
 	      mseq.c \
@@ -29,6 +30,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/c2ir/_c2ir.c \
 		$(top_srcdir)/bin/c2sp/_c2sp.c \
 		$(top_srcdir)/bin/clip/_clip.c \
+		$(top_srcdir)/bin/dct/_dct.c \
 		$(top_srcdir)/bin/df2/_df2.c \
 		$(top_srcdir)/bin/dfs/_dfs.c \
 		$(top_srcdir)/bin/fft/_fft.c \
@@ -45,6 +47,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/grpdelay/_grpdelay.c \
 		$(top_srcdir)/bin/histogram/_histogram.c \
 		$(top_srcdir)/bin/ifft/_ifft.c \
+		$(top_srcdir)/bin/ifftr/_ifftr.c \
 		$(top_srcdir)/bin/ifft2/_ifft2.c \
 		$(top_srcdir)/bin/ignorm/_ignorm.c \
 		$(top_srcdir)/bin/imsvq/_imsvq.c \
@@ -79,6 +82,7 @@ nodist_libSPTK_a_SOURCES = $(top_srcdir)/include/SPTK.h \
 		$(top_srcdir)/bin/rmse/_rmse.c \
 		$(top_srcdir)/bin/root_pol/_root_pol.c \
 		$(top_srcdir)/bin/smcep/_smcep.c \
+		$(top_srcdir)/bin/transpose/_transpose.c \
 		$(top_srcdir)/bin/uels/_uels.c \
 		$(top_srcdir)/bin/ulaw/_ulaw.c \
 		$(top_srcdir)/bin/vq/_vq.c \

@@ -46,7 +46,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_df2_OBJECTS = _df2.$(OBJEXT) df2.$(OBJEXT)
 df2_OBJECTS = $(am_df2_OBJECTS)
-df2_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+df2_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -166,7 +166,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 df2_SOURCES = _df2.c df2.c 
-df2_LDADD = $(top_srcdir)/lib/libSPTK.a
+df2_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

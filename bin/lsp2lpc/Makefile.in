@@ -46,7 +46,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_lsp2lpc_OBJECTS = _lsp2lpc.$(OBJEXT) lsp2lpc.$(OBJEXT)
 lsp2lpc_OBJECTS = $(am_lsp2lpc_OBJECTS)
-lsp2lpc_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+lsp2lpc_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -166,7 +166,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 lsp2lpc_SOURCES = _lsp2lpc.c lsp2lpc.c 
-lsp2lpc_LDADD = $(top_srcdir)/lib/libSPTK.a
+lsp2lpc_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

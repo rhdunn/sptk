@@ -25,7 +25,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -59,7 +59,11 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-static char *rcs_id = "$Id: sigproc.c,v 1.2 2011/10/31 09:33:49 mataki Exp $";
+/****************************************************************
+
+    $Id: sigproc.c,v 1.4 2012/12/21 11:27:36 mataki Exp $
+
+****************************************************************/
 
 #include <math.h>
 #include <stdlib.h>

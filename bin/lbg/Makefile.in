@@ -46,7 +46,7 @@ binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
 am_lbg_OBJECTS = _lbg.$(OBJEXT) lbg.$(OBJEXT)
 lbg_OBJECTS = $(am_lbg_OBJECTS)
-lbg_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+lbg_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -166,7 +166,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
 lbg_SOURCES = _lbg.c lbg.c 
-lbg_LDADD = $(top_srcdir)/lib/libSPTK.a
+lbg_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:

@@ -1,7 +1,7 @@
 ## Process this file with automake to produce Makefile.in
 ##
-## $Id: Makefile.am,v 1.1 2008/11/10 00:49:05 tatsuyaito Exp $
+## $Id: Makefile.am,v 1.3 2012/12/17 04:06:56 mataki Exp $
 INCLUDES = -I$(top_srcdir)/include
 bin_PROGRAMS = dct
-dct_SOURCES = dct.c
-dct_LDADD = $(top_srcdir)/lib/libSPTK.a
+dct_SOURCES = dct.c _dct.c
+dct_LDADD = $(top_builddir)/lib/libSPTK.a

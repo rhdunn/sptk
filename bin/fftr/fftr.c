@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -65,7 +65,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: fftr.c,v 1.24 2011/04/27 13:46:39 mataki Exp $";
+static char *rcs_id = "$Id: fftr.c,v 1.27 2012/12/21 11:27:33 mataki Exp $";
 
 
 /* Standard C Libraries */
@@ -129,9 +129,8 @@ int main(int argc, char *argv[])
 {
    FILE *fp;
    char *s, *infile = NULL, c;
-   int size = SIZE, nout = 0, nd = -1, out = ' ';
-   int dft(FILE * fp, const int size, const int nd, const int out,
-           const int nout);
+   int size = SIZE, nout = 0, k, nd = -1, out = ' ';
+   double *x, *y;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -184,26 +183,18 @@ int main(int argc, char *argv[])
    }
 
    nout = (nout) ? size / 2 + 1 : size;
+
+   fp = stdin;
+
    if (infile) {
       fp = getfp(infile, "rb");
-      dft(fp, size, nd, out, nout);
-      fclose(fp);
-   } else
-      dft(stdin, size, nd, out, nout);
-
-   return 0;
-}
-
-int dft(FILE * fp, const int size, const int nd, const int out, const int nout)
-{
-   double *x, *y;
-   int k;
+   }
 
    x = dgetmem(size + size);
    y = x + size;
 
    while (!feof(fp)) {
-      fillz(x, size, sizeof(double));
+      fillz(x, size, sizeof(*x));
       if (freadf(x, sizeof(*x), nd, fp) == 0)
          break;
       fftr(x, y, size);
@@ -218,5 +209,10 @@ int dft(FILE * fp, const int size, const int nd, const int out, const int nout)
       if (out == ' ' || out == 'I')
          fwritef(y, sizeof(*y), nout, stdout);
    }
+
+   if (infile) {
+      fclose(fp);
+   }
+
    return (0);
 }

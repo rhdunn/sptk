@@ -44,9 +44,9 @@ CONFIG_CLEAN_FILES =
 am__installdirs = "$(DESTDIR)$(bindir)"
 binPROGRAMS_INSTALL = $(INSTALL_PROGRAM)
 PROGRAMS = $(bin_PROGRAMS)
-am_dct_OBJECTS = dct.$(OBJEXT)
+am_dct_OBJECTS = dct.$(OBJEXT) _dct.$(OBJEXT)
 dct_OBJECTS = $(am_dct_OBJECTS)
-dct_DEPENDENCIES = $(top_srcdir)/lib/libSPTK.a
+dct_DEPENDENCIES = $(top_builddir)/lib/libSPTK.a
 DEFAULT_INCLUDES = -I.@am__isrc@
 depcomp = $(SHELL) $(top_srcdir)/config/depcomp
 am__depfiles_maybe = depfiles
@@ -165,8 +165,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 INCLUDES = -I$(top_srcdir)/include
-dct_SOURCES = dct.c
-dct_LDADD = $(top_srcdir)/lib/libSPTK.a
+dct_SOURCES = dct.c _dct.c
+dct_LDADD = $(top_builddir)/lib/libSPTK.a
 all: all-am
 
 .SUFFIXES:
@@ -233,6 +233,7 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/_dct.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dct.Po@am__quote@
 
 .c.o:

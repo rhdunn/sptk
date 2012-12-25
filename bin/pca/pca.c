@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2011  Nagoya Institute of Technology          */
+/*                1996-2012  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -53,10 +53,9 @@
 *                                                                                *
 *       options:                                                                 *
 *                -l L  : dimentionality of input/output vectors      [3]         *
-*                -t t  : number of input vectors                     [EOF]       *
 *                -n N  : number of output principal componets        [2]         *
-*                -i I  : number of iteration of jacobi method        [10000]     *
-*                -e e  : threshold of convergence of jacobi method   [0.000001]  *
+*                -i I  : number of iteration of Jacobi method        [10000]     *
+*                -e e  : threshold of convergence of Jacobi method   [0.000001]  *
 *                -v    : output eigenvectors and mean vector         [FALSE]     *
 *                -V fn : output eigenvalues and contribution ratio               *
 *                        (output filename = fn)                      [NULL]      *
@@ -83,7 +82,7 @@
 *                                                                                *
 *********************************************************************************/
 
-static char *rcs_id = "$Id: pca.c,v 1.15 2011/12/12 12:51:28 mataki Exp $";
+static char *rcs_id = "$Id: pca.c,v 1.19 2012/12/18 12:41:08 mataki Exp $";
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -115,6 +114,11 @@ typedef enum { FALSE = -1, TRUE = 1 } BOOL;
 /* Command Name */
 char *cmnd;
 
+typedef struct _float_list {
+   float *f;
+   struct _float_list *next;
+} float_list;
+
 void usage(int status)
 {
    fprintf(stderr, "\n");
@@ -127,15 +131,13 @@ void usage(int status)
            "       -l L  : dimentionality of input vectors               [%d]\n",
            LENG);
    fprintf(stderr,
-           "       -t t  : number of input vectors                       [EOF]\n");
-   fprintf(stderr,
            "       -n N  : dimentionality of output vectors              [%d]\n",
            PRICOMP_ORDER);
    fprintf(stderr,
-           "       -i I  : iteration of jacobi method                    [%d]\n",
+           "       -i I  : iteration of Jacobi method                    [%d]\n",
            ITEMAX);
    fprintf(stderr,
-           "       -e e  : threshold of convergence of jacobi method     [%f]\n",
+           "       -e e  : threshold of convergence of Jacobi method     [%f]\n",
            EPS);
    fprintf(stderr,
            "       -v    : output eigen vectors and mean vector          [FALSE]\n");
@@ -161,7 +163,7 @@ double **malloc_matrix(int n)
 {
    double **m;
    double *mtmp;
-   int i, j;
+   int i;
 
    mtmp = dgetmem(n * n);
    if ((m = (double **) malloc(sizeof(double *) * n)) == NULL) {
@@ -182,7 +184,7 @@ int jacobi(double **m, int n, double eps, double *e_val, double **e_vec,
    int ret;
    double **a;
    double max_e;
-   int r, c;
+   int r = 0, c = 0;
    double a1, a2, a3;
    double co, si;
    double w1, w2;
@@ -305,7 +307,7 @@ int jacobi(double **m, int n, double eps, double *e_val, double **e_vec,
 int main(int argc, char *argv[])
 {
    FILE *fp = stdin, *fp_eigen = NULL;
-   int i, j, k, n = PRICOMP_ORDER, leng = LENG, total = -1, ispipe;
+   int i, j, k, n = PRICOMP_ORDER, leng = LENG, total = -1;
    BOOL out_evecFlg = FALSE, out_evalFlg = FALSE;
    double sum;
    double *buf = NULL;
@@ -315,6 +317,7 @@ int main(int argc, char *argv[])
    double **e_vec = NULL, *e_val = NULL;        /* eigenvector and eigenvalue */
    double *cont_rate = NULL;    /* contribution rate */
    double jacobi_conv;
+   float_list *top, *cur, *prev, *tmpf, *tmpff;
 
    if ((cmnd = strrchr(argv[0], '/')) == NULL)
       cmnd = argv[0];
@@ -326,10 +329,6 @@ int main(int argc, char *argv[])
          switch (*(*argv + 1)) {
          case 'l':
             leng = atoi(*++argv);
-            --argc;
-            break;
-         case 't':
-            total = atoi(*++argv);
             --argc;
             break;
          case 'n':
@@ -361,33 +360,42 @@ int main(int argc, char *argv[])
       } else
          fp = getfp(*argv, "rb");
 
-   /* -- Count number of input vectors -- */
-   if (total == -1) {
-      ispipe = fseek(fp, 0L, SEEK_END); /* set current position to EOF */
-      total = (int) (ftell(fp) / (double) leng / (double) sizeof(float));
-      rewind(fp);               /* return current position to the front */
-
-      if (ispipe != 0) {        /* input vectors is from standard input via pipe */
-         fprintf(stderr,
-                 "\n %s (Error) -t option must be specified for the standard input via pipe.\n",
-                 cmnd);
-         usage(EXIT_FAILURE);
-      }
-   }
-
    if (n > leng) {
       fprintf(stderr, "\n %s (Error) output number of pricipal component"
               " must be less than length of vector.\n", cmnd);
       usage(EXIT_FAILURE);
    }
 
+   /* -- Count number of input vectors and read -- */
+   buf = dgetmem(leng);
+   top = prev = (float_list *) malloc(sizeof(float_list));
+   top->f = fgetmem(leng);
+   total = 0;
+   prev->next = NULL;
+   while (freadf(buf, sizeof(*buf), leng, fp) == leng) {
+      cur = (float_list *) malloc(sizeof(float_list));
+      cur->f = fgetmem(leng);
+      for (i = 0; i < leng; i++) {
+         cur->f[i] = (float) buf[i];
+      }
+      total++;
+      prev->next = cur;
+      cur->next = NULL;
+      prev = cur;
+   }
+   free(buf);
+   buf = dgetmem(total * leng);
+   for (i = 0, tmpf = top->next; tmpf != NULL; i++, tmpf = tmpff) {
+      for (j = 0; j < leng; j++) {
+         buf[i * leng + j] = tmpf->f[j];
+      }
+      tmpff = tmpf->next;
+      free(tmpf->f);
+      free(tmpf);
+   }
+   free(top);
+
 /* PCA */
-   /* allocate memory for input vectors */
-   buf = dgetmem(leng * total);
-
-   /* read input vectors */
-   freadf(buf, sizeof(*buf), total * leng, fp);
-
    /* allocate memory for mean vectors and covariance matrix */
    mean = dgetmem(leng);
    var = malloc_matrix(leng);
@@ -437,16 +445,16 @@ int main(int argc, char *argv[])
 
    /* output mean vector and eigen vectors */
    if (out_evecFlg == TRUE) {
-      fwritef(mean, sizeof(double), leng, stdout);
+      fwritef(mean, sizeof(*mean), leng, stdout);
       for (i = 0; i < n; i++)
-         fwritef(e_vec[i], sizeof(double), leng, stdout);
+         fwritef(e_vec[i], sizeof(*(e_vec[i])), leng, stdout);
    }
 
    /* output eigen values and contribution ratio */
    if (out_evalFlg == TRUE) {
       for (i = 0; i < n; i++) {
-         fwritef(e_val + i, sizeof(double), 1, fp_eigen);
-         fwritef(cont_rate + i, sizeof(double), 1, fp_eigen);
+         fwritef(e_val + i, sizeof(*e_val), 1, fp_eigen);
+         fwritef(cont_rate + i, sizeof(*cont_rate), 1, fp_eigen);
       }
       fclose(fp_eigen);
    }
