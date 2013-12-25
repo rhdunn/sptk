@@ -31,7 +31,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2012  Nagoya Institute of Technology          */
+/*                1996-2013  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -67,7 +67,7 @@
 
 /****************************************************************
 
-    $Id: swipe.c,v 1.8 2012/12/22 12:25:38 mataki Exp $
+    $Id: swipe.c,v 1.10 2013/12/16 09:02:02 mataki Exp $
 
 *****************************************************************/
 
@@ -192,6 +192,8 @@ void La(matrix L, vector f, vector fERBs,
       fo[j][0] = fi_tmp[j];
       fo[j][1] = fo_tmp[j];
     }
+    free(fi_tmp);
+    free(fo_tmp);
 
 #endif
 #if 0

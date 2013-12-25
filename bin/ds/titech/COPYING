@@ -1,15 +1,8 @@
 /* ----------------------------------------------------------------- */
-/*             The Speech Signal Processing Toolkit (SPTK)           */
-/*             developed by SPTK Working Group                       */
-/*             http://sp-tk.sourceforge.net/                         */
-/* ----------------------------------------------------------------- */
 /*                                                                   */
 /*  Copyright (c) 1984-2007  Tokyo Institute of Technology           */
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
-/*                                                                   */
-/*                1996-2012  Nagoya Institute of Technology          */
-/*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
 /*                                                                   */
@@ -42,8 +35,4 @@
 /* POSSIBILITY OF SUCH DAMAGE.                                       */
 /* ----------------------------------------------------------------- */
 
-/* $Id: gmm.h,v 1.5 2012/12/21 11:27:33 mataki Exp $ */
-
-#define LZERO  (-1.0E10)        /* ~log(0) */
-#define LSMALL (-0.5E10)        /* log values < LSMALL are set to LZERO */
-#define sq(x)  ((x)*(x))
+Filter coefficients were designed by Prof. Takao Kobayashi.
