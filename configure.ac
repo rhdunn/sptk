@@ -1,16 +1,13 @@
 #                                               -*- Autoconf -*-
 # Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.59)
-AC_INIT(SPTK, 3.7, http://sourceforge.net/projects/sp-tk/, SPTK)
+AC_INIT(SPTK, 3.8, http://sourceforge.net/projects/sp-tk/, SPTK)
 AC_CONFIG_AUX_DIR([config])
 AC_COPYRIGHT(Copyright 1984-2007 Tokyo Institute of Technology)
-AC_COPYRIGHT(Copyright 1996-2013 Nagoya Institute of Technology)
-AM_INIT_AUTOMAKE([nostdinc])
+AC_COPYRIGHT(Copyright 1996-2014 Nagoya Institute of Technology)
+AM_INIT_AUTOMAKE([nostdinc subdir-objects])
 AC_SUBST(PACKAGE_NAME)
 AC_SUBST(PACKAGE_VERSION)
-
-AC_PREFIX_DEFAULT(/usr/local/SPTK)
-AC_CONFIG_SRCDIR([bin/acep/acep.c])
 
 # Checks for programs.
 AC_PROG_CC
@@ -22,7 +19,10 @@ AN_MAKEVAR([AR], [AC_PROG_AR])
 AN_PROGRAM([ar], [AC_PROG_AR])
 AC_DEFUN([AC_PROG_AR], [AC_CHECK_TOOL(AR, ar, :)])
 AC_PROG_AR
-AC_PATH_PROG(CSH,csh,csh)
+AC_PATH_PROG(CSH, csh, no)
+if test "$CSH" = "no"; then
+   AC_MSG_ERROR("Cannot find csh")
+fi
 
 # Checks for libraries.
 AC_CHECK_LIB([m],[log],,AC_MSG_ERROR(Cannot find libm))
@@ -129,6 +129,14 @@ AC_MSG_CHECKING(audio device)
 				[AC_MSG_ERROR([sys/soundcard.h is not found])])
 		AM_CONDITIONAL( USEDA, true)
 		;;
+	*win32* | *wince* | *cygwin* | *mingw* )
+		AC_MSG_RESULT([windows])
+		AC_CHECK_HEADER([windows.h],
+				[AC_DEFINE(WIN32)],
+				[AC_MSG_ERROR([windows.h is not found])])
+		AM_CONDITIONAL( USEDA, true)
+		AC_HAVE_LIBRARY([winmm],,AC_MSG_ERROR(No winmm))
+		;;
 	*)
 		AC_MSG_WARN([not found])
 		AM_CONDITIONAL( USEDA, false)
@@ -159,6 +167,7 @@ AC_CONFIG_FILES([Makefile
                  bin/bcut/Makefile
                  bin/c2acr/Makefile
                  bin/c2ir/Makefile
+                 bin/c2ndps/Makefile
                  bin/c2sp/Makefile
                  bin/cat2/Makefile
                  bin/cdist/Makefile
@@ -220,6 +229,7 @@ AC_CONFIG_FILES([Makefile
                  bin/mfcc/Makefile
                  bin/mgc2mgc/Makefile
                  bin/mgc2sp/Makefile
+                 bin/mgclsp2sp/Makefile
                  bin/mgcep/Makefile
                  bin/mglsadf/Makefile
                  bin/minmax/Makefile
@@ -228,6 +238,7 @@ AC_CONFIG_FILES([Makefile
                  bin/mlsadf/Makefile
                  bin/msvq/Makefile
                  bin/nan/Makefile
+                 bin/ndps2c/Makefile
                  bin/norm0/Makefile
                  bin/nrand/Makefile
                  bin/par2lpc/Makefile
@@ -259,6 +270,8 @@ AC_CONFIG_FILES([Makefile
                  bin/vq/Makefile
                  bin/vstat/Makefile
                  bin/vsum/Makefile
+                 bin/wavjoin/Makefile
+                 bin/wavsplit/Makefile
                  bin/window/Makefile
                  bin/x2x/Makefile
                  bin/xgr/Makefile

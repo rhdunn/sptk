@@ -1,7 +1,3 @@
-## Process this file with automake to produce Makefile.in
-##
-## $Id: Makefile.am,v 1.23 2013/12/23 14:27:17 uratec Exp $
-
 SUBDIRS = acep \
 	acorr \
 	agcep \
@@ -12,6 +8,7 @@ SUBDIRS = acep \
 	bcut \
 	c2acr \
 	c2ir \
+	c2ndps \
 	c2sp \
 	cat2 \
 	cdist \
@@ -73,6 +70,7 @@ SUBDIRS = acep \
 	mfcc \
 	mgc2mgc \
 	mgc2sp \
+	mgclsp2sp \
 	mgcep \
 	mglsadf \
 	minmax \
@@ -81,6 +79,7 @@ SUBDIRS = acep \
 	mlsadf \
 	msvq \
 	nan \
+	ndps2c \
 	norm0 \
 	nrand \
 	par2lpc \
@@ -112,6 +111,8 @@ SUBDIRS = acep \
 	vq \
 	vstat \
 	vsum \
+	wavjoin \
+	wavsplit \
 	window \
 	x2x \
 	xgr \
