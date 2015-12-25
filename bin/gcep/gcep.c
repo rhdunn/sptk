@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -86,7 +86,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: gcep.c,v 1.36 2014/12/11 08:30:36 uratec Exp $";
+static char *rcs_id = "$Id: gcep.c,v 1.38 2015/12/14 05:34:34 uratec Exp $";
 
 
 /*  Standard C Libraries  */
@@ -94,19 +94,19 @@ static char *rcs_id = "$Id: gcep.c,v 1.36 2014/12/11 08:30:36 uratec Exp $";
 #include <stdlib.h>
 
 #ifdef HAVE_STRING_H
-#  include <string.h>
+#include <string.h>
 #else
-#  include <strings.h>
-#  ifndef HAVE_STRRCHR
-#     define strrchr rindex
-#  endif
+#include <strings.h>
+#ifndef HAVE_STRRCHR
+#define strrchr rindex
+#endif
 #endif
 
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 /*  Default Values  */
@@ -187,7 +187,7 @@ void usage(int status)
 int main(int argc, char **argv)
 {
    int m = ORDER, flng = FLENG, ilng = FLENG, itr1 = MINITR,
-       itr2 = MAXITR, itype = ITYPE, etype = ETYPE, norm = NORM, flag = 0;
+       itr2 = MAXITR, itype = ITYPE, etype = ETYPE, norm = NORM;
    FILE *fp = stdin;
    double *gc, *x, g = GAMMA, end = END, e = EPS, f = MINDET;
 
@@ -270,7 +270,7 @@ int main(int argc, char **argv)
 
    while (freadf(x, sizeof(*x), ilng, fp) == ilng) {
 
-      flag = gcep(x, flng, gc, m, g, itr1, itr2, end, etype, e, f, itype);
+      gcep(x, flng, gc, m, g, itr1, itr2, end, etype, e, f, itype);
 
       if (!norm)
          ignorm(gc, gc, m, g);

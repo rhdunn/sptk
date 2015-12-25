@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -66,7 +66,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: dmp.c,v 1.29 2014/12/11 08:30:33 uratec Exp $";
+static char *rcs_id = "$Id: dmp.c,v 1.31 2015/12/14 05:34:34 uratec Exp $";
 
 
 /*  Standard C Libraries  */
@@ -74,20 +74,20 @@ static char *rcs_id = "$Id: dmp.c,v 1.29 2014/12/11 08:30:33 uratec Exp $";
 #include <stdlib.h>
 
 #ifdef HAVE_STRING_H
-#  include <string.h>
+#include <string.h>
 #else
-#  include <strings.h>
-#  ifndef HAVE_STRRCHR
-#     define strrchr rindex
-#  endif
+#include <strings.h>
+#ifndef HAVE_STRRCHR
+#define strrchr rindex
+#endif
 #endif
 
 #include <ctype.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 /*  Default Values  */
@@ -156,7 +156,6 @@ int main(int argc, char **argv)
    char *s, c, cc = 'f';
    char format[SIZE], form[SIZE];
    int ff = 0;
-   Boolean int3flg = FA, uint3flg = FA;
    union u {
       char c;
       short s;
@@ -220,7 +219,6 @@ int main(int argc, char **argv)
          case 'i':
             if (*(s + 1) == '3') {
                size = 3;
-               int3flg = TR;
                cc = 't';
                (*argv)++;
             } else {
@@ -249,7 +247,6 @@ int main(int argc, char **argv)
          case 'I':
             if (*(s + 1) == '3') {
                size = 3;
-               uint3flg = TR;
                cc = 'T';
                (*argv)++;
             } else {

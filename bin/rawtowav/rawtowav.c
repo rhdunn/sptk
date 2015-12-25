@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -48,7 +48,7 @@
 *                                                                       *
 *                                       2009.9 A.Saito modified         *
 *       usage:                                                          *
-*               rawtowav [ fs(Hz) ] [ infile ] [ outfile ]              *
+*               rawtowav [ fs(Hz) ] [ bit ] [ infile ] [ outfile ]      *
 *       infile:                                                         *
 *               raw file format                                         *
 *       outfile:                                                        *
@@ -59,9 +59,9 @@
 #include<stdlib.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 void write_file(long fs, char BIT, char *rawfile, char *wavfile)
@@ -72,7 +72,7 @@ void write_file(long fs, char BIT, char *rawfile, char *wavfile)
    char fmt_chunk[] = "fmt ";
    char data_chunk[] = "data";
    int file_size, rawfile_size;
-   int chunk_size = BIT;
+   int chunk_size = 16;
    int data_speed;
    short formatID = 1;
    short channel = 1;           /* mono:1¡¤stereo:2 */
@@ -137,7 +137,7 @@ int main(int argc, char **argv)
       printf("error : failed to convert raw to wav\n\n");
       printf("rawtowav : convert raw to wav\n");
       printf("usage:\n");
-      printf("        rawtowav [ fs(Hz) ] [ infile ] [ outfile ]\n");
+      printf("        rawtowav [ fs(Hz) ] [ bit ] [ infile ] [ outfile ]\n");
       exit(0);
    }
 

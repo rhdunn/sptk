@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -95,7 +95,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: mgcep.c,v 1.41 2014/12/11 08:30:41 uratec Exp $";
+static char *rcs_id = "$Id: mgcep.c,v 1.43 2015/12/14 05:34:35 uratec Exp $";
 
 
 /*  Standard C Libraries  */
@@ -103,18 +103,18 @@ static char *rcs_id = "$Id: mgcep.c,v 1.41 2014/12/11 08:30:41 uratec Exp $";
 #include <stdlib.h>
 
 #ifdef HAVE_STRING_H
-#  include <string.h>
+#include <string.h>
 #else
-#  include <strings.h>
-#  ifndef HAVE_STRRCHR
-#     define strrchr rindex
-#  endif
+#include <strings.h>
+#ifndef HAVE_STRRCHR
+#define strrchr rindex
+#endif
 #endif
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 /*  Default Values  */
@@ -204,7 +204,7 @@ void usage(const int status)
 int main(int argc, char **argv)
 {
    int m = ORDER, flng = FLENG, ilng = FLENG, itr1 = MINITR, itr2 = MAXITR, n =
-       -1, flag = 0, otype = OTYPE, itype = ITYPE, etype = ETYPE, i;
+       -1, otype = OTYPE, itype = ITYPE, etype = ETYPE, i;
    FILE *fp = stdin;
    double *b, *x, a = ALPHA, g = GAMMA, end = END, e = EPS, f = MINDET;
 
@@ -297,7 +297,7 @@ int main(int argc, char **argv)
 
    while (freadf(x, sizeof(*x), ilng, fp) == ilng) {
 
-      flag = mgcep(x, flng, b, m, a, g, n, itr1, itr2, end, etype, e, f, itype);
+      mgcep(x, flng, b, m, a, g, n, itr1, itr2, end, etype, e, f, itype);
 
       if (otype == 0 || otype == 1 || otype == 2 || otype == 4)
          ignorm(b, b, m, g);    /* K, b'r --> br  */

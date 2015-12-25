@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _lspdf.c,v 1.17 2014/12/11 08:30:40 uratec Exp $
+    $Id: _lspdf.c,v 1.19 2015/12/14 05:34:35 uratec Exp $
 
     LSP Speech Synthesis Digital Filter
 
@@ -63,9 +63,9 @@
 #include <math.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 double lspdf_even(double x, double *f, const int m, double *d)
@@ -103,11 +103,10 @@ double lspdf_even(double x, double *f, const int m, double *d)
 double lspdf_odd(double x, double *f, const int m, double *d)
 {
    int i;
-   int mh1, mh2;
+   int mh1;
    double *d1, *d2, *lsp, x1, x2;
 
    mh1 = (m + 1) / 2;
-   mh2 = (m - 1) / 2;
 
    d1 = d + 1;
    d2 = d1 + (mh1 + mh1 - 1);

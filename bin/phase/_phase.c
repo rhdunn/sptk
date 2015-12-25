@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -43,7 +43,7 @@
 /* ----------------------------------------------------------------- */
 
 /*******************************************************************
-  $Id: _phase.c,v 1.16 2014/12/11 08:30:43 uratec Exp $
+  $Id: _phase.c,v 1.17 2015/12/14 01:14:21 uratec Exp $
   comupte phase of digital filter or real seaquence
      phase(p, mp, z, mz, ph, flng)
 
@@ -63,9 +63,9 @@
 #include <math.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 void phase(double *p, const int mp, double *z, const int mz, double *ph,

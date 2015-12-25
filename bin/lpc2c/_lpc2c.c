@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _lpc2c.c,v 1.17 2014/12/11 08:30:39 uratec Exp $
+    $Id: _lpc2c.c,v 1.18 2015/12/14 01:14:17 uratec Exp $
 
     Transformation LPC to Cepstrum
 
@@ -61,9 +61,9 @@
 #include <math.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 void lpc2c(double *a, int m1, double *c, const int m2)

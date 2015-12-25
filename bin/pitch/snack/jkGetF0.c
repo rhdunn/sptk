@@ -24,7 +24,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -60,7 +60,7 @@
 
 /****************************************************************
 
-    $Id: jkGetF0.c,v 1.14 2014/12/11 08:30:43 uratec Exp $
+    $Id: jkGetF0.c,v 1.15 2015/12/14 05:45:39 uratec Exp $
 
 *****************************************************************/
 

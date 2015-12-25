@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /******************************************************************
 
-    $Id: theq.c,v 1.20 2014/12/11 08:30:53 uratec Exp $
+    $Id: theq.c,v 1.22 2015/12/14 01:14:25 uratec Exp $
 
     Subroutine for Solving a Toeplitz plus Hankel
     Coefficient Matrix System of Equations  ( T + H ) a = b
@@ -298,7 +298,7 @@ int theq(double *t, double *h, double *a, double *b, const int n, double eps)
       size = n;
    }
    if (n > size) {
-      for (i = 0; i < n; i++) {
+      for (i = 0; i < size; i++) {
          free((char *) r[i]);
          free((char *) x[i]);
          free((char *) xx[i]);

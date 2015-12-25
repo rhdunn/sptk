@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _acep.c,v 1.16 2014/12/11 08:30:28 uratec Exp $
+    $Id: _acep.c,v 1.17 2015/12/14 01:14:09 uratec Exp $
 
     Adaptive Cepstral Analysis
 
@@ -67,9 +67,9 @@
 #include <math.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 double acep(double x, double *c, const int m, const double lambda,

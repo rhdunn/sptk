@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -76,28 +76,28 @@
 *                                                                        *
 *************************************************************************/
 
-static char *rcs_id = "$Id: x2x.c,v 1.47 2014/12/11 08:30:52 uratec Exp $";
+static char *rcs_id = "$Id: x2x.c,v 1.48 2015/12/14 01:14:25 uratec Exp $";
 
 
 /*  Standard C Libraries  */
 #include <stdio.h>
 
 #ifdef HAVE_STRING_H
-#  include <string.h>
+#include <string.h>
 #else
-#  include <strings.h>
-#  ifndef HAVE_STRRCHR
-#     define strrchr rindex
-#  endif
+#include <strings.h>
+#ifndef HAVE_STRRCHR
+#define strrchr rindex
+#endif
 #endif
 
 #include <stdlib.h>
 #include <ctype.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 #include <limits.h>
@@ -116,9 +116,9 @@ static char *rcs_id = "$Id: x2x.c,v 1.47 2014/12/11 08:30:52 uratec Exp $";
 #define INT3_MIN   (-8388608)
 #define UINT3_MAX  16777215
 #ifndef LLONG_MAX
-#  define LLONG_MAX __LONG_LONG_MAX__
-#  define LLONG_MIN (-__LONG_LONG_MAX__-1)
-#  define ULLONG_MAX (__LONG_LONG_MAX__*2ULL+1)
+#define LLONG_MAX __LONG_LONG_MAX__
+#define LLONG_MIN (-__LONG_LONG_MAX__-1)
+#define ULLONG_MAX (__LONG_LONG_MAX__*2ULL+1)
 #endif
 
 char *BOOL[] = { "FALSE", "TRUE" };

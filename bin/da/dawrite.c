@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -67,7 +67,7 @@
 *                                                                            *
 *****************************************************************************/
 
-static char *rcs_id = "$Id: dawrite.c,v 1.33 2014/12/11 08:30:32 uratec Exp $";
+static char *rcs_id = "$Id: dawrite.c,v 1.34 2015/12/14 01:14:12 uratec Exp $";
 
 
 /* Standard C Libraries */
@@ -75,22 +75,22 @@ static char *rcs_id = "$Id: dawrite.c,v 1.33 2014/12/11 08:30:32 uratec Exp $";
 #include <stdlib.h>
 
 #ifdef HAVE_STRING_H
-#  include <string.h>
+#include <string.h>
 #else
-#  include <strings.h>
-#  ifndef HAVE_STRRCHR
-#     define strrchr rindex
-#  endif
+#include <strings.h>
+#ifndef HAVE_STRRCHR
+#define strrchr rindex
+#endif
 #endif
 
 #ifndef WIN32
-#  include <unistd.h>
-#  include <SPTK.h>
-#  include "da.h"
+#include <unistd.h>
+#include <SPTK.h>
+#include "da.h"
 #else
-#  include "SPTK.h"
-#  include "da.h"
-#  include "winplay.h"
+#include "SPTK.h"
+#include "da.h"
+#include "winplay.h"
 #endif
 
 /* Default Value */

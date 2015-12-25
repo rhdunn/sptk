@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -80,28 +80,28 @@
  *                                                                               *
  ********************************************************************************/
 
-static char *rcs_id = "$Id: gmm.c,v 1.25 2014/12/11 08:30:36 uratec Exp $";
+static char *rcs_id = "$Id: gmm.c,v 1.28 2015/12/16 07:27:40 shikano Exp $";
 
 /*  Standard C Libraries  */
 #include <stdio.h>
 #include <stdlib.h>
 
 #ifdef HAVE_STRING_H
-#  include <string.h>
+#include <string.h>
 #else
-#  include <strings.h>
-#  ifndef HAVE_STRRCHR
-#     define strrchr rindex
-#  endif
+#include <strings.h>
+#ifndef HAVE_STRRCHR
+#define strrchr rindex
+#endif
 #endif
 
 #include <math.h>
 #include <ctype.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 /*  Default Values  */
@@ -525,42 +525,7 @@ int main(int argc, char **argv)
 
          /* masking */
          if (multiple_dim == TR) {
-            for (m = 0; m < M; m++) {
-               offset_row = 0;
-               for (row = 0; row < cov_dim; row++) {    /* row */
-                  offset_col = 0;
-                  for (col = 0; col <= row; col++) {    /* column */
-                     for (k = offset_row; k < offset_row + dim_list[row]; k++) {
-                        for (l = offset_col; l < offset_col + dim_list[col];
-                             l++) {
-                           if (dim_list[row] != dim_list[col]) {
-                              gmm.gauss[m].cov[k][l] = 0.0;
-                           } else {
-                              if (block_full == FA && block_corr == FA) {
-                                 if (row != col) {
-                                    gmm.gauss[m].cov[k][l] = 0.0;
-                                 } else {
-                                    if (k - offset_row != l - offset_col) {
-                                       gmm.gauss[m].cov[k][l] = 0.0;
-                                    }
-                                 }
-                              } else if (block_full == FA && block_corr == TR) {
-                                 if (k - offset_row != l - offset_col) {
-                                    gmm.gauss[m].cov[k][l] = 0.0;
-                                 }
-                              } else if (block_full == TR && block_corr == FA) {
-                                 if (row != col) {
-                                    gmm.gauss[m].cov[k][l] = 0.0;
-                                 }
-                              }
-                           }
-                        }
-                     }
-                     offset_col += dim_list[col];
-                  }
-                  offset_row += dim_list[row];
-               }
-            }
+            maskCov_GMM(&gmm, dim_list, cov_dim, block_full, block_corr);
          }
       }
       floorVar_GMM(&gmm, V);
@@ -577,7 +542,7 @@ int main(int argc, char **argv)
       } else {
          for (m = 0; m < M; m++) {
             gmm.gauss[m].gconst = cal_gconstf(gmm.gauss[m].cov, L);
-            if (gmm.gauss[m].gconst == 0) {
+            if (gmm.gauss[m].gconst == LZERO) {
                fprintf(stderr, "ERROR : Can't caluculate covdet\n");
                exit(EXIT_FAILURE);
             }
@@ -617,7 +582,7 @@ int main(int argc, char **argv)
 
       /* Output average log likelihood at each iteration */
       ave_logp1 /= (double) T;
-      if (i == 1 && m == 1)
+      if (i == 1 && M == 1)
          ave_logp0 = ave_logp1;
 
       fprintf(stderr, "iter %3d : ", i);

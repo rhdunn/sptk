@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -43,7 +43,7 @@
 /* ----------------------------------------------------------------- */
 
 /***************************************************************
-    $Id: _c2ndps.c,v 1.1 2014/02/27 09:39:53 artk0816 Exp $
+    $Id: _c2ndps.c,v 1.2 2015/12/14 01:14:11 uratec Exp $
 
     Transform Cepstrum to Negative Derivative of Phase Spectrum (NDPS)
 
@@ -61,9 +61,9 @@
 #include <math.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 void c2ndps(double *c, const int m, double *n, const int l)

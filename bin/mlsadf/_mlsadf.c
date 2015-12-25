@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _mlsadf.c,v 1.19 2014/12/11 08:30:42 uratec Exp $
+    $Id: _mlsadf.c,v 1.21 2015/12/14 05:34:35 uratec Exp $
 
     MLSA Digital Filter
 
@@ -64,9 +64,9 @@
 #include <stdio.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 static double pade[] = { 1.0,
@@ -128,10 +128,9 @@ static double mlsadf1(double x, double *b, const double a,
 static double mlsadf2(double x, double *b, const int m, const double a,
                       const int pd, double *d)
 {
-   double v, out = 0.0, *pt, aa;
+   double v, out = 0.0, *pt;
    int i;
 
-   aa = 1 - a * a;
    pt = &d[pd * (m + 2)];
 
    for (i = pd; i >= 1; i--) {
@@ -182,10 +181,9 @@ static double mlsafirt(double x, double *b, const int m, const double a,
 static double mlsadf2t(double x, double *b, const int m, const double a,
                        const int pd, double *d)
 {
-   double v, out = 0.0, *pt, aa;
+   double v, out = 0.0, *pt;
    int i;
 
-   aa = 1 - a * a;
    pt = &d[pd * (m + 2)];
 
    for (i = pd; i >= 1; i--) {

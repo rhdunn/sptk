@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /***********************************************************************
 
-    $Id: _mgc2sp.c,v 1.16 2014/12/11 08:30:41 uratec Exp $
+    $Id: _mgc2sp.c,v 1.17 2015/12/14 01:14:19 uratec Exp $
 
     Transformation mel-generalized cepstrum to log spectrum
 
@@ -64,9 +64,9 @@
 #include <stdlib.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 void mgc2sp(double *mgc, const int m, const double a, const double g, double *x,

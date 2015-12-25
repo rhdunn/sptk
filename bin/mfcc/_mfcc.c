@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _mfcc.c,v 1.13 2014/12/11 08:30:41 uratec Exp $
+    $Id: _mfcc.c,v 1.15 2015/12/14 05:34:35 uratec Exp $
 
     Mel-Frequency Cepstral Analysis
 
@@ -72,9 +72,9 @@
 #include <memory.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 #define MEL 1127.01048
@@ -207,7 +207,7 @@ void mfcc(double *in, double *mc, const double sampleFreq, const double alpha,
 {
    static double *x = NULL, *px, *wx, *sp, *fb, *dc;
    double energy = 0.0, c0 = 0.0;
-   int k, size = wlng;
+   int k;
 
    if (x == NULL) {
       x = dgetmem(wlng + wlng + flng + flng + n + 1 + m + 1);
@@ -224,7 +224,6 @@ void mfcc(double *in, double *mc, const double sampleFreq, const double alpha,
       sp = wx + flng;
       fb = sp + flng;
       dc = fb + n + 1;
-      size = wlng;
    }
 
    movem(in, x, sizeof(*in), wlng);

@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _gcep.c,v 1.23 2014/12/11 08:30:36 uratec Exp $
+    $Id: _gcep.c,v 1.24 2015/12/14 01:14:15 uratec Exp $
 
     Generalized Cepstral Analysis
 
@@ -77,9 +77,9 @@
 #include <math.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 int gcep(double *xw, const int flng, double *gc, const int m, const double g,

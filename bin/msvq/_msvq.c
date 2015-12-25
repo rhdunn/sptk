@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _msvq.c,v 1.16 2014/12/11 08:30:42 uratec Exp $
+    $Id: _msvq.c,v 1.17 2015/12/14 01:14:20 uratec Exp $
 
     Multi Stage Vector Quantization
 
@@ -63,9 +63,9 @@
 #include <stdlib.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 void msvq(double *x, double *cb, const int l, int *cbsize, const int stage,

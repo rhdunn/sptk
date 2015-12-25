@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -80,7 +80,7 @@
 *                                                                       *
 ************************************************************************/
 
-static char *rcs_id = "$Id: uels.c,v 1.31 2014/12/11 08:30:51 uratec Exp $";
+static char *rcs_id = "$Id: uels.c,v 1.33 2015/12/14 05:34:35 uratec Exp $";
 
 
 /*  Standard C Libraries  */
@@ -88,19 +88,19 @@ static char *rcs_id = "$Id: uels.c,v 1.31 2014/12/11 08:30:51 uratec Exp $";
 #include <stdlib.h>
 
 #ifdef HAVE_STRING_H
-#  include <string.h>
+#include <string.h>
 #else
-#  include <strings.h>
-#  ifndef HAVE_STRRCHR
-#     define strrchr rindex
-#  endif
+#include <strings.h>
+#ifndef HAVE_STRRCHR
+#define strrchr rindex
+#endif
 #endif
 
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 /*  Default Values  */
@@ -168,7 +168,7 @@ void usage(int status)
 int main(int argc, char **argv)
 {
    int m = ORDER, flng = FLENG, ilng = FLENG, itype = ITYPE,
-       etype = ETYPE, itr1 = MINITR, itr2 = MAXITR, flag = 0;
+       etype = ETYPE, itr1 = MINITR, itr2 = MAXITR;
    FILE *fp = stdin;
    double *c, *x, end = END, e = EPS;
 
@@ -231,9 +231,7 @@ int main(int argc, char **argv)
    c = x + flng;
 
    while (freadf(x, sizeof(*x), ilng, fp) == ilng) {
-
-      flag = uels(x, flng, c, m, itr1, itr2, end, etype, e, itype);
-
+      uels(x, flng, c, m, itr1, itr2, end, etype, e, itype);
       fwritef(c, sizeof(*c), m + 1, stdout);
    }
 

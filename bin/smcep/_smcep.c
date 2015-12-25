@@ -8,7 +8,7 @@
 /*                           Interdisciplinary Graduate School of    */
 /*                           Science and Engineering                 */
 /*                                                                   */
-/*                1996-2014  Nagoya Institute of Technology          */
+/*                1996-2015  Nagoya Institute of Technology          */
 /*                           Department of Computer Science          */
 /*                                                                   */
 /* All rights reserved.                                              */
@@ -44,7 +44,7 @@
 
 /****************************************************************
 
-    $Id: _smcep.c,v 1.27 2014/12/11 08:30:49 uratec Exp $
+    $Id: _smcep.c,v 1.29 2015/12/14 05:34:35 uratec Exp $
 
     Mel-Cepstral Analysis (2nd order all-pass filter)
 
@@ -79,9 +79,9 @@
 #include <math.h>
 
 #if defined(WIN32)
-#  include "SPTK.h"
+#include "SPTK.h"
 #else
-#  include <SPTK.h>
+#include <SPTK.h>
 #endif
 
 /***************************************************************
@@ -240,7 +240,7 @@ static void freqt2(double *c1, const int m1, double *c2, const int m2,
 {
    int i, j;
    double w, b, *ww, *dw, *f, *re, *im, *pf, *pg, *next;
-   int size_g, size_f, fftsz2, fftszh;
+   int size_g, size_f, fftsz2;
    static double *g = NULL;
    static int size2, flag_g = 1;
 
@@ -264,8 +264,6 @@ static void freqt2(double *c1, const int m1, double *c2, const int m2,
    if (flag_g == 0) {
       ww = dgetmem(fftsz);
       dw = dgetmem(fftsz);
-
-      fftszh = (int) (fftsz / 2.);
 
       for (j = 0, w = 0.0; j < fftsz; j++, w += b)
          ww[j] = warp(w, a, t);
